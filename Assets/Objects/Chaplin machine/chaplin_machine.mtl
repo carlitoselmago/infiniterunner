@@ -1,0 +1,36 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+
+newmtl Metal_Rough
+Ka 0.000000 0.000000 0.000000
+Kd 0.580392 0.596078 0.607843
+Ks 0.330000 0.330000 0.330000
+map_Kd chaplin_machine/Metal_Rough.jpg
+
+newmtl Color_A01
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.000000 0.000000
+Ks 0.330000 0.330000 0.330000
+
+newmtl Metal_Rough1_
+Ka 0.000000 0.000000 0.000000
+Kd 0.600000 0.615686 0.627451
+Ks 0.330000 0.330000 0.330000
+map_Kd chaplin_machine/Metal_Rough1_.jpg
+
+newmtl _0039_DarkOrange_1
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.549020 0.000000
+Ks 0.330000 0.330000 0.330000
+
+newmtl Ferraille_claire_a2
+Ka 0.000000 0.000000 0.000000
+Kd 0.690196 0.666667 0.647059
+Ks 0.330000 0.330000 0.330000
+
+newmtl Inox
+Ka 0.000000 0.000000 0.000000
+Kd 0.815686 0.807843 0.827451
+Ks 0.330000 0.330000 0.330000
+
