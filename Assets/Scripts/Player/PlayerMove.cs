@@ -16,9 +16,18 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public GameObject playerObject;
     private Animator animator;
+
+     public GameObject mainCam;
+     public AudioSource crashThud;
+
+      public GameObject levelControl;
+
+    private BoxCollider boxCollider;
+
     void Start(){
         animator=GetComponentInChildren<Animator>();
-        Debug.Log(animator);
+        boxCollider = GetComponent<BoxCollider>();
+        normalhitbox();
     }
 
     void Update()
@@ -66,6 +75,7 @@ public class PlayerMove : MonoBehaviour
                     isJumping = true;
                     //playerObject.GetComponent<Animator>().Play("Jump");
                     animator.SetBool("isjumping",true);
+                    
                     StartCoroutine(JumpSequence());
                 }
             }
@@ -76,10 +86,10 @@ public class PlayerMove : MonoBehaviour
         {
             if (comingDown == false)
             {
-                transform.Translate(Vector3.up * Time.deltaTime * 4.5f, Space.World);
+                //transform.Translate(Vector3.up * Time.deltaTime * 4.5f, Space.World);
             } else
             {
-                transform.Translate(Vector3.up * Time.deltaTime * -4.5f, Space.World);
+                //transform.Translate(Vector3.up * Time.deltaTime * -4.5f, Space.World);
             }
         }
 
@@ -108,8 +118,40 @@ public class PlayerMove : MonoBehaviour
         nowCanFly = canFly;
     }
 
+    void OnTriggerEnter(Collider other){
+         //Output the Collider's GameObject's name
+          Debug.Log("Entered collision with " + other.gameObject.tag+' '+other.gameObject.name);
+          if (other.gameObject.CompareTag("obstacle"))
+            {
+                other.GetComponent<BoxCollider>().enabled = false;
+                animator.Play("Stumble Backwards");
+                crashThud.Play();
+                mainCam.GetComponent<Animator>().enabled = true;
+                levelControl.GetComponent<EndRunSequence>().enabled = true;
+                 // Disable this script
+                this.enabled = false;
+            }
+    }
+
+
+    void normalhitbox(){
+         // Set new size
+        boxCollider.size = new Vector3(0.67f,1,0.58f);
+        // Set new center position
+         boxCollider.center = new Vector3(0,0, -0.42f);
+
+      
+    }
+    void jumphitbox(){
+        // Set new size
+        boxCollider.size = new Vector3(0.67f,0.30f,0.58f);
+        // Set new center position
+        boxCollider.center = new Vector3(0,1,-0.42f);
+    }
+
     IEnumerator JumpSequence()
-    {
+    {   
+        jumphitbox();
         yield return new WaitForSeconds(0.30f);
         comingDown = true;
         yield return new WaitForSeconds(0.30f);
@@ -117,6 +159,7 @@ public class PlayerMove : MonoBehaviour
         comingDown = false;
         //playerObject.GetComponent<Animator>().Play("Standard Run");
         animator.SetBool("isjumping",false);
+        normalhitbox();
     }
 
     IEnumerator RollSequence()
