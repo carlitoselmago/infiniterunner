@@ -55,7 +55,7 @@ public class PlayerMove : MonoBehaviour
         {
             if (isRolling == false)
             {
-       
+                 crouchhitbox();
                 //transform.Translate(Vector3.up * Time.deltaTime * moveSpeed *-1);
                 //playerObject.GetComponent<Animator>().Play("Quick Roll To Run");
                 animator.SetBool("isrolling",true);
@@ -143,11 +143,19 @@ public class PlayerMove : MonoBehaviour
       
     }
     void jumphitbox(){
-        // Set new size
-        boxCollider.size = new Vector3(0.67f,0.30f,0.58f);
         // Set new center position
         boxCollider.center = new Vector3(0,1,-0.42f);
+        // Set new size
+        boxCollider.size = new Vector3(0.67f,0.78f,0.58f);
     }
+
+   void crouchhitbox(){
+        // Set new center position
+        boxCollider.center = new Vector3(0,-0.79f,-0.42f);
+        // Set new size
+        boxCollider.size = new Vector3(0.67f,0.24f,0.58f);
+    }
+
 
     IEnumerator JumpSequence()
     {   
@@ -170,6 +178,7 @@ public class PlayerMove : MonoBehaviour
         isRolling = false;
         //playerObject.GetComponent<Animator>().Play("Standard Run");
         animator.SetBool("isrolling",false);
+        normalhitbox();
     }
 
     IEnumerator FlyTimeout()

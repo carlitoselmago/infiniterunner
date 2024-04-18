@@ -8,6 +8,6 @@ public class RotateObject : MonoBehaviour
 
     void Update()
     {
-        transform.Rotate(0, rotateSpeed, 0, Space.World);
+        transform.Rotate( 0,0, rotateSpeed, Space.Self);
     }
 }
