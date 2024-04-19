@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Trigger
   - obstacle
+  - coin
   layers:
   - Default
   - TransparentFX
