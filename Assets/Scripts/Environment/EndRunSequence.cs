@@ -16,9 +16,9 @@ public class EndRunSequence : MonoBehaviour
 
 IEnumerator EndSequence()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
         endScreen.SetActive(true);
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(2);
         gameOverText.GetComponent<Animator>().enabled = true;
