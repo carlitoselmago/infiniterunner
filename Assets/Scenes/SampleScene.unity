@@ -2422,6 +2422,9 @@ MonoBehaviour:
   endScreen: {fileID: 2056816481}
   fadeOut: {fileID: 262151146}
   gameOverText: {fileID: 1189289002}
+  audioMixer: {fileID: 24100000, guid: 4a0cbcc355bf64e7e9c459021e1be1a4, type: 2}
+  duration: 0
+  targetVolume: 0
 --- !u!114 &174568200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19238,7 +19241,8 @@ AudioSource:
   m_GameObject: {fileID: 1644684372}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -1492483194632010279, guid: 4a0cbcc355bf64e7e9c459021e1be1a4,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: da0f5b96a733b4d08b7494980682338b, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
