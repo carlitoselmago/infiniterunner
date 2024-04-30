@@ -38,8 +38,12 @@ public class PlayerMove : MonoBehaviour
 
     public AudioSource coinFX;
 
- 
+    public GameObject MAP;
 
+    public float horizontalSpeed = 20f;
+
+    public string pos ="center";
+    private float targetpos=0f;
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -52,24 +56,48 @@ public class PlayerMove : MonoBehaviour
     void Update()
 
     {
-        transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed, Space.World);
+        MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+           if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+    {
+        if (pos == "center" && transform.position.x==0f) // Pressing left from center goes to left
         {
-            if (this.gameObject.transform.position.x > LevelBoundary.leftSide)
-            {
-                transform.Translate(Vector3.left * Time.deltaTime * leftRightSpeed);
-            }
+            pos = "left";
         }
-
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        else if (pos == "right") // Pressing left when at right should go to center
         {
-            if (this.gameObject.transform.position.x < LevelBoundary.rightSide)
-            {
-                transform.Translate(Vector3.left * Time.deltaTime * leftRightSpeed * -1);
-            }
+            pos = "center";
         }
+    }
 
+    if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+    {
+        if (pos == "center" && transform.position.x==0f) // Pressing right from center goes to right
+        {
+            pos = "right";
+        }
+        else if (pos == "left") // Pressing right when at left should go to center
+        {
+            pos = "center";
+        }
+    }
+
+    // pos interpolator
+    switch (pos)
+    {
+        case "left":
+            targetpos = -3f;
+            break;
+        case "center":
+            targetpos = 0f;
+            break;
+        case "right":
+            targetpos = 3f;
+            break;
+    }
+
+    // Move the character to the target position
+    transform.position = Vector3.MoveTowards(transform.position, new Vector3(targetpos, transform.position.y, transform.position.z), horizontalSpeed * Time.deltaTime);
         // Ajupir-se
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
@@ -185,7 +213,7 @@ public class PlayerMove : MonoBehaviour
         Debug.Log("Entered collision with " + other.gameObject.tag + ' ' + other.gameObject.name);
         if (other.gameObject.CompareTag("obstacle"))
         {
-            /*
+           
             other.GetComponent<BoxCollider>().enabled = false;
             animator.Play("Stumble Backwards");
             crashThud.Play();
@@ -193,7 +221,7 @@ public class PlayerMove : MonoBehaviour
             levelControl.GetComponent<EndRunSequence>().enabled = true;
             // Disable this script
             this.enabled = false;
-            */
+            
         }
         if (other.gameObject.CompareTag("coin"))
         {
@@ -224,7 +252,7 @@ public class PlayerMove : MonoBehaviour
     void crouchhitbox()
     {
         // Set new center position
-        boxCollider.center = new Vector3(0, -0.79f, -0.42f);
+        boxCollider.center = new Vector3(0,-0.22f, -0.42f);
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.24f, 0.58f);
     }

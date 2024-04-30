@@ -4,36 +4,45 @@ using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
 {
-    public GameObject[] section;
-    public int zPos = 50;
+    public GameObject templatesparent;
+    private GameObject[] section;
+    public int stepamount=100;
+    private int zPos;
     public bool creatingSection = false;
 
-    public GameObject player;
+    public GameObject MAP;
     public int secNum;
 
     // Queue to store references to the instantiated sections
     private Queue<GameObject> createdSections = new Queue<GameObject>();
 
-    void Start()
+   void Start()
+{
+    zPos = stepamount;
+
+    // Initialize the section array with the number of children in templatesparent
+    section = new GameObject[templatesparent.transform.childCount];
+
+    // Loop through each child, set its position to 0,0,0, and add it to the section array
+    for (int i = 0; i < templatesparent.transform.childCount; i++)
     {
-        // Preload 3 sections at the start of the game
-        for (int i = 0; i < 3; i++)
-        {
-            InstantiateInitialSection();
-        }
+        GameObject child = templatesparent.transform.GetChild(i).gameObject;
+        child.transform.localPosition = Vector3.zero;  // Reset the position of each child
+        section[i] = child;
     }
 
-    void Update()
+    // Preload 3 sections at the start of the game
+    for (int i = 0; i < 3; i++)
     {
-        /*
-        if (creatingSection == false)
-        {
-            creatingSection = true;
-            StartCoroutine(GenerateSection());
-        }
-        */
-        // Check if player's z-position is at or beyond the next trigger point and if we are not currently creating a section
-        if (!creatingSection && player.transform.position.z >= zPos - 150)
+        InstantiateInitialSection();
+    }
+}
+
+
+  void Update()
+    {
+        // Check if the map has moved enough to require a new section
+        if (MAP.transform.position.z < -zPos + (stepamount*2) && !creatingSection)
         {
             creatingSection = true;
             GenerateSection();
@@ -42,9 +51,10 @@ public class GenerateLevel : MonoBehaviour
 
     void GenerateSection()
     {
-        secNum = Random.Range(0, 4);
+         secNum = Random.Range(0, section.Length);
         GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
-        zPos += 50;
+        newSection.transform.SetParent(MAP.transform, false);
+        zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
         if (createdSections.Count > 4)
         {
@@ -58,7 +68,9 @@ public class GenerateLevel : MonoBehaviour
       void InstantiateInitialSection()
     {
         GameObject newSection = Instantiate(section[Random.Range(0, section.Length)], new Vector3(0, 0, zPos), Quaternion.identity);
-        zPos += 50;
+         // Set the parent of the instantiated child to MAP
+        newSection.transform.SetParent(MAP.transform, false);
+        zPos += stepamount;
         createdSections.Enqueue(newSection);
     }
 
