@@ -42,7 +42,7 @@ public class GenerateLevel : MonoBehaviour
 
     void GenerateSection()
     {
-        secNum = Random.Range(0, 3);
+        secNum = Random.Range(0, 4);
         GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
         zPos += 50;
         createdSections.Enqueue(newSection);  // Add the new section to the queue

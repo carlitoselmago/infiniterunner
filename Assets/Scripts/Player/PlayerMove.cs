@@ -38,9 +38,7 @@ public class PlayerMove : MonoBehaviour
 
     public AudioSource coinFX;
 
-   
-
-    
+ 
 
     void Start()
     {
@@ -52,6 +50,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     void Update()
+
     {
         transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed, Space.World);
 
@@ -72,7 +71,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         // Ajupir-se
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
             if (isRolling == false)
             {
@@ -89,7 +88,7 @@ public class PlayerMove : MonoBehaviour
         // Jumping
         if (isFlying == false)
         {
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))
             {
                 if (isJumping == false)
                 {
@@ -115,7 +114,7 @@ public class PlayerMove : MonoBehaviour
                 //transform.Translate(Vector3.up * Time.deltaTime * -4.5f, Space.World);
             }
         }
-        if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
         {
 
             initialmoveSpeed = moveSpeed;
