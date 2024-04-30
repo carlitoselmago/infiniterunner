@@ -186,6 +186,7 @@ public class PlayerMove : MonoBehaviour
         Debug.Log("Entered collision with " + other.gameObject.tag + ' ' + other.gameObject.name);
         if (other.gameObject.CompareTag("obstacle"))
         {
+            /*
             other.GetComponent<BoxCollider>().enabled = false;
             animator.Play("Stumble Backwards");
             crashThud.Play();
@@ -193,6 +194,7 @@ public class PlayerMove : MonoBehaviour
             levelControl.GetComponent<EndRunSequence>().enabled = true;
             // Disable this script
             this.enabled = false;
+            */
         }
         if (other.gameObject.CompareTag("coin"))
         {
