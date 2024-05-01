@@ -15,6 +15,9 @@ public class PlayerMove : MonoBehaviour
     public bool nowCanFly = false;
     public bool isFlying = false;
     public bool floating = false;
+
+    public bool holding = false;
+    public int flycoinsamount = 60;
     public GameObject playerObject;
     private Animator animator;
 
@@ -28,10 +31,10 @@ public class PlayerMove : MonoBehaviour
     private float targetHeight = 8.0f;
     private float startY;
     private float originY;
-     private float jumpedHeight;
-    
+    private float jumpedHeight;
+
     private float speed = 2.0f; // Adjusted speed for a more natural feel
- 
+
     private float elapsedTime = 0.0f; // Track time since the start of the jump
 
     public GameObject flycoin;
@@ -42,14 +45,16 @@ public class PlayerMove : MonoBehaviour
 
     public float horizontalSpeed = 20f;
 
-    public string pos ="center";
-    private float targetpos=0f;
+    public string pos = "center";
+    private float targetpos = 0f;
+
+
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
         boxCollider = GetComponent<BoxCollider>();
         startY = transform.position.y;
-        originY=startY;
+        originY = startY;
         normalhitbox();
     }
 
@@ -58,46 +63,52 @@ public class PlayerMove : MonoBehaviour
     {
         MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
 
-           if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-    {
-        if (pos == "center" && transform.position.x==0f) // Pressing left from center goes to left
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            pos = "left";
+            if (!isFlying)
+            {
+                if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
+                {
+                    pos = "left";
+                }
+                else if (pos == "right") // Pressing left when at right should go to center
+                {
+                    pos = "center";
+                }
+            }
         }
-        else if (pos == "right") // Pressing left when at right should go to center
-        {
-            pos = "center";
-        }
-    }
 
-    if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-    {
-        if (pos == "center" && transform.position.x==0f) // Pressing right from center goes to right
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            pos = "right";
+            if (!isFlying)
+            {
+                if (pos == "center" && transform.position.x == 0f) // Pressing right from center goes to right
+                {
+                    pos = "right";
+                }
+                else if (pos == "left") // Pressing right when at left should go to center
+                {
+                    pos = "center";
+                }
+            }
         }
-        else if (pos == "left") // Pressing right when at left should go to center
+
+        // pos interpolator
+        switch (pos)
         {
-            pos = "center";
+            case "left":
+                targetpos = -3f;
+                break;
+            case "center":
+                targetpos = 0f;
+                break;
+            case "right":
+                targetpos = 3f;
+                break;
         }
-    }
 
-    // pos interpolator
-    switch (pos)
-    {
-        case "left":
-            targetpos = -3f;
-            break;
-        case "center":
-            targetpos = 0f;
-            break;
-        case "right":
-            targetpos = 3f;
-            break;
-    }
-
-    // Move the character to the target position
-    transform.position = Vector3.MoveTowards(transform.position, new Vector3(targetpos, transform.position.y, transform.position.z), horizontalSpeed * Time.deltaTime);
+        // Move the character to the target position
+        transform.position = Vector3.MoveTowards(transform.position, new Vector3(targetpos, transform.position.y, transform.position.z), horizontalSpeed * Time.deltaTime);
         // Ajupir-se
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
@@ -108,7 +119,6 @@ public class PlayerMove : MonoBehaviour
                 //playerObject.GetComponent<Animator>().Play("Quick Roll To Run");
                 animator.SetBool("isrolling", true);
                 StartCoroutine(RollSequence());
-
             }
         }
 
@@ -123,7 +133,6 @@ public class PlayerMove : MonoBehaviour
                     isJumping = true;
                     //playerObject.GetComponent<Animator>().Play("Jump");
                     animator.SetBool("isjumping", true);
-
                     StartCoroutine(JumpSequence());
                 }
             }
@@ -144,40 +153,27 @@ public class PlayerMove : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
         {
-
-            initialmoveSpeed = moveSpeed;
-
-            animator.SetBool("isflying", true);
-            if (!isFlying)
-            {
-                //create array of coins
-                float currentZ = this.transform.position.z + 60;
-
-                for (int i = 0; i < 18; i++)
-                {
-                    GameObject newcoin = Instantiate(flycoin, Vector3.zero, Quaternion.identity);
-                    newcoin.transform.localPosition = new Vector3(this.transform.position.x, targetHeight, currentZ + (i * 3));
-
-                }
-                StartCoroutine(FlyTimeout());
-            }
-            isFlying = true;
-           
+            //hold
+            holding = true;
+        }
+        else
+        {
+            holding = false;
         }
 
         //test fly
         if (floating)
         {
-           // PerformFall();
-            jumpedHeight=interpolateValueY(false,jumpedHeight,originY,2.8f);
-           
+            // PerformFall();
+            jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
+
         }
         else
         {
             if (isFlying)
             {
-               // PerformFly();
-                startY=interpolateValueY(true,startY,targetHeight,1f);
+                // PerformFly();
+                startY = interpolateValueY(true, startY, targetHeight, 1f);
                 //Debug.Log(startY);
                 //Debug.Log(targetHeight);
             }
@@ -213,7 +209,7 @@ public class PlayerMove : MonoBehaviour
         Debug.Log("Entered collision with " + other.gameObject.tag + ' ' + other.gameObject.name);
         if (other.gameObject.CompareTag("obstacle"))
         {
-           
+
             other.GetComponent<BoxCollider>().enabled = false;
             animator.Play("Stumble Backwards");
             crashThud.Play();
@@ -221,13 +217,35 @@ public class PlayerMove : MonoBehaviour
             levelControl.GetComponent<EndRunSequence>().enabled = true;
             // Disable this script
             this.enabled = false;
-            
+
         }
         if (other.gameObject.CompareTag("coin"))
         {
             coinFX.Play();
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
+        }
+        if (other.gameObject.CompareTag("powerup"))
+        {
+
+            //fly object
+            initialmoveSpeed = moveSpeed;
+
+            animator.SetBool("isflying", true);
+            if (!isFlying)
+            {
+                //create array of coins
+                float currentZ = this.transform.position.z + 30;
+
+                for (int i = 0; i < flycoinsamount; i++)
+                {
+                    GameObject newcoin = Instantiate(flycoin, Vector3.zero, Quaternion.identity);
+                    newcoin.transform.localPosition = new Vector3(this.transform.position.x, targetHeight, currentZ + (i * 3));
+                    newcoin.transform.SetParent(MAP.transform, false);
+                }
+                StartCoroutine(FlyTimeout());
+            }
+            isFlying = true;
         }
     }
 
@@ -252,7 +270,7 @@ public class PlayerMove : MonoBehaviour
     void crouchhitbox()
     {
         // Set new center position
-        boxCollider.center = new Vector3(0,-0.22f, -0.42f);
+        boxCollider.center = new Vector3(0, -0.22f, -0.42f);
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.24f, 0.58f);
     }
@@ -284,61 +302,44 @@ public class PlayerMove : MonoBehaviour
     IEnumerator FlyTimeout()
     {
         yield return new WaitForSeconds(4);
-        
-        floating = true;
-         animator.SetBool("isflying", false);
-        jumpedHeight=this.transform.position.y;
-        yield return new WaitForSeconds(1);
-       
-        isFlying = false;
-        startY=originY;
-         yield return new WaitForSeconds(1);
-        floating = false;
-       
-   
-    }
-    IEnumerator FlyTimeout_OLD()
-    {
-        float targetHeight = 5.0f;
-        float speed = 5.0f;
-        bool movingUp = false;
-        float startY = 0;
-        float step = speed * Time.deltaTime;
-        float newY = Mathf.Lerp(transform.position.y, targetHeight + startY, step);
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-        if (Mathf.Abs(transform.position.y - (targetHeight + startY)) < 0.01f)
+        while (holding)
         {
-            transform.position = new Vector3(transform.position.x, targetHeight + startY, transform.position.z);
-            movingUp = false;
+            yield return new WaitForSeconds(1);
         }
-        // transform.Translate(Vector3.up * Time.deltaTime * 500, Space.World);
-        yield return new WaitForSeconds(4);
-        //transform.Translate(Vector3.up * Time.deltaTime * 3.5f, Space.World);
-        //playerObject.GetComponent<Animator>().Play("Flying");
-        animator.SetBool("isflying", false);
-        jumpedHeight=this.transform.position.y;
-        isFlying=false;
         floating = true;
+        animator.SetBool("isflying", false);
+        jumpedHeight = this.transform.position.y;
+        yield return new WaitForSeconds(1);
+
+        isFlying = false;
+        startY = originY;
+        yield return new WaitForSeconds(1);
+        floating = false;
+
+
     }
 
-    private float interpolateValueY(bool easingOut=true,float origin=0.0f,float target=5.0f,float intspeed=0.2f){
+    private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
+    {
         float fraction = Time.deltaTime * intspeed;
-        
+
         // Check the type of easing
         if (easingOut)
         {
             // Easing out: movement starts quickly and slows down
             fraction = 1 - Mathf.Pow(1 - fraction, 3);
-            if (moveSpeed<30-0f){
-                moveSpeed+=fraction*10;
+            if (moveSpeed < 30 - 0f)
+            {
+                moveSpeed += fraction * 10;
             }
         }
         else
         {
             // Easing in: movement starts slowly and speeds up
             fraction = Mathf.Pow(fraction, 0.9f); // Adjust the power to make the easing smoother (the smaller the faster)
-             if (moveSpeed>12.0f){
-                moveSpeed-=fraction*2;
+            if (moveSpeed > 12.0f)
+            {
+                moveSpeed -= fraction * 2;
             }
         }
 
@@ -348,30 +349,14 @@ public class PlayerMove : MonoBehaviour
         // Update the GameObject's position
         transform.position = new Vector3(transform.position.x, currentY, transform.position.z);
         origin = currentY;
-        
+
         return origin;
     }
     private void PerformFly()
     {
-        /*
-        elapsedTime += Time.deltaTime;
-        float timeFraction = elapsedTime / (speed / 2); // Time fraction over the total duration
 
-        if (timeFraction < 1.0f)
-        {
-            // Ease out effect using Mathf.SmoothStep for smoother transition
-            float newY = Mathf.SmoothStep(startY, startY + targetHeight, timeFraction);
-            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-            moveSpeed += 0.05f;
-        }
-        else
-        {
-            // Ensure it ends exactly at the target height and stop the jump
-            transform.position = new Vector3(transform.position.x, startY + targetHeight, transform.position.z);
-        }
-        */
-       float tweenspeed=1.0f;
-         // Calculate the new Y position with easing out effect
+        float tweenspeed = 1.0f;
+        // Calculate the new Y position with easing out effect
         float newY = Mathf.Lerp(startY, targetHeight, 1 - Mathf.Pow(1 - Time.deltaTime * tweenspeed, 3));
 
         // Apply the new Y position
@@ -385,13 +370,13 @@ public class PlayerMove : MonoBehaviour
     {
         elapsedTime += Time.deltaTime;
         float timeFraction = elapsedTime / (5); // Time fraction over the total duration
-       
+
         if (timeFraction < 2f)
         {
-            
+
             // Ease out effect using Mathf.SmoothStep for smoother transition
             float initialY = jumpedHeight;//startY + jumpedHeight; // Start falling from this height
-            
+
             float newY = Mathf.SmoothStep(initialY, startY, timeFraction);
             Debug.Log(newY);
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
@@ -402,7 +387,7 @@ public class PlayerMove : MonoBehaviour
             // Ensure it ends exactly at the startY and stop the fall
             transform.position = new Vector3(transform.position.x, startY, transform.position.z);
             //isFlying = false; // Consider renaming this flag to better suit your context, like isFalling or movementFinished
-            
+
         }
     }
 
