@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed = 7;
+    public float moveSpeed = 12;
     private float initialmoveSpeed = 0;
-    public float leftRightSpeed = 5;
+    public float leftRightSpeed = 9;
     public bool isJumping = false;
     public bool comingDown = false;
     public bool isRolling = false;
