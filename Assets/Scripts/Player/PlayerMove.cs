@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed = 12;
+    public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float leftRightSpeed = 9;
     public bool isJumping = false;
@@ -33,7 +33,7 @@ public class PlayerMove : MonoBehaviour
     private float originY;
     private float jumpedHeight;
 
-    private float speed = 2.0f; // Adjusted speed for a more natural feel
+    //private float speed = 2.0f; // Adjusted speed for a more natural feel
 
     private float elapsedTime = 0.0f; // Track time since the start of the jump
 
@@ -225,6 +225,25 @@ public class PlayerMove : MonoBehaviour
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
         }
+
+        if (other.gameObject.CompareTag("floating coin"))
+        {
+            coinFX.Play();
+
+            // pitch shift of collected coins
+           if (coinFX.pitch < 2)
+                {
+                    coinFX.pitch += 0.25f;
+                }
+                else
+                {
+                    coinFX.pitch = 1;
+                }
+            StartCoroutine(PitchShiftTimeout());
+            CollectableControl.coinCount += 1;
+            other.gameObject.SetActive(false);
+
+        }
         if (other.gameObject.CompareTag("powerup"))
         {
 
@@ -317,6 +336,12 @@ public class PlayerMove : MonoBehaviour
         floating = false;
 
 
+    }
+
+    IEnumerator PitchShiftTimeout()
+    {
+        yield return new WaitForSeconds(1.5f);
+        coinFX.pitch = 1;
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
