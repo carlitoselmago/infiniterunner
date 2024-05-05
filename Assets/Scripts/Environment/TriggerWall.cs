@@ -1,17 +1,23 @@
-﻿/*using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 public class TriggerWall : MonoBehaviour
 {
-    public GameObject roadSection;
+    public GameObject panopticPoster;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Trigger"))
+        if (other.gameObject.CompareTag("fade trigger"))
         {
-            Instantiate(roadSection);
+            panopticPoster.SetActive(true);
         }
     }
-}*/
+
+    IEnumerator wait()
+    {
+        yield return new WaitForSeconds(10);
+        panopticPoster.SetActive(false);
+    }
+}

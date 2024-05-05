@@ -221,6 +221,7 @@ public class PlayerMove : MonoBehaviour
         }
         if (other.gameObject.CompareTag("coin"))
         {
+            coinFX.pitch = 1;
             coinFX.Play();
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
@@ -233,7 +234,7 @@ public class PlayerMove : MonoBehaviour
             // pitch shift of collected coins
            if (coinFX.pitch < 2)
                 {
-                    coinFX.pitch += 0.25f;
+                    coinFX.pitch += 0.2f;
                 }
                 else
                 {

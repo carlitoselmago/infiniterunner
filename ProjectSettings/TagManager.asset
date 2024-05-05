@@ -9,6 +9,7 @@ TagManager:
   - coin
   - powerup
   - floating coin
+  - fade trigger
   layers:
   - Default
   - TransparentFX
