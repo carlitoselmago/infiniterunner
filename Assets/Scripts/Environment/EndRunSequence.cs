@@ -11,6 +11,7 @@ public class EndRunSequence : MonoBehaviour
     public GameObject fadeOut;
     public GameObject gameOverText;
     public AudioMixer audioMixer;
+    public AudioSource gameOverFX;
     private string exposedParameter = "volumeBGM";
     private float duration;
     private float targetVolume;
@@ -27,11 +28,12 @@ IEnumerator EndSequence()
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter, duration = 3, targetVolume = 0));
         endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
+        gameOverFX.Play();
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(2);
         gameOverText.GetComponent<Animator>().enabled = true;
         gameOverText.GetComponent<Animator>().Play("FadeOutText");
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         SceneManager.LoadScene(0);
     }
 
