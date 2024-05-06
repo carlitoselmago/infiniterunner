@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class FlyingCountdown : MonoBehaviour
 {
-    public static float countdown = 20;
+    public static float countdown = 10;
     public GameObject countdownDisplay;
     public Text countdownText;
     public GameObject levelControl;
