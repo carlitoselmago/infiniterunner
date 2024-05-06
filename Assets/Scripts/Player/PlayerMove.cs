@@ -23,6 +23,8 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject mainCam;
     public AudioSource crashThud;
+    public AudioSource BGM;
+    public AudioSource flyFX;
 
     public GameObject levelControl;
 
@@ -250,7 +252,8 @@ public class PlayerMove : MonoBehaviour
 
             //fly object
             initialmoveSpeed = moveSpeed;
-
+            flyFX.Play();
+            BGM.pitch += 0.1f;
             animator.SetBool("isflying", true);
             if (!isFlying)
             {
@@ -333,6 +336,7 @@ public class PlayerMove : MonoBehaviour
 
         isFlying = false;
         startY = originY;
+        BGM.pitch = 1;
         yield return new WaitForSeconds(1);
         floating = false;
 
@@ -341,7 +345,7 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator PitchShiftTimeout()
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1);
         coinFX.pitch = 1;
     }
 
