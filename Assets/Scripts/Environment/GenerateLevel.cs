@@ -6,8 +6,10 @@ public class GenerateLevel : MonoBehaviour
 {
     public GameObject templatesparent;
     private GameObject[] section;
+    public AudioSource mainTheme;
     public int stepamount=100;
     private int zPos;
+    public int generatedSections = 0;
     public bool creatingSection = false;
 
     public GameObject MAP;
@@ -46,7 +48,15 @@ public class GenerateLevel : MonoBehaviour
         {
             creatingSection = true;
             GenerateSection();
+            generatedSections ++;
+            // That should check how many sections were created and start playing the main theme. Not working yet.
+            if (generatedSections > 6)
+            {
+                mainTheme.Play();
+            }
         }
+
+
     }
 
     void GenerateSection()
