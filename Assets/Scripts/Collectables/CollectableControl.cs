@@ -9,7 +9,11 @@ public class CollectableControl : MonoBehaviour
     public GameObject coinCountDisplay;
     public GameObject coinEndDisplay;
 
-
+    void Start(){
+        coinCount = 0;
+         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
+        coinEndDisplay.GetComponent<Text>().text = "" + coinCount;
+    }
     void Update()
     {
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;

@@ -50,6 +50,7 @@ public class PlayerMove : MonoBehaviour
     public string pos = "center";
     private float targetpos = 0f;
 
+    private bool startedrunning=false;
 
     void Start()
     {
@@ -63,10 +64,16 @@ public class PlayerMove : MonoBehaviour
     void Update()
 
     {
-        MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
+        if ( startedrunning==true &&   !animator.GetBool("isrunning")){
+            animator.SetBool("isrunning",true);
+        }
+        if ( animator.GetBool("isrunning")){
+         MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
+        }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
+            startedrunning=true;
             if (!isFlying)
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
@@ -82,6 +89,7 @@ public class PlayerMove : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
+            startedrunning=true;
             if (!isFlying)
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing right from center goes to right
@@ -114,6 +122,7 @@ public class PlayerMove : MonoBehaviour
         // Ajupir-se
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
+            startedrunning=true;
             if (isRolling == false)
             {
                 crouchhitbox();
@@ -130,6 +139,7 @@ public class PlayerMove : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))
             {
+                 startedrunning=true;
                 if (isJumping == false)
                 {
                     isJumping = true;
@@ -157,6 +167,7 @@ public class PlayerMove : MonoBehaviour
         {
             //hold
             holding = true;
+             startedrunning=true;
         }
         else
         {
@@ -251,6 +262,7 @@ public class PlayerMove : MonoBehaviour
         {
 
             //fly object
+            //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
             initialmoveSpeed = moveSpeed;
             flyFX.Play();
             BGM.pitch += 0.1f;
@@ -324,6 +336,7 @@ public class PlayerMove : MonoBehaviour
     }
     IEnumerator FlyTimeout()
     {
+        Debug.Log("FLYTIMEOUT!!!!!!!!!!!!");
         yield return new WaitForSeconds(4);
         while (holding)
         {
