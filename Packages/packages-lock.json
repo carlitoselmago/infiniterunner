@@ -160,6 +160,12 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "com.yasirkula.adjustpivot": {
+      "version": "file:C:/Users/ccarb/Downloads/UnityAdjustPivot-master/UnityAdjustPivot-master",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
