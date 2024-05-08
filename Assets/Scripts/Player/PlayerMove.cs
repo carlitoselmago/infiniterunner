@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -22,9 +23,23 @@ public class PlayerMove : MonoBehaviour
     private Animator animator;
 
     public GameObject mainCam;
+
+    //sfx
     public AudioSource crashThud;
     public AudioSource BGM;
+    public AudioSource mainTheme;
     public AudioSource flyFX;
+
+    //pitch shifter for flying timeout
+    public float startingPitch = 1.5f;
+    public float endingPitch = 1f;
+    public float pitchDuration = 0.8f;
+
+    //audio mixer
+    public AudioMixer audioMixer;
+    private string exposedParameter = "volumeBGM";
+    private float duration;
+    private float targetVolume;
 
     public GameObject levelControl;
 
@@ -59,11 +74,17 @@ public class PlayerMove : MonoBehaviour
         startY = transform.position.y;
         originY = startY;
         normalhitbox();
+        BGM.pitch = 1.0f;
     }
 
     void Update()
 
     {
+        if (startedrunning==false && Input.anyKey==true)
+        {
+            BGM.Play();
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter, duration = 3, targetVolume = 1));
+        }
         if ( startedrunning==true &&   !animator.GetBool("isrunning")){
             animator.SetBool("isrunning",true);
         }
@@ -74,6 +95,7 @@ public class PlayerMove : MonoBehaviour
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
             startedrunning=true;
+           
             if (!isFlying)
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
@@ -265,7 +287,7 @@ public class PlayerMove : MonoBehaviour
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
             initialmoveSpeed = moveSpeed;
             flyFX.Play();
-            BGM.pitch += 0.1f;
+            BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
             if (!isFlying)
             {
@@ -337,11 +359,12 @@ public class PlayerMove : MonoBehaviour
     IEnumerator FlyTimeout()
     {
         Debug.Log("FLYTIMEOUT!!!!!!!!!!!!");
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(10);
         while (holding)
         {
             yield return new WaitForSeconds(1);
         }
+        StartCoroutine(ChangePitchOverTime());
         floating = true;
         animator.SetBool("isflying", false);
         jumpedHeight = this.transform.position.y;
@@ -349,17 +372,30 @@ public class PlayerMove : MonoBehaviour
 
         isFlying = false;
         startY = originY;
-        BGM.pitch = 1;
-        yield return new WaitForSeconds(1);
+    
+    yield return new WaitForSeconds(1);
         floating = false;
-
-
     }
 
     IEnumerator PitchShiftTimeout()
     {
         yield return new WaitForSeconds(1);
         coinFX.pitch = 1;
+    }
+
+    IEnumerator ChangePitchOverTime()
+    {
+        float startTime = Time.time;
+
+        while (Time.time - startTime < pitchDuration)
+        {
+            float t = (Time.time - startTime) / pitchDuration;
+            BGM.pitch = Mathf.Lerp(startingPitch, endingPitch, t);
+            yield return null;
+        }
+
+        // Ensure the pitch is exactly what we want at the end
+        BGM.pitch = endingPitch;
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
