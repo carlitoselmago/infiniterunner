@@ -37,7 +37,7 @@ public class PlayerMove : MonoBehaviour
 
     //audio mixer
     public AudioMixer audioMixer;
-    private string exposedParameter = "volumeBGM";
+    private string exposedParameter;
     private float duration;
     private float targetVolume;
 
@@ -83,7 +83,7 @@ public class PlayerMove : MonoBehaviour
         if (startedrunning==false && Input.anyKey==true)
         {
             BGM.Play();
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter, duration = 3, targetVolume = 1));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 1));
         }
         if ( startedrunning==true &&   !animator.GetBool("isrunning")){
             animator.SetBool("isrunning",true);
