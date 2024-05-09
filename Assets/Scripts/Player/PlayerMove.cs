@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed = 9.0f;
+    public float moveSpeed = 10.0f;
     private float initialmoveSpeed = 0;
     public float leftRightSpeed = 9;
     public bool isJumping = false;
@@ -19,6 +19,7 @@ public class PlayerMove : MonoBehaviour
 
     public bool holding = false;
     public int flycoinsamount = 60;
+    private bool gotFirstCoin = false;
     public GameObject playerObject;
     private Animator animator;
 
@@ -260,13 +261,20 @@ public class PlayerMove : MonoBehaviour
             coinFX.Play();
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
+
+            //Plays the main theme as soon as player picks up the first coin
+            if (gotFirstCoin == false && isFlying == false)
+            {
+                mainTheme.Play();
+                gotFirstCoin = true;
+            }
         }
 
         if (other.gameObject.CompareTag("floating coin"))
         {
             coinFX.Play();
 
-            // pitch shift of collected coins
+            // pitch shift of collected floating coins
            if (coinFX.pitch < 2)
                 {
                     coinFX.pitch += 0.2f;
