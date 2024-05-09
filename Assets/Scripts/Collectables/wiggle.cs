@@ -3,7 +3,7 @@ using UnityEngine;
 public class wiggle : MonoBehaviour
 {
     public float amplitude = 0.5f;    // Amplitude of the float.
-    public float frequency = 1f;      // Speed of the float.
+    public float frequency = 0.7f;      // Speed of the float.
     public float rotationSpeed = 50f; // Speed of the rotation.
 
     private Vector3 startPos;
