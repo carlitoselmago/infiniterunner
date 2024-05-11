@@ -5,9 +5,9 @@ using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed = 10.0f;
+    public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
-    public float leftRightSpeed = 9;
+    public float leftRightSpeed = 10;
     public bool isJumping = false;
     public bool comingDown = false;
     public bool isRolling = false;
