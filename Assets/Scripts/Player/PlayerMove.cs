@@ -294,6 +294,7 @@ public class PlayerMove : MonoBehaviour
             //fly object
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
             initialmoveSpeed = moveSpeed;
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 0));
             flyFX.Play();
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
@@ -404,6 +405,8 @@ public class PlayerMove : MonoBehaviour
 
         // Ensure the pitch is exactly what we want at the end
         BGM.pitch = endingPitch;
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1));
+
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
