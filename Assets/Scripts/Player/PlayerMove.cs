@@ -263,10 +263,13 @@ public class PlayerMove : MonoBehaviour
             other.gameObject.SetActive(false);
 
             //Plays the main theme as soon as player picks up the first coin
-            if (gotFirstCoin == false && isFlying == false)
+            if (isFlying == false)
             {
-                mainTheme.Play();
-                gotFirstCoin = true;
+                if (gotFirstCoin == false)
+                {
+                    mainTheme.Play();
+                    gotFirstCoin = true;
+                }
             }
         }
 
