@@ -237,6 +237,7 @@ public class PlayerMove : MonoBehaviour
         }
         nowCanFly = canFly;
         */
+
     }
 
     void OnTriggerEnter(Collider other)
@@ -316,6 +317,7 @@ public class PlayerMove : MonoBehaviour
             }
             isFlying = true;
         }
+
     }
 
 
