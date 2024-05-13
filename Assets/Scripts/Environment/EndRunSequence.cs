@@ -12,7 +12,7 @@ public class EndRunSequence : MonoBehaviour
     public GameObject gameOverText;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
-    private string exposedParameter = "volumeBGM";
+    private string exposedParameter;
     private float duration;
     private float targetVolume;
 
@@ -25,7 +25,8 @@ public class EndRunSequence : MonoBehaviour
 IEnumerator EndSequence()
     {
         yield return new WaitForSeconds(1);
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter, duration = 3, targetVolume = 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 0));
         endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
         gameOverFX.Play();

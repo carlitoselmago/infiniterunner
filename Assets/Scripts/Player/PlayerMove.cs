@@ -29,6 +29,7 @@ public class PlayerMove : MonoBehaviour
     public AudioSource crashThud;
     public AudioSource BGM;
     public AudioSource mainTheme;
+    public AudioSource pyramidsTheme;
     public AudioSource flyFX;
 
     //pitch shifter for flying timeout
@@ -85,6 +86,7 @@ public class PlayerMove : MonoBehaviour
         {
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 1));
+            StartCoroutine(PlayMainTheme());
         }
         if ( startedrunning==true &&   !animator.GetBool("isrunning")){
             animator.SetBool("isrunning",true);
@@ -264,14 +266,14 @@ public class PlayerMove : MonoBehaviour
             other.gameObject.SetActive(false);
 
             //Plays the main theme as soon as player picks up the first coin
-            if (isFlying == false)
+            /*if (isFlying == false)
             {
                 if (gotFirstCoin == false)
                 {
                     mainTheme.Play();
                     gotFirstCoin = true;
                 }
-            }
+            }*/
         }
 
         if (other.gameObject.CompareTag("floating coin"))
@@ -292,6 +294,7 @@ public class PlayerMove : MonoBehaviour
             other.gameObject.SetActive(false);
 
         }
+
         if (other.gameObject.CompareTag("powerup"))
         {
 
@@ -318,6 +321,13 @@ public class PlayerMove : MonoBehaviour
             isFlying = true;
         }
 
+        if (other.gameObject.CompareTag("pyramids"))
+        {
+            if (!mainTheme.isPlaying)
+            {
+                pyramidsTheme.Play();
+            }
+        }
     }
 
 
@@ -411,7 +421,12 @@ public class PlayerMove : MonoBehaviour
         // Ensure the pitch is exactly what we want at the end
         BGM.pitch = endingPitch;
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1));
+    }
 
+    IEnumerator PlayMainTheme()
+    {
+        yield return new WaitForSeconds(5);
+        mainTheme.Play();
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
@@ -449,7 +464,6 @@ public class PlayerMove : MonoBehaviour
     }
     private void PerformFly()
     {
-
         float tweenspeed = 1.0f;
         // Calculate the new Y position with easing out effect
         float newY = Mathf.Lerp(startY, targetHeight, 1 - Mathf.Pow(1 - Time.deltaTime * tweenspeed, 3));
