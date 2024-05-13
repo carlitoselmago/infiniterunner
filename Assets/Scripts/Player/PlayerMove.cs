@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed = 12.0f;
+    public float moveSpeed = 12;
     private float initialmoveSpeed = 0;
     public float leftRightSpeed = 10;
     public bool isJumping = false;
@@ -31,11 +31,12 @@ public class PlayerMove : MonoBehaviour
     public AudioSource mainTheme;
     public AudioSource pyramidsTheme;
     public AudioSource flyFX;
+    public AudioSource cogFactorySFX;
 
     //pitch shifter for flying timeout
-    public float startingPitch = 1.5f;
-    public float endingPitch = 1f;
-    public float pitchDuration = 0.8f;
+    private float startingPitch = 1.5f;
+    private float endingPitch = 1f;
+    private float pitchDuration = 0.8f;
 
     //audio mixer
     public AudioMixer audioMixer;
@@ -52,7 +53,7 @@ public class PlayerMove : MonoBehaviour
     private float originY;
     private float jumpedHeight;
 
-    //private float speed = 2.0f; // Adjusted speed for a more natural feel
+    private float speed = 2.0f; // Adjusted speed for a more natural feel
 
     private float elapsedTime = 0.0f; // Track time since the start of the jump
 
@@ -82,6 +83,7 @@ public class PlayerMove : MonoBehaviour
         normalhitbox();
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
+        startedrunning = false;
     }
 
     void Update()
@@ -92,6 +94,7 @@ public class PlayerMove : MonoBehaviour
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 1));
             StartCoroutine(PlayMainTheme());
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
         }
         if ( startedrunning==true &&   !animator.GetBool("isrunning")){
             animator.SetBool("isrunning",true);
@@ -193,6 +196,7 @@ public class PlayerMove : MonoBehaviour
                 //transform.Translate(Vector3.up * Time.deltaTime * -4.5f, Space.World);
             }
         }
+
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
         {
             //hold
@@ -297,7 +301,6 @@ public class PlayerMove : MonoBehaviour
             StartCoroutine(PitchShiftTimeout());
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
-
         }
 
         if (other.gameObject.CompareTag("powerup"))
@@ -306,7 +309,7 @@ public class PlayerMove : MonoBehaviour
             //fly object
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
             initialmoveSpeed = moveSpeed;
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 0));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
@@ -328,13 +331,18 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("pyramids"))
         {
-
-            if (!mainTheme.isPlaying)
+            if (!mainTheme.isPlaying && !pyramidsTheme.isPlaying)
             {
                 pyramidsTheme.Play();
             }
         }
-   if (other.gameObject.CompareTag("tutorial"))
+
+        if (other.gameObject.CompareTag("cogfactory"))
+        {
+                cogFactorySFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("tutorial"))
 {
     // Hide all previous tutorial panels
     HideAllTutorialCards();
@@ -450,8 +458,11 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator PlayMainTheme()
     {
-        yield return new WaitForSeconds(5);
-        mainTheme.Play();
+        if (!mainTheme.isPlaying)
+        {
+            yield return new WaitForSeconds(5);
+            mainTheme.Play();
+        }
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
@@ -514,7 +525,7 @@ public class PlayerMove : MonoBehaviour
             float newY = Mathf.SmoothStep(initialY, startY, timeFraction);
             Debug.Log(newY);
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-            moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
+            //moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
         }
         else
         {
