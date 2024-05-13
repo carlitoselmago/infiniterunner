@@ -6,17 +6,17 @@ using UnityEngine.Audio;
 
 public class HighScores : MonoBehaviour
 {
-    public GameObject highScorePopUp;
-    public GameObject survivalPopUp;
-    public GameObject restfulPopUp;
-
-    private static int maxScore;
+  private static int maxScore;
     private static int maxTimePlayed;
     private float maxTimeResting = 60;
 
     private bool HighScoreAchieved = false;
     private bool SurvivalAchieved = false;
     private bool RestfulAchieved = false;
+
+public GameObject highScorePopUp;
+    public GameObject survivalPopUp;
+    public GameObject restfulPopUp;
 
     public AudioSource highScoreSFX;
     public AudioSource survivalSFX;
