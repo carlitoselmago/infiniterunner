@@ -18,7 +18,7 @@ public class FloatingAndRotating : MonoBehaviour
     {
         // Float up/down with a sine wave.
         float tempPos = amplitude * Mathf.Sin(Time.time * frequency);
-        Debug.Log(startPos.z);
+       // Debug.Log(startPos.z);
         transform.position = new Vector3(startPos.x, startPos.y + tempPos, startPos.z);
 
         // Rotate around the Y-axis.
