@@ -12,6 +12,7 @@ TagManager:
   - fade trigger
   - pyramids
   - tutorial
+  - cogfactory
   layers:
   - Default
   - TransparentFX
