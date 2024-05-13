@@ -11,6 +11,7 @@ TagManager:
   - floating coin
   - fade trigger
   - pyramids
+  - tutorial
   layers:
   - Default
   - TransparentFX

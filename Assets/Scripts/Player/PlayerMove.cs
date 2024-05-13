@@ -58,6 +58,7 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject flycoin;
 
+    public GameObject tutorial2d;
     public AudioSource coinFX;
 
     public GameObject MAP;
@@ -69,6 +70,9 @@ public class PlayerMove : MonoBehaviour
 
     private bool startedrunning=false;
 
+    private string tutorialcard="";
+
+
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -77,6 +81,7 @@ public class PlayerMove : MonoBehaviour
         originY = startY;
         normalhitbox();
         BGM.pitch = 1.0f;
+        HideAllTutorialCards();
     }
 
     void Update()
@@ -323,11 +328,31 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("pyramids"))
         {
+
             if (!mainTheme.isPlaying)
             {
                 pyramidsTheme.Play();
             }
         }
+   if (other.gameObject.CompareTag("tutorial"))
+{
+    // Hide all previous tutorial panels
+    HideAllTutorialCards();
+    // Get the tutorial card name
+    string tutorialcard = other.gameObject.name;
+
+    // Assuming tutorial2d is a Transform, find a child and set it active
+    Transform tutorialCardTransform = tutorial2d.transform.Find(tutorialcard);
+    if (tutorialCardTransform != null)
+    {
+        tutorialCardTransform.gameObject.SetActive(true);
+    }
+    else
+    {
+        Debug.LogError("Tutorial card not found: " + tutorialcard);
+    }
+}
+
     }
 
 
@@ -499,6 +524,15 @@ public class PlayerMove : MonoBehaviour
 
         }
     }
+private void HideAllTutorialCards() {
+    // Fetch all Transform components in children of tutorial2D GameObject
+    var children = tutorial2d.GetComponentsInChildren<Transform>(true); // Including inactive children
+    foreach (var child in children) {
+        if (child.gameObject != tutorial2d.gameObject) { // Avoid disabling the parent GameObject itself
+            child.gameObject.SetActive(false);
+        }
+    }
+}
 
 
 
