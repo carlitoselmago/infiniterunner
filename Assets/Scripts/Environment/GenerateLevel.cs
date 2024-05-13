@@ -49,11 +49,6 @@ public class GenerateLevel : MonoBehaviour
             creatingSection = true;
             GenerateSection();
             generatedSections ++;
-            // That should check how many sections were created and start playing the main theme. Not working yet.
-            if (generatedSections > 6)
-            {
-                mainTheme.Play();
-            }
         }
 
 
@@ -83,5 +78,4 @@ public class GenerateLevel : MonoBehaviour
         zPos += stepamount;
         createdSections.Enqueue(newSection);
     }
-
 }
