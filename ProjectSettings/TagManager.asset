@@ -13,6 +13,11 @@ TagManager:
   - pyramids
   - tutorial
   - cogfactory
+  - cogsfarm
+  - photos
+  - backdoor
+  - panoptic
+  - canyon
   layers:
   - Default
   - TransparentFX
