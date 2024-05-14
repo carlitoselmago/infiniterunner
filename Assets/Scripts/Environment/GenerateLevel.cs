@@ -34,7 +34,7 @@ public class GenerateLevel : MonoBehaviour
     }
 
     // Preload 3 sections at the start of the game
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         InstantiateInitialSection();
     }
@@ -44,7 +44,7 @@ public class GenerateLevel : MonoBehaviour
   void Update()
     {
         // Check if the map has moved enough to require a new section
-        if (MAP.transform.position.z < -zPos + (stepamount*2) && !creatingSection)
+        if (MAP.transform.position.z < -zPos + (stepamount*4) && !creatingSection)
         {
             creatingSection = true;
             GenerateSection();
@@ -61,7 +61,7 @@ public class GenerateLevel : MonoBehaviour
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
-        if (createdSections.Count > 4)
+        if (createdSections.Count > 5)
         {
             GameObject oldSection = createdSections.Dequeue();  // Remove the oldest section from the queue
             Destroy(oldSection);  // Destroy the oldest section object

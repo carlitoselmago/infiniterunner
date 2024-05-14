@@ -48,7 +48,7 @@ public class PlayerMove : MonoBehaviour
 
     private BoxCollider boxCollider;
 
-    private float targetHeight = 8.0f;
+    private float targetHeight = 17.0f;
     private float startY;
     private float originY;
     private float jumpedHeight;
@@ -222,7 +222,7 @@ public class PlayerMove : MonoBehaviour
             holding = false;
         }
 
-        //test fly
+        // fly
         if (floating)
         {
             // PerformFall();
@@ -307,7 +307,7 @@ public class PlayerMove : MonoBehaviour
             if (!isFlying)
             {
                 //create array of coins
-                float currentZ = this.transform.position.z + 30;
+                float currentZ = this.transform.position.z + 50;
 
                 for (int i = 0; i < flycoinsamount; i++)
                 {
