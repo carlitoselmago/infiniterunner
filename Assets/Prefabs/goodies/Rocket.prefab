@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 885550882734586064}
   - component: {fileID: 5828291567069931004}
+  - component: {fileID: 6193601713616275676}
+  - component: {fileID: 2628891452628281936}
   m_Layer: 0
   m_Name: Rocket
   m_TagString: powerup
@@ -54,6 +56,34 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8028919, y: 2.201026, z: 0.86290467}
   m_Center: {x: 0.0089508295, y: 5.328963, z: 0.014343023}
+--- !u!114 &6193601713616275676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2827851846035165340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fcdba34dfa73f347b48d5c2e2e2ad54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amplitude: 0.5
+  frequency: 0.7
+  rotationSpeed: 50
+--- !u!114 &2628891452628281936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2827851846035165340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 989ffbbaa58ae4aefa05d69a98ee5c3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activationProbability: 0.5
 --- !u!1 &3049926863671952112
 GameObject:
   m_ObjectHideFlags: 0
