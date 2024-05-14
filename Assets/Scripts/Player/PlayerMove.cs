@@ -69,9 +69,9 @@ public class PlayerMove : MonoBehaviour
     public string pos = "center";
     private float targetpos = 0f;
 
-    private bool startedrunning=false;
+    private bool startedrunning = false;
 
-    private string tutorialcard="";
+    private string tutorialcard = "";
 
 
     void Start()
@@ -89,24 +89,28 @@ public class PlayerMove : MonoBehaviour
     void Update()
 
     {
-        if (startedrunning==false && Input.anyKey==true)
+        if (startedrunning == false && Input.anyKey == true)
         {
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 1));
             StartCoroutine(PlayMainTheme());
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
         }
-        if ( startedrunning==true &&   !animator.GetBool("isrunning")){
-            animator.SetBool("isrunning",true);
+        if (startedrunning == true && !animator.GetBool("isrunning"))
+        {
+            animator.SetBool("isrunning", true);
         }
-        if ( animator.GetBool("isrunning")){
-         MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
+        if (animator.GetBool("isrunning"))
+        {
+            MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
         }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            startedrunning=true;
-           
+            startedrunning = true;
+            if (tutorialcard=="left"){
+                tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+            }
             if (!isFlying)
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
@@ -122,7 +126,10 @@ public class PlayerMove : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            startedrunning=true;
+            startedrunning = true;
+            if (tutorialcard=="right"){
+                tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+            }
             if (!isFlying)
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing right from center goes to right
@@ -155,7 +162,10 @@ public class PlayerMove : MonoBehaviour
         // Ajupir-se
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            startedrunning=true;
+            startedrunning = true;
+            if (tutorialcard=="crouch"){
+                tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+            }
             if (isRolling == false)
             {
                 crouchhitbox();
@@ -172,7 +182,10 @@ public class PlayerMove : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))
             {
-                 startedrunning=true;
+                startedrunning = true;
+                if (tutorialcard=="jump"){
+                    tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+                }
                 if (isJumping == false)
                 {
                     isJumping = true;
@@ -200,8 +213,9 @@ public class PlayerMove : MonoBehaviour
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
         {
             //hold
+            tutorial2d.transform.Find("fly").gameObject.SetActive(false);
             holding = true;
-             startedrunning=true;
+            startedrunning = true;
         }
         else
         {
@@ -225,29 +239,6 @@ public class PlayerMove : MonoBehaviour
                 //Debug.Log(targetHeight);
             }
         }
-
-        /*
-        if (canFly == true)
-        {
-            if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
-            {
-                if (isFlying == false)
-                {
-                    isFlying = true;
-                    if (floating == false)
-                    {
-                        animator.SetBool("isflying",true);
-                        
-                       // StartCoroutine(FlyTimeout());
-                    }
-                }
-            } else
-            {
-                isFlying = false;
-            }
-        }
-        nowCanFly = canFly;
-        */
 
     }
 
@@ -290,14 +281,14 @@ public class PlayerMove : MonoBehaviour
             coinFX.Play();
 
             // pitch shift of collected floating coins
-           if (coinFX.pitch < 2)
-                {
-                    coinFX.pitch += 0.2f;
-                }
-                else
-                {
-                    coinFX.pitch = 1;
-                }
+            if (coinFX.pitch < 2)
+            {
+                coinFX.pitch += 0.2f;
+            }
+            else
+            {
+                coinFX.pitch = 1;
+            }
             StartCoroutine(PitchShiftTimeout());
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
@@ -339,27 +330,27 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("cogfactory"))
         {
-                cogFactorySFX.Play();
+            cogFactorySFX.Play();
         }
 
         if (other.gameObject.CompareTag("tutorial"))
-{
-    // Hide all previous tutorial panels
-    HideAllTutorialCards();
-    // Get the tutorial card name
-    string tutorialcard = other.gameObject.name;
+        {
+            // Hide all previous tutorial panels
+            HideAllTutorialCards();
+            // Get the tutorial card name
+            tutorialcard = other.gameObject.name;
 
-    // Assuming tutorial2d is a Transform, find a child and set it active
-    Transform tutorialCardTransform = tutorial2d.transform.Find(tutorialcard);
-    if (tutorialCardTransform != null)
-    {
-        tutorialCardTransform.gameObject.SetActive(true);
-    }
-    else
-    {
-        Debug.LogError("Tutorial card not found: " + tutorialcard);
-    }
-}
+            // Assuming tutorial2d is a Transform, find a child and set it active
+            Transform tutorialCardTransform = tutorial2d.transform.Find(tutorialcard);
+            if (tutorialCardTransform != null)
+            {
+                tutorialCardTransform.gameObject.SetActive(true);
+            }
+            else
+            {
+                Debug.LogError("Tutorial card not found: " + tutorialcard);
+            }
+        }
 
     }
 
@@ -416,7 +407,14 @@ public class PlayerMove : MonoBehaviour
     IEnumerator FlyTimeout()
     {
         Debug.Log("FLYTIMEOUT!!!!!!!!!!!!");
-        yield return new WaitForSeconds(10);
+        
+        yield return new WaitForSeconds(3);
+        tutorial2d.transform.Find("fly").gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(5);
+        tutorial2d.transform.Find("fly").gameObject.SetActive(false);
+        //show tutorial
+        
         while (holding)
         {
             yield return new WaitForSeconds(1);
@@ -429,10 +427,11 @@ public class PlayerMove : MonoBehaviour
 
         isFlying = false;
         startY = originY;
-    
-    yield return new WaitForSeconds(1);
+        
+        yield return new WaitForSeconds(1);
         floating = false;
     }
+  
 
     IEnumerator PitchShiftTimeout()
     {
@@ -523,7 +522,7 @@ public class PlayerMove : MonoBehaviour
             float initialY = jumpedHeight;//startY + jumpedHeight; // Start falling from this height
 
             float newY = Mathf.SmoothStep(initialY, startY, timeFraction);
-            Debug.Log(newY);
+
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
             //moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
         }
@@ -535,16 +534,14 @@ public class PlayerMove : MonoBehaviour
 
         }
     }
-private void HideAllTutorialCards() {
-    // Fetch all Transform components in children of tutorial2D GameObject
-    var children = tutorial2d.GetComponentsInChildren<Transform>(true); // Including inactive children
-    foreach (var child in children) {
-        if (child.gameObject != tutorial2d.gameObject) { // Avoid disabling the parent GameObject itself
-            child.gameObject.SetActive(false);
-        }
+    private void HideAllTutorialCards()
+{
+    // Iterate over all direct children of the tutorial2D GameObject
+    foreach (Transform child in tutorial2d.transform)
+    {
+        // Disable the child GameObject
+        child.gameObject.SetActive(false);
     }
 }
-
-
 
 }
