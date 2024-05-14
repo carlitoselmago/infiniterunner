@@ -32,6 +32,11 @@ public class PlayerMove : MonoBehaviour
     public AudioSource pyramidsTheme;
     public AudioSource flyFX;
     public AudioSource cogFactorySFX;
+    public AudioSource cogsfarmSFX;
+    public AudioSource photosSFX;
+    public AudioSource backDoorSFX;
+    public AudioSource panopticSFX;
+    public AudioSource canyonSFX;
 
     //pitch shifter for flying timeout
     private float startingPitch = 1.5f;
@@ -61,6 +66,7 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject tutorial2d;
     public AudioSource coinFX;
+    public GameObject objectWithMoveScript;
 
     public GameObject MAP;
 
@@ -239,7 +245,6 @@ public class PlayerMove : MonoBehaviour
                 //Debug.Log(targetHeight);
             }
         }
-
     }
 
     void OnTriggerEnter(Collider other)
@@ -256,7 +261,6 @@ public class PlayerMove : MonoBehaviour
             levelControl.GetComponent<EndRunSequence>().enabled = true;
             // Disable this script
             this.enabled = false;
-
         }
         if (other.gameObject.CompareTag("coin"))
         {
@@ -264,16 +268,6 @@ public class PlayerMove : MonoBehaviour
             coinFX.Play();
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
-
-            //Plays the main theme as soon as player picks up the first coin
-            /*if (isFlying == false)
-            {
-                if (gotFirstCoin == false)
-                {
-                    mainTheme.Play();
-                    gotFirstCoin = true;
-                }
-            }*/
         }
 
         if (other.gameObject.CompareTag("floating coin"))
@@ -333,6 +327,38 @@ public class PlayerMove : MonoBehaviour
             cogFactorySFX.Play();
         }
 
+        if (other.gameObject.CompareTag("cogsfarm"))
+        {
+            cogsfarmSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("photos"))
+        {
+            photosSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("backdoor"))
+        {
+            backDoorSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying)
+        {
+            panopticSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        {
+            canyonSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("Trigger"))
+        {
+            // Get the MoveOnCollision component from the specified GameObject
+            MoveOnCollision moveScript = objectWithMoveScript.GetComponent<MoveOnCollision>();
+            StartCoroutine(moveScript.MoveObject(18.0f, 8.0f));
+        }
+
         if (other.gameObject.CompareTag("tutorial"))
         {
             // Hide all previous tutorial panels
@@ -361,9 +387,8 @@ public class PlayerMove : MonoBehaviour
         boxCollider.size = new Vector3(0.67f, 1, 0.58f);
         // Set new center position
         boxCollider.center = new Vector3(0, 0, -0.42f);
-
-
     }
+
     void jumphitbox()
     {
         // Set new center position
