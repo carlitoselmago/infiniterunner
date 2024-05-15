@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class CollectableControl : MonoBehaviour
 {
@@ -21,6 +22,13 @@ public class CollectableControl : MonoBehaviour
     // private bool SurvivalAchieved = false;
     //private bool RestfulAchieved = false;
 
+    //audio mixer
+    public AudioMixer audioMixer;
+    private string exposedParameter;
+    private float duration;
+    private float targetVolume;
+    public AudioSource highScoreSFX;
+
 
     void Start()
     {
@@ -38,9 +46,11 @@ public class CollectableControl : MonoBehaviour
         {
             if (coinCount >= treballadordelmes_coins[treballadordelmes_coins_index])
             {
-                //highScoreSFX.Play();
-                achievementEndUItext.GetComponent<Text>().text = "¡treballador del mes! \n" + treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
+                achievementEndUItext.GetComponent<Text>().text = "Treballador del mes! \n" + treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
                 achievementUI.SetActive(true);
+                highScoreSFX.Play();
+                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
+                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
                 treballadordelmes_coins_index += 1;
                 StartCoroutine(hideachievement());
             }
@@ -60,7 +70,10 @@ public class CollectableControl : MonoBehaviour
 
     IEnumerator hideachievement()
     {
-        yield return new WaitForSeconds(6);
+        yield return new WaitForSeconds(2);
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 2, targetVolume = 1));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 1));
+        yield return new WaitForSeconds(3);
         achievementUI.SetActive(false);
     }
 }
