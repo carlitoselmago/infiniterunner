@@ -314,35 +314,32 @@ public class PlayerMove : MonoBehaviour
             isFlying = true;
         }
 
-        if (other.gameObject.CompareTag("pyramids"))
+        if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
-            if (!mainTheme.isPlaying && !pyramidsTheme.isPlaying)
-            {
                 pyramidsTheme.Play();
-            }
         }
 
-        if (other.gameObject.CompareTag("cogfactory"))
+        if (other.gameObject.CompareTag("cogfactory") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             cogFactorySFX.Play();
         }
 
-        if (other.gameObject.CompareTag("cogsfarm"))
+        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             cogsfarmSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("photos"))
+        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             photosSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("backdoor"))
+        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             backDoorSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying)
+        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             panopticSFX.Play();
         }
@@ -356,7 +353,7 @@ public class PlayerMove : MonoBehaviour
         {
             // Get the MoveOnCollision component from the specified GameObject
             MoveOnCollision moveScript = objectWithMoveScript.GetComponent<MoveOnCollision>();
-            StartCoroutine(moveScript.MoveObject(18.0f, 8.0f));
+            StartCoroutine(moveScript.MoveObject(18.0f, 2.0f));
         }
 
         if (other.gameObject.CompareTag("tutorial"))
@@ -429,6 +426,7 @@ public class PlayerMove : MonoBehaviour
         animator.SetBool("isrolling", false);
         normalhitbox();
     }
+
     IEnumerator FlyTimeout()
     {
         Debug.Log("FLYTIMEOUT!!!!!!!!!!!!");
@@ -457,7 +455,6 @@ public class PlayerMove : MonoBehaviour
         floating = false;
     }
   
-
     IEnumerator PitchShiftTimeout()
     {
         yield return new WaitForSeconds(1);
@@ -484,7 +481,7 @@ public class PlayerMove : MonoBehaviour
     {
         if (!mainTheme.isPlaying)
         {
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(6);
             mainTheme.Play();
         }
     }
