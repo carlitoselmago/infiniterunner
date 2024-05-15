@@ -324,12 +324,12 @@ public class PlayerMove : MonoBehaviour
             cogFactorySFX.Play();
         }
 
-        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying)
         {
             cogsfarmSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying)
         {
             photosSFX.Play();
         }
@@ -339,12 +339,12 @@ public class PlayerMove : MonoBehaviour
             backDoorSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying)
         {
             panopticSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
         {
             canyonSFX.Play();
         }
@@ -353,7 +353,7 @@ public class PlayerMove : MonoBehaviour
         {
             // Get the MoveOnCollision component from the specified GameObject
             MoveOnCollision moveScript = objectWithMoveScript.GetComponent<MoveOnCollision>();
-            StartCoroutine(moveScript.MoveObject(18.0f, 2.0f));
+            StartCoroutine(moveScript.MoveObject(15.0f, 1.0f));
         }
 
         if (other.gameObject.CompareTag("tutorial"))
