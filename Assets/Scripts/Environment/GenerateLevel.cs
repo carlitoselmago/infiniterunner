@@ -20,7 +20,7 @@ public class GenerateLevel : MonoBehaviour
 
    void Start()
 {
-    zPos = stepamount;
+    zPos = stepamount*2;
 
     // Initialize the section array with the number of children in templatesparent
     section = new GameObject[templatesparent.transform.childCount];
