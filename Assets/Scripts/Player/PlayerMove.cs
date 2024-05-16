@@ -21,6 +21,7 @@ public class PlayerMove : MonoBehaviour
     public int flycoinsamount = 60;
     private bool gotFirstCoin = false;
     public GameObject playerObject;
+    public GameObject shield;
     private Animator animator;
 
     public GameObject mainCam;
@@ -411,7 +412,6 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(0.30f);
         isJumping = false;
         comingDown = false;
-        //playerObject.GetComponent<Animator>().Play("Standard Run");
         animator.SetBool("isjumping", false);
         normalhitbox();
     }
@@ -422,7 +422,6 @@ public class PlayerMove : MonoBehaviour
         standingUp = true;
         yield return new WaitForSeconds(0.45f);
         isRolling = false;
-        //playerObject.GetComponent<Animator>().Play("Standard Run");
         animator.SetBool("isrolling", false);
         normalhitbox();
     }
