@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class flickering : MonoBehaviour
+public class Flickering : MonoBehaviour
 {
     public Light pointLight;
     public float minIntensity = 0.5f;
@@ -13,13 +13,36 @@ public class flickering : MonoBehaviour
     public Renderer shield;
     public bool isFlickering = true;
 
+    private Coroutine flickerCoroutine;
+
     private void Start()
     {
         if (energyShield)
         {
             shield = GetComponent<Renderer>();
         }
-        StartCoroutine(Flicker());
+
+        // If the GameObject is enabled at the start, start the flickering coroutine
+        if (gameObject.activeInHierarchy)
+        {
+            flickerCoroutine = StartCoroutine(Flicker());
+        }
+    }
+
+    private void OnEnable()
+    {
+        // Start the coroutine when the GameObject is enabled
+        flickerCoroutine = StartCoroutine(Flicker());
+    }
+
+    private void OnDisable()
+    {
+        // Stop the coroutine when the GameObject is disabled
+        if (flickerCoroutine != null)
+        {
+            StopCoroutine(flickerCoroutine);
+            flickerCoroutine = null;
+        }
     }
 
     private IEnumerator Flicker()
@@ -54,7 +77,7 @@ public class flickering : MonoBehaviour
         isFlickering = !isFlickering;
         if (!isFlickering && shield)
         {
-            shield.enabled = true; //Ensure renderer is enabled when flickering is off
+            shield.enabled = true; // Ensure renderer is enabled when flickering is off
         }
     }
 }
