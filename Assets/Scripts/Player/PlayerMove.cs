@@ -25,7 +25,6 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject godmodevisual;
     public GameObject playerObject;
-    public GameObject shield;
     private Animator animator;
 
     public GameObject mainCam;
@@ -502,9 +501,12 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator delayedGodmodeOff()
     {
-         yield return new WaitForSeconds(6);
-        godmode=false;
+         yield return new WaitForSeconds(5);
+        godmodevisual.GetComponent<Flickering>().enabled = true;
+        yield return new WaitForSeconds(5);
+        godmode = false;
         godmodevisual.SetActive(false);
+        godmodevisual.GetComponent<Flickering>().enabled = false;
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
