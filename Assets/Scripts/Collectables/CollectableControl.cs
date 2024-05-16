@@ -13,7 +13,9 @@ public class CollectableControl : MonoBehaviour
     //achievements vars
     public GameObject achievementUI;
     public GameObject achievementEndUItext;
-    public static List<int> treballadordelmes_coins = new List<int> { 5, 50 };
+
+    public GameObject achievementEndUIsubtext;
+    public static List<int> treballadordelmes_coins = new List<int> { 5, 30,60,100,200,300,500,600,1000,1500,2000,3000 };
     private int treballadordelmes_coins_index = 0;
     //private static int maxTimePlayed;
     //private float maxTimeResting = 60;
@@ -46,13 +48,14 @@ public class CollectableControl : MonoBehaviour
         {
             if (coinCount >= treballadordelmes_coins[treballadordelmes_coins_index])
             {
-                achievementEndUItext.GetComponent<Text>().text = "Treballador del mes! \n" + treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
+                achievementEndUItext.GetComponent<Text>().text = "¡TREBALLADORA DEL MES!";
+                achievementEndUIsubtext.GetComponent<Text>().text = "Has recolectat "+treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
                 achievementUI.SetActive(true);
                 highScoreSFX.Play();
                 StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
                 StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
                 treballadordelmes_coins_index += 1;
-                StartCoroutine(hideachievement());
+                //StartCoroutine(hideachievement());
             }
         }
         /*
