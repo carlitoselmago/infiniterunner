@@ -15,7 +15,7 @@ public class CollectableControl : MonoBehaviour
     public GameObject achievementEndUItext;
 
     public GameObject achievementEndUIsubtext;
-    public static List<int> treballadordelmes_coins = new List<int> { 5, 30,60,100,200,300,500,600,1000,1500,2000,3000 };
+    public static List<int> treballadordelmes_coins = new List<int> {  30,100,200,300,500,600,1000,1500,2000,3000 };
     private int treballadordelmes_coins_index = 0;
     //private static int maxTimePlayed;
     //private float maxTimeResting = 60;

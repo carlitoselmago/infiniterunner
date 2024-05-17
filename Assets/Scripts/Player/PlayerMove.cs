@@ -20,7 +20,7 @@ public class PlayerMove : MonoBehaviour
     public bool holding = false;
 
      public bool godmode = false;
-    public int flycoinsamount = 60;
+    public int flycoinsamount = 30;
     private bool gotFirstCoin = false;
 
     public GameObject godmodevisual;
@@ -313,7 +313,7 @@ public class PlayerMove : MonoBehaviour
             if (!isFlying)
             {
                 //create array of coins
-                float currentZ = this.transform.position.z + 50;
+                float currentZ = this.transform.position.z + 100;
 
                 for (int i = 0; i < flycoinsamount; i++)
                 {

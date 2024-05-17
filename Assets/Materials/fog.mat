@@ -44,7 +44,7 @@ Material:
   - TransparentBackface
   - DepthOnly
   - SHADOWCASTER
-  m_LockedProperties: 
+  m_LockedProperties: _SoftParticlesEnabled
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
