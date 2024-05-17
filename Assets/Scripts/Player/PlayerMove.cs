@@ -503,7 +503,7 @@ public class PlayerMove : MonoBehaviour
     {
          yield return new WaitForSeconds(5);
         godmodevisual.GetComponent<ToggleShield>().enabled = true;
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(3);
         godmode = false;
         godmodevisual.SetActive(false);
         godmodevisual.GetComponent<ToggleShield>().enabled = false;
