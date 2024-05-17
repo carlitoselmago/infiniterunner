@@ -190,7 +190,7 @@ Material:
     - _BlendOp: 0
     - _BumpScale: 1
     - _CameraFadingEnabled: 1
-    - _CameraFarFadeDistance: 2
+    - _CameraFarFadeDistance: 95.33
     - _CameraNearFadeDistance: 1
     - _CoatMask: 0
     - _ColorMode: 0
@@ -278,8 +278,8 @@ Material:
     - _SmoothnessRemapMin: 0
     - _SmoothnessTextureChannel: 0
     - _SoftParticlesEnabled: 1
-    - _SoftParticlesFarFadeDistance: 304.62
-    - _SoftParticlesNearFadeDistance: 2.92
+    - _SoftParticlesFarFadeDistance: 500
+    - _SoftParticlesNearFadeDistance: 60
     - _SpecularAAScreenSpaceVariance: 0.1
     - _SpecularAAThreshold: 0.2
     - _SpecularHighlights: 1
@@ -326,7 +326,7 @@ Material:
     - _BaseColor: {r: 0.7987421, g: 0.91773266, b: 1, a: 1}
     - _BaseColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
-    - _CameraFadeParams: {r: 1, g: 1, b: 0, a: 0}
+    - _CameraFadeParams: {r: 1, g: 0.010601081, b: 0, a: 0}
     - _Color: {r: 0.7987421, g: 0.91773266, b: 1, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
@@ -335,7 +335,7 @@ Material:
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
-    - _SoftParticleFadeParams: {r: 2.92, g: 0.003314551, b: 0, a: 0}
+    - _SoftParticleFadeParams: {r: 60, g: 0.0022727272, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
