@@ -502,11 +502,11 @@ public class PlayerMove : MonoBehaviour
     IEnumerator delayedGodmodeOff()
     {
          yield return new WaitForSeconds(5);
-        godmodevisual.GetComponent<Flickering>().enabled = true;
+        godmodevisual.GetComponent<ToggleShield>().enabled = true;
         yield return new WaitForSeconds(5);
         godmode = false;
         godmodevisual.SetActive(false);
-        godmodevisual.GetComponent<Flickering>().enabled = false;
+        godmodevisual.GetComponent<ToggleShield>().enabled = false;
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
