@@ -252,6 +252,7 @@ public class PlayerMove : MonoBehaviour
             {
                 // PerformFly();
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
+                
                 //Debug.Log(startY);
                 //Debug.Log(targetHeight);
             }
@@ -266,9 +267,11 @@ public class PlayerMove : MonoBehaviour
         {
             if (!godmode){
                 other.GetComponent<BoxCollider>().enabled = false;
+                mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.Play("Stumble Backwards");
-                crashThud.Play();
-                mainCam.GetComponent<Animator>().enabled = true;
+                //crashThud.Play();
+                
+                //mainCam.GetComponent<Animator>().enabled = true;
                 levelControl.GetComponent<EndRunSequence>().enabled = true;
                 // Disable this script
                 this.enabled = false;
@@ -310,6 +313,7 @@ public class PlayerMove : MonoBehaviour
             flyFX.Play();
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
+            mainCam.GetComponent<Animator>().SetBool("flying", true);
             if (!isFlying)
             {
                 //create array of coins
@@ -452,6 +456,7 @@ public class PlayerMove : MonoBehaviour
         {
             yield return new WaitForSeconds(1);
         }
+        mainCam.GetComponent<Animator>().SetBool("flying", false);
         godmode=true;
         godmodevisual.SetActive(true);
         StartCoroutine(delayedGodmodeOff());
@@ -463,7 +468,7 @@ public class PlayerMove : MonoBehaviour
 
         isFlying = false;
         startY = originY;
-
+        
         yield return new WaitForSeconds(1);
         floating = false;
     }
