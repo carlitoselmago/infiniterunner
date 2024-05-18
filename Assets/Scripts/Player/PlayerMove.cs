@@ -192,7 +192,6 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-
         // Jumping
         if (isFlying == false)
         {
@@ -244,7 +243,6 @@ public class PlayerMove : MonoBehaviour
         {
             // PerformFall();
             jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
-
         }
         else
         {
@@ -269,7 +267,7 @@ public class PlayerMove : MonoBehaviour
                 other.GetComponent<BoxCollider>().enabled = false;
                 mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.Play("Stumble Backwards");
-                //crashThud.Play();
+                crashThud.Play();
                 
                 //mainCam.GetComponent<Animator>().enabled = true;
                 levelControl.GetComponent<EndRunSequence>().enabled = true;
@@ -314,10 +312,11 @@ public class PlayerMove : MonoBehaviour
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
             mainCam.GetComponent<Animator>().SetBool("flying", true);
+            godmode = true;
             if (!isFlying)
             {
                 //create array of coins
-                float currentZ = this.transform.position.z + 100;
+                float currentZ = this.transform.position.z + 200;
 
                 for (int i = 0; i < flycoinsamount; i++)
                 {
@@ -449,15 +448,13 @@ public class PlayerMove : MonoBehaviour
         tutorial2d.transform.Find("fly").gameObject.SetActive(true);
 
         yield return new WaitForSeconds(5);
-        tutorial2d.transform.Find("fly").gameObject.SetActive(false);
-        //show tutorial
+        tutorial2d.transform.Find("fly").gameObject.SetActive(false); //show tutorial
 
         while (holding)
         {
             yield return new WaitForSeconds(1);
         }
         mainCam.GetComponent<Animator>().SetBool("flying", false);
-        godmode=true;
         godmodevisual.SetActive(true);
         StartCoroutine(delayedGodmodeOff());
         StartCoroutine(ChangePitchOverTime());

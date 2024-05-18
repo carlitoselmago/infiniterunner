@@ -18,7 +18,7 @@ public class CollectableControl : MonoBehaviour
     private int treballadordelmes_coins_index = 0;
 
     //list of compliments
-    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "DEL SEGLE", "TOTAL", "INCANSABLE", "COMPULSIVA", "DEMENCIAL", "MILIONÀRIA", "INSACIABLE" };
+    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "TOP", "100", "COMPULSIVA", "DEMENT", "ESVERADA", "INSACIABLE" };
 
     //audio mixer
     public AudioMixer audioMixer;
@@ -52,7 +52,7 @@ public class CollectableControl : MonoBehaviour
                 StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
                 StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
                 treballadordelmes_coins_index += 1;
-                //StartCoroutine(hideachievement());
+                StartCoroutine(hideachievement());
             }
         }
     }
