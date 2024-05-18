@@ -13,16 +13,12 @@ public class CollectableControl : MonoBehaviour
     //achievements vars
     public GameObject achievementUI;
     public GameObject achievementEndUItext;
-
     public GameObject achievementEndUIsubtext;
-    public static List<int> treballadordelmes_coins = new List<int> {  30,100,200,300,500,600,1000,1500,2000,3000 };
+    public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 500, 600, 1000, 1500, 2000, 3000 };
     private int treballadordelmes_coins_index = 0;
-    //private static int maxTimePlayed;
-    //private float maxTimeResting = 60;
 
-    // private bool HighScoreAchieved = false;
-    // private bool SurvivalAchieved = false;
-    //private bool RestfulAchieved = false;
+    //list of compliments
+    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "DEL SEGLE", "TOTAL", "INCANSABLE", "COMPULSIVA", "DEMENCIAL", "MILIONÀRIA", "INSACIABLE" };
 
     //audio mixer
     public AudioMixer audioMixer;
@@ -31,7 +27,6 @@ public class CollectableControl : MonoBehaviour
     private float targetVolume;
     public AudioSource highScoreSFX;
 
-
     void Start()
     {
         coinCount = 0;
@@ -39,6 +34,7 @@ public class CollectableControl : MonoBehaviour
         coinEndDisplay.GetComponent<Text>().text = "" + coinCount;
         achievementUI.SetActive(false);
     }
+
     void Update()
     {
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
@@ -48,8 +44,9 @@ public class CollectableControl : MonoBehaviour
         {
             if (coinCount >= treballadordelmes_coins[treballadordelmes_coins_index])
             {
-                achievementEndUItext.GetComponent<Text>().text = "¡TREBALLADORA DEL MES!";
-                achievementEndUIsubtext.GetComponent<Text>().text = "Has recolectat "+treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
+                string compliment = compliments[treballadordelmes_coins_index];
+                achievementEndUItext.GetComponent<Text>().text = "TREBALLADORA " + compliment + "!";
+                achievementEndUIsubtext.GetComponent<Text>().text = "Has recol·lectat " + treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
                 achievementUI.SetActive(true);
                 highScoreSFX.Play();
                 StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
@@ -58,17 +55,6 @@ public class CollectableControl : MonoBehaviour
                 //StartCoroutine(hideachievement());
             }
         }
-        /*
-         if (coinCount >= maxScore && !HighScoreAchieved)
-        {
-            highScoreSFX.Play();
-            highScorePopUp.SetActive(true);
-            HighScoreAchieved = true;
-            //StartCoroutine FadeOutFrame;
-
-            //record new high score!
-        }
-        */
     }
 
     IEnumerator hideachievement()
@@ -80,5 +66,3 @@ public class CollectableControl : MonoBehaviour
         achievementUI.SetActive(false);
     }
 }
-
-
