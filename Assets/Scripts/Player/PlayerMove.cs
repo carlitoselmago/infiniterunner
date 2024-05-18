@@ -497,9 +497,9 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator PlayMainTheme()
     {
-        if (!mainTheme.isPlaying)
+        if (!mainTheme.isPlaying && !flyFX.isPlaying)
         {
-            yield return new WaitForSeconds(6);
+            yield return new WaitForSeconds(20);
             mainTheme.Play();
         }
     }
