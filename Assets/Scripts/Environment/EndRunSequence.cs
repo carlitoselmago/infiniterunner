@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class EndRunSequence : MonoBehaviour
 {
-    public GameObject liveCoins;
+    public GameObject endCoinCount;
     public GameObject endScreen;
     public GameObject fadeOut;
     public GameObject gameOverText;
@@ -16,13 +17,12 @@ public class EndRunSequence : MonoBehaviour
     private float duration;
     private float targetVolume;
 
-
     void Start()
     {
         StartCoroutine(EndSequence());
     }
 
-IEnumerator EndSequence()
+    IEnumerator EndSequence()
     {
         yield return new WaitForSeconds(1);
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 1.5f, targetVolume = 0));
@@ -30,12 +30,16 @@ IEnumerator EndSequence()
         endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
         gameOverFX.Play();
+        endCoinCount.GetComponent<Text>().text = "Has recollit " + CollectableControl.coinCount + " monedes. \n" + CollectableControl.lastAchievementText;
+        endCoinCount.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(2);
         gameOverText.GetComponent<Animator>().enabled = true;
         gameOverText.GetComponent<Animator>().Play("FadeOutText");
+        endCoinCount.GetComponent<Animator>().enabled = true;
+        endCoinCount.GetComponent<Animator>().Play("FadeOutText");
+
         yield return new WaitForSeconds(3);
         SceneManager.LoadScene(0);
     }
-
 }

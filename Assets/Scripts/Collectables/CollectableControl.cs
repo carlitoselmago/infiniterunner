@@ -8,7 +8,6 @@ public class CollectableControl : MonoBehaviour
 {
     public static int coinCount;
     public GameObject coinCountDisplay;
-    public GameObject coinEndDisplay;
 
     //achievements vars
     public GameObject achievementUI;
@@ -19,6 +18,9 @@ public class CollectableControl : MonoBehaviour
 
     //list of compliments
     private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "TOP", "100", "COMPULSIVA", "DEMENT", "ESVERADA", "INSACIABLE" };
+
+    // store the last achievement text
+    public static string lastAchievementText = "";
 
     //audio mixer
     public AudioMixer audioMixer;
@@ -31,21 +33,20 @@ public class CollectableControl : MonoBehaviour
     {
         coinCount = 0;
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
-        coinEndDisplay.GetComponent<Text>().text = "" + coinCount;
         achievementUI.SetActive(false);
     }
 
     void Update()
     {
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
-        coinEndDisplay.GetComponent<Text>().text = "" + coinCount;
 
         if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
         {
             if (coinCount >= treballadordelmes_coins[treballadordelmes_coins_index])
             {
                 string compliment = compliments[treballadordelmes_coins_index];
-                achievementEndUItext.GetComponent<Text>().text = "TREBALLADORA " + compliment + "!";
+                lastAchievementText = "TREBALLADORA " + compliment + "!";
+                achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
                 achievementEndUIsubtext.GetComponent<Text>().text = "Has recol·lectat " + treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
                 achievementUI.SetActive(true);
                 highScoreSFX.Play();
