@@ -268,8 +268,8 @@ public class PlayerMove : MonoBehaviour
                 mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.Play("Stumble Backwards");
                 crashThud.Play();
-                
                 //mainCam.GetComponent<Animator>().enabled = true;
+                HideAllTutorialCards();
                 levelControl.GetComponent<EndRunSequence>().enabled = true;
                 // Disable this script
                 this.enabled = false;
@@ -316,7 +316,7 @@ public class PlayerMove : MonoBehaviour
             if (!isFlying)
             {
                 //create array of coins
-                float currentZ = this.transform.position.z + 200;
+                float currentZ = this.transform.position.z + 300;
 
                 for (int i = 0; i < flycoinsamount; i++)
                 {
