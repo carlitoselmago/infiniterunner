@@ -13,11 +13,11 @@ public class CollectableControl : MonoBehaviour
     public GameObject achievementUI;
     public GameObject achievementEndUItext;
     public GameObject achievementEndUIsubtext;
-    public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 500, 600, 1000, 1500, 2000, 3000 };
+    public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 400, 500, 600, 700, 800, 900 };
     private int treballadordelmes_coins_index = 0;
 
     //list of compliments
-    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "TOP", "100", "COMPULSIVA", "DEMENT", "ESVERADA", "INSACIABLE" };
+    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "DEMENT", "MÀQUINA", "COMPULSIVA", "BRUTAL", "ESVERADA", "INSACIABLE" };
 
     // store the last achievement text
     public static string lastAchievementText = "";
@@ -34,6 +34,7 @@ public class CollectableControl : MonoBehaviour
         coinCount = 0;
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
         achievementUI.SetActive(false);
+        lastAchievementText = "";
     }
 
     void Update()
