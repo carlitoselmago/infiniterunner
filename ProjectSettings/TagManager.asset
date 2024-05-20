@@ -18,6 +18,8 @@ TagManager:
   - backdoor
   - panoptic
   - canyon
+  - car
+  - claxon
   layers:
   - Default
   - TransparentFX
