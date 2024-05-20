@@ -5,9 +5,9 @@ using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed = 12;
+    public static float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
-    public float leftRightSpeed = 10;
+    public float leftRightSpeed = 10.0f;
     public bool isJumping = false;
     public bool comingDown = false;
     public bool isRolling = false;
@@ -16,10 +16,10 @@ public class PlayerMove : MonoBehaviour
     public bool nowCanFly = false;
     public bool isFlying = false;
     public bool floating = false;
-
+    public bool alreadyCrashed = false;
     public bool holding = false;
 
-     public bool godmode = false;
+    public bool godmode = false;
     public int flycoinsamount = 30;
     private bool gotFirstCoin = false;
 
@@ -41,6 +41,8 @@ public class PlayerMove : MonoBehaviour
     public AudioSource backDoorSFX;
     public AudioSource panopticSFX;
     public AudioSource canyonSFX;
+    public AudioSource claxonSFX;
+    public AudioSource carCrashSFX;
 
     //pitch shifter for flying timeout
     private float startingPitch = 1.5f;
@@ -259,20 +261,23 @@ public class PlayerMove : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        //Output the Collider's GameObject's name
-        Debug.Log("Entered collision with " + other.gameObject.tag + ' ' + other.gameObject.name);
         if (other.gameObject.CompareTag("obstacle"))
         {
             if (!godmode){
-                other.GetComponent<BoxCollider>().enabled = false;
-                mainCam.GetComponent<Animator>().SetBool("dead", true);
-                animator.Play("Stumble Backwards");
-                crashThud.Play();
-                //mainCam.GetComponent<Animator>().enabled = true;
-                HideAllTutorialCards();
-                levelControl.GetComponent<EndRunSequence>().enabled = true;
-                // Disable this script
-                this.enabled = false;
+                if (!alreadyCrashed)
+                {
+                    Debug.Log("Entered in collision with " + other);
+                    alreadyCrashed = true;
+                    other.GetComponent<BoxCollider>().enabled = false;
+                    mainCam.GetComponent<Animator>().SetBool("dead", true);
+                    animator.Play("Stumble Backwards");
+                    crashThud.Play();
+                    //mainCam.GetComponent<Animator>().enabled = true;
+                    HideAllTutorialCards();
+                    levelControl.GetComponent<EndRunSequence>().enabled = true;
+                    // Disable this script
+                    this.enabled = false;
+                }
             }
         }
         if (other.gameObject.CompareTag("coin"))
@@ -303,16 +308,15 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("powerup"))
         {
-
             //fly object
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
-            initialmoveSpeed = moveSpeed;
+            //initialmoveSpeed = moveSpeed;
+            godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
             mainCam.GetComponent<Animator>().SetBool("flying", true);
-            godmode = true;
             if (!isFlying)
             {
                 //create array of coins
@@ -344,7 +348,7 @@ public class PlayerMove : MonoBehaviour
             cogsfarmSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying)
+        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !photosSFX.isPlaying)
         {
             photosSFX.Play();
         }
@@ -362,6 +366,30 @@ public class PlayerMove : MonoBehaviour
         if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
         {
             canyonSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("claxon"))
+        {
+            claxonSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("car"))
+        {
+            if (!godmode)
+            {
+                if (!alreadyCrashed)
+            {
+                    alreadyCrashed = true;
+                    other.GetComponent<BoxCollider>().enabled = false;
+                    mainCam.GetComponent<Animator>().SetBool("dead", true);
+                    animator.Play("Stumble Backwards");
+                    carCrashSFX.Play();
+                    HideAllTutorialCards();
+                    levelControl.GetComponent<EndRunSequence>().enabled = true;
+                    // Disable this script
+                    this.enabled = false;
+            }
+        }
         }
 
         if (other.gameObject.CompareTag("Trigger"))
@@ -455,7 +483,6 @@ public class PlayerMove : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         mainCam.GetComponent<Animator>().SetBool("flying", false);
-        godmodevisual.SetActive(true);
         StartCoroutine(delayedGodmodeOff());
         StartCoroutine(ChangePitchOverTime());
         floating = true;
@@ -503,12 +530,15 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator delayedGodmodeOff()
     {
-         yield return new WaitForSeconds(5);
+        godmodevisual.SetActive(true);
+        godmodevisual.GetComponent<ToggleShield>().shield.enabled = true;
+        yield return new WaitForSeconds(5);
         godmodevisual.GetComponent<ToggleShield>().enabled = true;
         yield return new WaitForSeconds(3);
         godmode = false;
         godmodevisual.SetActive(false);
         godmodevisual.GetComponent<ToggleShield>().enabled = false;
+        godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
