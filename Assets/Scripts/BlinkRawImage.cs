@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class BlinkRawImage : MonoBehaviour
 {
     public float blinkInterval = 0.5f; // Time in seconds between blinks
-    private RawImage rawImage;
+    public RawImage rawImage;
     private float timer;
     private bool isVisible;
 
