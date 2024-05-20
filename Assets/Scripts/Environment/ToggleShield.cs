@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class ToggleShield : MonoBehaviour
 {
@@ -6,26 +7,39 @@ public class ToggleShield : MonoBehaviour
     public float flashInterval = 0.25f;
     public float onDuration = 0.25f;
 
-    private static bool isOn = false;
+    private bool isOn = false;
     private float timer = 0f;
+    private Coroutine toggleCoroutine;
 
-    void Update()
+    private void OnEnable()
     {
-        timer += Time.deltaTime;
-        if (timer >= flashInterval)
+        // Ensure the shield is always enabled when the script is activated
+        if (toggleCoroutine != null)
         {
-            isOn = !isOn;
-            shield.enabled = isOn;
-            timer = 0f;
-            if (isOn)
-            {
-                Invoke("TurnOff", onDuration);
-            }
+            StopCoroutine(toggleCoroutine);
         }
+        toggleCoroutine = StartCoroutine(ToggleShieldCoroutine());
     }
 
-    void TurnOff()
+    private void OnDisable()
     {
-        shield.enabled = false;
+        if (toggleCoroutine != null)
+        {
+            StopCoroutine(toggleCoroutine);
+            toggleCoroutine = null;
+        }
+        shield.enabled = false; // Ensure the shield is off when the script is disabled
+    }
+
+    IEnumerator ToggleShieldCoroutine()
+    {
+        while (true)
+        {
+            shield.enabled = true;
+            yield return new WaitForSeconds(onDuration);
+
+            shield.enabled = false;
+            yield return new WaitForSeconds(flashInterval - onDuration);
+        }
     }
 }
