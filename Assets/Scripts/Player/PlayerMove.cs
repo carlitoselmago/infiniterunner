@@ -16,15 +16,14 @@ public class PlayerMove : MonoBehaviour
     public bool nowCanFly = false;
     public bool isFlying = false;
     public bool floating = false;
-    public bool alreadyCrashed = false;
     public bool holding = false;
 
     public bool godmode = false;
     public int flycoinsamount = 30;
-    private bool gotFirstCoin = false;
 
     public GameObject godmodevisual;
     public GameObject playerObject;
+    public Rigidbody playerBody;
     private Animator animator;
 
     public GameObject mainCam;
@@ -78,8 +77,6 @@ public class PlayerMove : MonoBehaviour
 
     public float horizontalSpeed = 20f;
 
-   
-
     public string pos = "center";
     private float targetpos = 0f;
 
@@ -118,6 +115,11 @@ public class PlayerMove : MonoBehaviour
         if (animator.GetBool("isrunning"))
         {
             MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
+        }
+
+        if (playerBody.IsSleeping())
+        {
+            playerBody.WakeUp();
         }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
@@ -263,11 +265,9 @@ public class PlayerMove : MonoBehaviour
     {
         if (other.gameObject.CompareTag("obstacle"))
         {
-            if (!godmode){
-                if (!alreadyCrashed)
+            if (!godmode)
                 {
                     Debug.Log("Entered in collision with " + other);
-                    alreadyCrashed = true;
                     other.GetComponent<BoxCollider>().enabled = false;
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     animator.Play("Stumble Backwards");
@@ -278,8 +278,8 @@ public class PlayerMove : MonoBehaviour
                     // Disable this script
                     this.enabled = false;
                 }
-            }
-        }
+              }
+
         if (other.gameObject.CompareTag("coin"))
         {
             coinFX.pitch = 1;
@@ -310,7 +310,7 @@ public class PlayerMove : MonoBehaviour
         {
             //fly object
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
-            //initialmoveSpeed = moveSpeed;
+            initialmoveSpeed = moveSpeed;
             godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
@@ -358,7 +358,7 @@ public class PlayerMove : MonoBehaviour
             backDoorSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying)
+        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying)
         {
             panopticSFX.Play();
         }
@@ -377,9 +377,6 @@ public class PlayerMove : MonoBehaviour
         {
             if (!godmode)
             {
-                if (!alreadyCrashed)
-            {
-                    alreadyCrashed = true;
                     other.GetComponent<BoxCollider>().enabled = false;
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     animator.Play("Stumble Backwards");
@@ -390,8 +387,7 @@ public class PlayerMove : MonoBehaviour
                     this.enabled = false;
             }
         }
-        }
-
+     
         if (other.gameObject.CompareTag("Trigger"))
         {
             // Get the MoveOnCollision component from the specified GameObject
@@ -419,7 +415,6 @@ public class PlayerMove : MonoBehaviour
         }
 
     }
-
 
     void normalhitbox()
     {
@@ -521,9 +516,9 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator PlayMainTheme()
     {
-        if (!mainTheme.isPlaying && !flyFX.isPlaying)
+        if (!mainTheme.isPlaying && pyramidsTheme.isPlaying && !flyFX.isPlaying)
         {
-            yield return new WaitForSeconds(20);
+            yield return new WaitForSeconds(15);
             mainTheme.Play();
         }
     }
@@ -574,6 +569,7 @@ public class PlayerMove : MonoBehaviour
 
         return origin;
     }
+
     private void PerformFly()
     {
         float tweenspeed = 1.0f;
@@ -594,14 +590,13 @@ public class PlayerMove : MonoBehaviour
 
         if (timeFraction < 2f)
         {
-
             // Ease out effect using Mathf.SmoothStep for smoother transition
             float initialY = jumpedHeight;//startY + jumpedHeight; // Start falling from this height
 
             float newY = Mathf.SmoothStep(initialY, startY, timeFraction);
 
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-            //moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
+            moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
         }
         else
         {
@@ -611,6 +606,7 @@ public class PlayerMove : MonoBehaviour
 
         }
     }
+
     private void HideAllTutorialCards()
     {
         // Iterate over all direct children of the tutorial2D GameObject
@@ -620,5 +616,4 @@ public class PlayerMove : MonoBehaviour
             child.gameObject.SetActive(false);
         }
     }
-
 }

@@ -34,7 +34,7 @@ public class CarBehaviour : MonoBehaviour
 
     void SetRandomInterval()
     {
-        interval = Random.Range(0f, 4f);
+        interval = Random.Range(0f, 16f);
     }
 
     void ActivateAnimator()
