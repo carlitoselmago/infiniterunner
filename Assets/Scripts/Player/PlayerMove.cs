@@ -18,18 +18,6 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public bool holding = false;
 
-    //acceleration
-    private float maxSpeed = 20f; // Maximum speed the player can reach
-    private float resetSpeed = 12f; // Speed to reset to after death
-    private float accelerationDuration = 180f; // Duration in seconds over which speed should increase (3 minutes)
-    private float startDelay = 60f; // Delay before starting the acceleration (1 minute)
-    private float accelerationRate;
-    private bool isDead = false;
-    private float elapsedTimeToAccelerate = 0f;
-    private bool accelerationStarted = false;
-    private bool maxSpeedReached = false;
-
-
     public bool godmode = false;
     public int flycoinsamount = 30;
 
@@ -94,7 +82,7 @@ public class PlayerMove : MonoBehaviour
     public string pos = "center";
     private float targetpos = 0f;
 
-    private bool startedrunning = false;
+    public static bool startedrunning = false;
 
     private string tutorialcard = "";
 
@@ -111,8 +99,6 @@ public class PlayerMove : MonoBehaviour
         startedrunning = false;
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
-        // Calculate the acceleration rate to reach maxSpeed in accelerationDuration
-        accelerationRate = (maxSpeed - moveSpeed) / accelerationDuration;
     }
 
     void Update()
@@ -276,42 +262,6 @@ public class PlayerMove : MonoBehaviour
                 //Debug.Log(targetHeight);
             }
         }
-
-        //acceleration over time
-        if (!isDead)
-        {
-            // Increase the elapsed time
-            elapsedTimeToAccelerate += Time.deltaTime;
-
-            // Start acceleration after the delay
-            if (elapsedTimeToAccelerate >= startDelay && !accelerationStarted)
-            {
-                accelerationStarted = true;
-                elapsedTimeToAccelerate = 0f; // Reset elapsed time for the acceleration period
-            }
-
-            // Accelerate the player speed over time within the specified duration
-            if (accelerationStarted && elapsedTimeToAccelerate < accelerationDuration)
-            {
-                moveSpeed += accelerationRate * Time.deltaTime;
-            }
-            else if (accelerationStarted && !maxSpeedReached)
-            {
-                moveSpeed = maxSpeed; // Cap the speed at maxSpeed after the duration
-                maxSpeedReached = true;
-                CollectableControl.maxSpeedIsReached = true;
-            }
-        }
-        else
-        {
-            // Reset speed after death
-            moveSpeed = resetSpeed;
-            elapsedTimeToAccelerate = 0f; // Reset the elapsed time
-            accelerationStarted = false; // Reset acceleration flag
-            maxSpeedReached = false; // Reset max speed reached flag
-            isDead = false; // Set isDead to false so the player can start moving again
-        }
-
     }
 
     void OnTriggerEnter(Collider other)
@@ -325,7 +275,6 @@ public class PlayerMove : MonoBehaviour
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
-                    Die();
                     //mainCam.GetComponent<Animator>().enabled = true;
                     HideAllTutorialCards();
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
@@ -444,13 +393,6 @@ public class PlayerMove : MonoBehaviour
                     // Disable this script
                     this.enabled = false;
             }
-        }
-     
-        if (other.gameObject.CompareTag("Trigger"))
-        {
-            // Get the MoveOnCollision component from the specified GameObject
-            MoveOnCollision moveScript = objectWithMoveScript.GetComponent<MoveOnCollision>();
-            StartCoroutine(moveScript.MoveObject(15.0f, 1.0f));
         }
 
         if (other.gameObject.CompareTag("tutorial"))
@@ -685,10 +627,5 @@ public class PlayerMove : MonoBehaviour
             // Disable the child GameObject
             child.gameObject.SetActive(false);
         }
-    }
-
-    public void Die()
-    {
-        isDead = true;
     }
 }
