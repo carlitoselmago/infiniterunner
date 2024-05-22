@@ -27,7 +27,10 @@ public class CollectableControl : MonoBehaviour
     private string exposedParameter;
     private float duration;
     private float targetVolume;
+    private bool accelerating = true;
+    public static bool maxSpeedIsReached = false;
     public AudioSource highScoreSFX;
+    public AudioSource highSpeedSFX;
 
     void Start()
     {
@@ -56,6 +59,24 @@ public class CollectableControl : MonoBehaviour
                 treballadordelmes_coins_index += 1;
                 StartCoroutine(hideachievement());
             }
+        }
+
+        //acceleration
+        if (accelerating)
+        {
+            if (!maxSpeedIsReached)
+            {
+                achievementEndUItext.GetComponent<Text>().text = "MÀXIMA VELOCITAT!";
+                achievementUI.SetActive(true);
+                highSpeedSFX.Play();
+                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
+                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
+                StartCoroutine(hideachievement());
+                accelerating = false;
+            }
+        } else
+        {
+            Debug.Log("Acceleration complete");
         }
     }
 
