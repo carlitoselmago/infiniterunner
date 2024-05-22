@@ -21,6 +21,8 @@ public class PlayerMove : MonoBehaviour
     public bool godmode = false;
     public int flycoinsamount = 30;
 
+    private List<GameObject> instantiatedCoins = new List<GameObject>();
+
     public GameObject godmodevisual;
     public GameObject playerObject;
     public Rigidbody playerBody;
@@ -307,7 +309,7 @@ public class PlayerMove : MonoBehaviour
             other.gameObject.SetActive(false);
         }
 
-        if (other.gameObject.CompareTag("powerup"))
+        if (other.gameObject.CompareTag("powerup") || (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
         {
             //fly object
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
@@ -321,13 +323,17 @@ public class PlayerMove : MonoBehaviour
             if (!isFlying)
             {
                 //create array of coins
-                float currentZ = this.transform.position.z + 300;
-
+                 // Calculate currentZ based on the relative position of the player to the map
+                float currentZ = MAP.transform.InverseTransformPoint(this.transform.position).z + 230;
+                Debug.Log(currentZ);
                 for (int i = 0; i < flycoinsamount; i++)
                 {
                     GameObject newcoin = Instantiate(flycoin, Vector3.zero, Quaternion.identity);
                     newcoin.transform.localPosition = new Vector3(this.transform.position.x, targetHeight, currentZ + (i * 3));
                     newcoin.transform.SetParent(MAP.transform, false);
+
+                    // Add new coin to the list
+                    instantiatedCoins.Add(newcoin);
                 }
                 StartCoroutine(FlyTimeout());
             }
@@ -493,6 +499,15 @@ public class PlayerMove : MonoBehaviour
         floating = false;
         //set move speed back to initial
         moveSpeed=initialmoveSpeed ;
+
+         // Destroy all instantiated coins
+        foreach (GameObject coin in instantiatedCoins)
+        {
+            Destroy(coin);
+        }
+
+        // Clear the list
+        instantiatedCoins.Clear();
     }
 
     IEnumerator PitchShiftTimeout()
