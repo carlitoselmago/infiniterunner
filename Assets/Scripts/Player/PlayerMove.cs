@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
-    public static float moveSpeed = 12.0f;
+    public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float leftRightSpeed = 10.0f;
     public bool isJumping = false;
@@ -96,6 +96,7 @@ public class PlayerMove : MonoBehaviour
         HideAllTutorialCards();
         startedrunning = false;
         godmodevisual.SetActive(false);
+        initialmoveSpeed = moveSpeed;
     }
 
     void Update()
@@ -310,7 +311,7 @@ public class PlayerMove : MonoBehaviour
         {
             //fly object
             //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
-            initialmoveSpeed = moveSpeed;
+            
             godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
@@ -490,6 +491,8 @@ public class PlayerMove : MonoBehaviour
         
         yield return new WaitForSeconds(1);
         floating = false;
+        //set move speed back to initial
+        moveSpeed=initialmoveSpeed ;
     }
 
     IEnumerator PitchShiftTimeout()
@@ -597,13 +600,14 @@ public class PlayerMove : MonoBehaviour
 
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
             moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
+            Debug.Log("falling............");
         }
         else
         {
             // Ensure it ends exactly at the startY and stop the fall
             transform.position = new Vector3(transform.position.x, startY, transform.position.z);
             //isFlying = false; // Consider renaming this flag to better suit your context, like isFalling or movementFinished
-
+            
         }
     }
 
