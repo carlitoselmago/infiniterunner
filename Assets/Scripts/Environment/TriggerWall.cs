@@ -5,19 +5,13 @@ using UnityEngine;
 
 public class TriggerWall : MonoBehaviour
 {
-    public GameObject panopticPoster;
+    public GameObject triggeredObject;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("fade trigger"))
+        if (other.gameObject.CompareTag("Trigger"))
         {
-            panopticPoster.SetActive(true);
+            triggeredObject.SetActive(true);
         }
-    }
-
-    IEnumerator wait()
-    {
-        yield return new WaitForSeconds(10);
-        panopticPoster.SetActive(false);
     }
 }

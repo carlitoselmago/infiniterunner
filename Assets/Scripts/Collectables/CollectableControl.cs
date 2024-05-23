@@ -18,7 +18,7 @@ public class CollectableControl : MonoBehaviour
 
     //time vars
     private float elapsedTime = 0f;
-    private List<float> seconds_to_elapse = new List<float> { 60f, 120f, 180f, 240f, 360f };
+    private List<float> seconds_to_elapse = new List<float> { 120f, 180f, 240f, 360f, 420f };
     private int seconds_to_elapse_index = 0;
     public int ConvertSecondsToMinutes(float totalSeconds)
     {
