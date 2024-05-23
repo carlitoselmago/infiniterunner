@@ -18,7 +18,7 @@ public class CollectableControl : MonoBehaviour
 
     //time vars
     private float elapsedTime = 0f;
-    private List<float> seconds_to_elapse = new List<float> { 120f, 180f, 240f, 360f, 420f };
+    private List<float> seconds_to_elapse = new List<float> { 60f, 120f, 180f, 240f, 360f, 420f };
     private int seconds_to_elapse_index = 0;
     public int ConvertSecondsToMinutes(float totalSeconds)
     {
@@ -33,7 +33,7 @@ public class CollectableControl : MonoBehaviour
     public static string lastAchievementText = "";
 
     //list of time compliments
-    private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE", "IRREFRENABLE!", "EL TEMPS ÉS OR", "NO HI HA FINAL" };
+    private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL" };
 
     private bool achievementShown = false; //used to prevent collisions between score and time achievements
 
@@ -42,8 +42,6 @@ public class CollectableControl : MonoBehaviour
     private string exposedParameter;
     private float duration;
     private float targetVolume;
-    private bool accelerating = true;
-    public static bool maxSpeedIsReached = false;
     public AudioSource highScoreSFX;
     public AudioSource highSpeedSFX;
 

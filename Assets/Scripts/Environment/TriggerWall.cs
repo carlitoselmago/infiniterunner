@@ -7,10 +7,11 @@ public class TriggerWall : MonoBehaviour
 {
     public GameObject triggeredObject;
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Trigger"))
         {
+            Debug.Log("TRIGGER");
             triggeredObject.SetActive(true);
         }
     }

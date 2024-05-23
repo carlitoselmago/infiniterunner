@@ -57,7 +57,7 @@ public class PlayerMove : MonoBehaviour
     private float targetVolume;
 
     public GameObject levelControl;
-
+    public GameObject triggeredObject;
     private BoxCollider boxCollider;
 
     private float targetHeight = 17.0f;
@@ -338,6 +338,12 @@ public class PlayerMove : MonoBehaviour
                 StartCoroutine(FlyTimeout());
             }
             isFlying = true;
+        }
+
+        if (other.gameObject.CompareTag("Trigger"))
+        {
+            Debug.Log("TRIGGER");
+            triggeredObject.SetActive(true);
         }
 
         if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
