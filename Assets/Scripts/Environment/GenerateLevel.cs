@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
 {
+    public int stepamount=100;
     public GameObject templatesparent;
     private GameObject[] section;
     public AudioSource mainTheme;
-    public int stepamount=100;
+    
     private int zPos;
     public int generatedSections = 0;
     public bool creatingSection = false;
@@ -20,7 +21,7 @@ public class GenerateLevel : MonoBehaviour
 
    void Start()
 {
-    zPos = stepamount*2;
+    zPos =200;// stepamount*2;
 
     // Initialize the section array with the number of children in templatesparent
     section = new GameObject[templatesparent.transform.childCount];
