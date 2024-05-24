@@ -18,7 +18,8 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public bool holding = false;
 
-    public static int remainingHealth = 3;
+    public static int maxHealth = 3;
+    public static int remainingHealth;
     private bool hit = false;
     public bool isDead = false;
     public bool godmode = false;
@@ -100,6 +101,7 @@ public class PlayerMove : MonoBehaviour
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
+        remainingHealth = maxHealth;
         startedrunning = false;
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;

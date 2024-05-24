@@ -126,10 +126,13 @@ public class CollectableControl : MonoBehaviour
 
     void lifeUp()
     {
-        if (PlayerMove.remainingHealth <= 3)
+        if (PlayerMove.remainingHealth <= PlayerMove.maxHealth)
         {
             PlayerMove.remainingHealth++;
             Debug.Log("Extra life!");
+        } else
+        {
+            Debug.Log("Health is maxed.");
         }
     }
 
