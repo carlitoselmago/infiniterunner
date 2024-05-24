@@ -18,6 +18,9 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public bool holding = false;
 
+    public static int remainingHealth = 3;
+    private bool hit = false;
+    public bool isDead = false;
     public bool godmode = false;
     public int flycoinsamount = 30;
 
@@ -96,6 +99,7 @@ public class PlayerMove : MonoBehaviour
         normalhitbox();
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
+        isDead = false;
         startedrunning = false;
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
@@ -257,7 +261,6 @@ public class PlayerMove : MonoBehaviour
             {
                 // PerformFly();
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
-                
                 //Debug.Log(startY);
                 //Debug.Log(targetHeight);
             }
@@ -269,10 +272,15 @@ public class PlayerMove : MonoBehaviour
         if (other.gameObject.CompareTag("obstacle"))
         {
             if (!godmode)
+            {
+                hit = true;
+                remainingHealth--;
+                Debug.Log("Entered in collision with " + other);
+                other.GetComponent<BoxCollider>().enabled = false;
+                if (remainingHealth <= 0) // dead
                 {
-                    Debug.Log("Entered in collision with " + other);
-                    other.GetComponent<BoxCollider>().enabled = false;
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
+                    isDead = true;
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
                     //mainCam.GetComponent<Animator>().enabled = true;
@@ -280,7 +288,14 @@ public class PlayerMove : MonoBehaviour
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
                     // Disable this script
                     this.enabled = false;
+                } else if (hit == true && remainingHealth > 0) // hurt
+                {
+                    animator.SetBool("ishurt", true);
+                    StartCoroutine(HurtSequence());
+                    crashThud.Play();
                 }
+                hit = false;
+            }
               }
 
         if (other.gameObject.CompareTag("coin"))
@@ -467,6 +482,12 @@ public class PlayerMove : MonoBehaviour
         isRolling = false;
         animator.SetBool("isrolling", false);
         normalhitbox();
+    }
+
+    IEnumerator HurtSequence()
+    {
+        yield return new WaitForSeconds(1.15f);
+        animator.SetBool("ishurt", false);
     }
 
     IEnumerator FlyTimeout()

@@ -75,6 +75,7 @@ public class CollectableControl : MonoBehaviour
                         achievementShown = true;
                         highScoreSFX.Play();
                         dimVolumes();
+                        lifeUp();
                         treballadordelmes_coins_index += 1;
                         StartCoroutine(hideachievement());
                     }
@@ -101,6 +102,7 @@ public class CollectableControl : MonoBehaviour
                     achievementShown = true;
                     highSpeedSFX.Play();
                     dimVolumes();
+                        lifeUp();
                     seconds_to_elapse_index += 1;
                     StartCoroutine(hideachievement());
                 }
@@ -120,6 +122,15 @@ public class CollectableControl : MonoBehaviour
     {
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
+    }
+
+    void lifeUp()
+    {
+        if (PlayerMove.remainingHealth <= 3)
+        {
+            PlayerMove.remainingHealth++;
+            Debug.Log("Extra life!");
+        }
     }
 
     IEnumerator hideachievement()
