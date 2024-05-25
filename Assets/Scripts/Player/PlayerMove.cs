@@ -285,7 +285,6 @@ public class PlayerMove : MonoBehaviour
                     isDead = true;
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
-                    //mainCam.GetComponent<Animator>().enabled = true;
                     HideAllTutorialCards();
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
                     // Disable this script
@@ -388,9 +387,19 @@ public class PlayerMove : MonoBehaviour
             backDoorSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("panoptic") && !mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("panoptic")) // check if it works properly
         {
-            panopticSFX.Play();
+            float random = Random.value;
+           if (random > 0.5)
+            {
+                mainCam.GetComponent<Animator>().SetBool("panoptic", true);
+                StartCoroutine(ApplyGlissando());
+            }
+
+            if (!mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying)
+            {
+                panopticSFX.Play();
+            }
         }
 
         if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
@@ -436,7 +445,6 @@ public class PlayerMove : MonoBehaviour
                 Debug.LogError("Tutorial card not found: " + tutorialcard);
             }
         }
-
     }
 
     void normalhitbox()
@@ -552,6 +560,35 @@ public class PlayerMove : MonoBehaviour
         // Ensure the pitch is exactly what we want at the end
         BGM.pitch = endingPitch;
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1));
+    }
+
+    IEnumerator ApplyGlissando()
+    {
+        float halfDuration = 2.0f;
+        float elapsedTime = 0f;
+
+        // Gradually increase the pitch from pitchMin to pitchMax
+        while (elapsedTime < halfDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / halfDuration;
+            BGM.pitch = Mathf.Lerp(1f, 5f, t);
+            yield return null;
+        }
+        elapsedTime = 0f;
+
+        // Gradually decrease the pitch from pitchMax back to pitchMin
+        while (elapsedTime < halfDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / halfDuration;
+            BGM.pitch = Mathf.Lerp(5.5f, 1f, t);
+            yield return null;
+        }
+        // Ensure the pitch is reset to the minimum value at the end
+        BGM.pitch = endingPitch;
+        yield return new WaitForSeconds(2);
+        mainCam.GetComponent<Animator>().SetBool("panoptic", false);
     }
 
     IEnumerator PlayMainTheme()
