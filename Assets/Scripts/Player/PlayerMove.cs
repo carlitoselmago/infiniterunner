@@ -82,6 +82,13 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject MAP;
 
+    public GameObject hearts;
+
+    public GameObject heart;
+
+     // List to store instantiated hearts
+    public List<GameObject> heartList = new List<GameObject>();
+
     public float horizontalSpeed = 20f;
 
     public string pos = "center";
@@ -102,10 +109,50 @@ public class PlayerMove : MonoBehaviour
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
-        remainingHealth = maxHealth;
+        remainingHealth = 0;//maxHealth;
         startedrunning = false;
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
+
+        //set hearts based on amount of life
+          for (int i = 0; i < maxHealth; i++)
+        {
+            AddHeart();
+        }
+    }
+
+    public void AddHeart(){
+        if (heartList.Count< maxHealth){
+        Debug.Log("added heart!!!!");
+         // Instantiate the heart prefab at the specified location
+            GameObject clonedHeart = Instantiate(heart,  Vector3.zero, Quaternion.identity);
+
+            // Set the parent of the cloned heart
+            clonedHeart.transform.SetParent(hearts.transform, false);
+
+            // Optionally adjust the position if you want to stagger them or place them differently
+            clonedHeart.transform.localPosition = new Vector3(heartList.Count*50, 0, 0);
+
+            // Get the Animator component of the cloned heart
+            Animator heartAnimator = clonedHeart.GetComponent<Animator>();
+            heartList.Add(clonedHeart);
+            heartAnimator.SetBool("started", true);
+            remainingHealth+=1;
+        } else{
+            Debug.Log("Cannot add more hearts");
+        }
+    }
+
+  public void RemoveHeartsInReverseOrder()
+    {
+        int lastindex=heartList.Count - 1;
+         // Destroy the heart GameObject
+            Destroy(heartList[lastindex]);
+
+            // Remove the heart from the list
+            heartList.RemoveAt(lastindex);
+
+       
     }
 
     void Update()
@@ -287,7 +334,7 @@ public class PlayerMove : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("obstacle"))
+        if (other.gameObject.CompareTag("obstacle")) 
         {
             if (!godmode)
             {
@@ -299,17 +346,21 @@ public class PlayerMove : MonoBehaviour
                 {
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     isDead = true;
+                    
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
                     HideAllTutorialCards();
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
+                      RemoveHeartsInReverseOrder();
                     // Disable this script
                     this.enabled = false;
+                    
                 } else if (hit == true && remainingHealth > 0) // hurt
                 {
                     animator.SetBool("ishurt", true);
                     StartCoroutine(HurtSequence());
                     crashThud.Play();
+                    RemoveHeartsInReverseOrder();
                 }
                 hit = false;
             }

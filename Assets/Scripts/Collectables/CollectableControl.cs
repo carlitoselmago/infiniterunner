@@ -6,6 +6,7 @@ using UnityEngine.Audio;
 
 public class CollectableControl : MonoBehaviour
 {
+    public GameObject player;
     public static int coinCount;
     public GameObject coinCountDisplay;
 
@@ -35,7 +36,7 @@ public class CollectableControl : MonoBehaviour
     //list of time compliments
     private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL" };
 
-    private bool achievementShown = false; //used to prevent collisions between score and time achievements
+    public bool achievementShown = false; //used to prevent collisions between score and time achievements
 
     //audio mixer
     public AudioMixer audioMixer;
@@ -44,6 +45,7 @@ public class CollectableControl : MonoBehaviour
     private float targetVolume;
     public AudioSource highScoreSFX;
     public AudioSource highSpeedSFX;
+    private PlayerMove playerMove;
 
     void Start()
     {
@@ -51,6 +53,9 @@ public class CollectableControl : MonoBehaviour
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
         achievementUI.SetActive(false);
         lastAchievementText = "";
+
+        PlayerMove playerMove = player.GetComponent<PlayerMove>();
+       
     }
 
     void Update()
@@ -63,10 +68,10 @@ public class CollectableControl : MonoBehaviour
 
             if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
             {
-                if (coinCount >= treballadordelmes_coins[treballadordelmes_coins_index])
+                if (coinCount == treballadordelmes_coins[treballadordelmes_coins_index])
                 {
-                    if (achievementShown == false)
-                    {
+                  if (1==1){
+                   // if (achievementShown == false) {
                         string compliment = compliments[treballadordelmes_coins_index];
                         lastAchievementText = "TREBALLADORA " + compliment + "!";
                         achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
@@ -81,7 +86,8 @@ public class CollectableControl : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError("Skipped High Score Achievement!");
+                        //Debug.LogError("Skipped High Score Achievement!");
+                        Debug.Log("Skipped High Score Achievement!");
                     }
                 }
         }
@@ -101,13 +107,14 @@ public class CollectableControl : MonoBehaviour
                     achievementShown = true;
                     highSpeedSFX.Play();
                     dimVolumes();
-                        lifeUp();
+                    lifeUp();
                     seconds_to_elapse_index += 1;
                     StartCoroutine(hideachievement());
                 }
                 else
                 {
-                    Debug.LogError("Skipped Time Achievement!");
+                    //Debug.LogError("Skipped Time Achievement!");
+                    Debug.Log("Skipped Time Achievement!");
                 }
 
                 }
@@ -124,14 +131,20 @@ public class CollectableControl : MonoBehaviour
 
     void lifeUp()
     {
+         PlayerMove playerMove = player.GetComponent<PlayerMove>();
+         playerMove.AddHeart();
+         /*
         if (PlayerMove.remainingHealth <= PlayerMove.maxHealth)
         {
-            PlayerMove.remainingHealth++;
+            //PlayerMove.remainingHealth++;
             Debug.Log("Extra life!");
+           
+           
         } else
         {
             Debug.Log("Health is maxed.");
         }
+        */
     }
 
     IEnumerator hideachievement()
