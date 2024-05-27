@@ -7,7 +7,6 @@ public class ToggleShield : MonoBehaviour
     public float flashInterval = 0.25f;
     public float onDuration = 0.25f;
 
-    private bool isOn = false;
     private float timer = 0f;
     private Coroutine toggleCoroutine;
 

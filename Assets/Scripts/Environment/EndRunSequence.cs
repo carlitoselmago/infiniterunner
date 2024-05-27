@@ -27,6 +27,7 @@ public class EndRunSequence : MonoBehaviour
         yield return new WaitForSeconds(1);
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 1.5f, targetVolume = 0));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 0));
         endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
         gameOverFX.Play();

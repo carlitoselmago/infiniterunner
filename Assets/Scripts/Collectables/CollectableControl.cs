@@ -84,7 +84,6 @@ public class CollectableControl : MonoBehaviour
                         Debug.LogError("Skipped High Score Achievement!");
                     }
                 }
-            
         }
             
                 if (seconds_to_elapse_index < seconds_to_elapse.Count)
@@ -113,15 +112,14 @@ public class CollectableControl : MonoBehaviour
 
                 }
             }
-
         }
-
     }
 
     void dimVolumes()
     {
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.25f));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 0.5f, targetVolume = 0.25f));
     }
 
     void lifeUp()
@@ -141,6 +139,7 @@ public class CollectableControl : MonoBehaviour
         yield return new WaitForSeconds(2);
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 2, targetVolume = 1));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 1));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 2, targetVolume = 1));
         yield return new WaitForSeconds(3);
         achievementUI.SetActive(false);
         achievementShown = false;

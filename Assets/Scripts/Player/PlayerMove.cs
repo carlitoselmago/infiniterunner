@@ -114,10 +114,10 @@ public class PlayerMove : MonoBehaviour
         if (startedrunning == false)
         {
             timer += Time.deltaTime;
-            if (timer >= 4f)
+            if (timer >= 3f)
             {
                 tutorial2d.transform.Find("touch-cards").gameObject.SetActive(true);
-                if (timer >= 8f)
+                if (timer >= 7f)
                 {
                     tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
                     timer = 0f;
@@ -374,8 +374,15 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("Trigger"))
         {
-            Debug.Log("TRIGGER");
-            triggeredObject.SetActive(true);
+            Debug.Log("BRDIGE TRIGGER");
+            foreach (Transform child in triggeredObject.transform)
+            {
+                float carRandom = Random.value;
+                if (carRandom >= 0.5f)
+                {
+                child.gameObject.SetActive(true);
+                }
+            }
         }
 
         if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
@@ -406,7 +413,7 @@ public class PlayerMove : MonoBehaviour
         if (other.gameObject.CompareTag("panoptic")) // check if it works properly
         {
             float random = Random.value;
-           if (random > 0.5)
+           if (random >= 0.5f)
             {
                 mainCam.GetComponent<Animator>().SetBool("panoptic", true);
                 StartCoroutine(ApplyGlissando());
@@ -518,8 +525,6 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator FlyTimeout()
     {
-        //Debug.Log("FLYTIMEOUT!!!!!!!!!!!!");
-
         yield return new WaitForSeconds(3);
         tutorial2d.transform.Find("fly").gameObject.SetActive(true);
 
@@ -573,14 +578,13 @@ public class PlayerMove : MonoBehaviour
             yield return null;
         }
 
-        // Ensure the pitch is exactly what we want at the end
         BGM.pitch = endingPitch;
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1));
     }
 
     IEnumerator ApplyGlissando()
     {
-        float halfDuration = 2.0f;
+        float halfDuration = 4.0f;
         float elapsedTime = 0f;
 
         // Gradually increase the pitch from pitchMin to pitchMax
@@ -603,7 +607,7 @@ public class PlayerMove : MonoBehaviour
         }
         // Ensure the pitch is reset to the minimum value at the end
         BGM.pitch = endingPitch;
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(6);
         mainCam.GetComponent<Animator>().SetBool("panoptic", false);
     }
 
@@ -697,7 +701,6 @@ public class PlayerMove : MonoBehaviour
             // Ensure it ends exactly at the startY and stop the fall
             transform.position = new Vector3(transform.position.x, startY, transform.position.z);
             //isFlying = false; // Consider renaming this flag to better suit your context, like isFalling or movementFinished
-            
         }
     }
 

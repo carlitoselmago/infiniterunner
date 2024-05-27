@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TriggerWall : MonoBehaviour
 {
-    public GameObject triggeredObject;
+    /*public GameObject triggeredObject;
 
     void OnTriggerEnter(Collider other)
     {
@@ -14,5 +14,5 @@ public class TriggerWall : MonoBehaviour
             Debug.Log("TRIGGER");
             triggeredObject.SetActive(true);
         }
-    }
+    }*/
 }
