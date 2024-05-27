@@ -76,6 +76,7 @@ public class PlayerMove : MonoBehaviour
     public GameObject flycoin;
 
     public GameObject tutorial2d;
+    private float timer;
     public AudioSource coinFX;
     public GameObject objectWithMoveScript;
 
@@ -110,12 +111,27 @@ public class PlayerMove : MonoBehaviour
     void Update()
 
     {
+        if (startedrunning == false)
+        {
+            timer += Time.deltaTime;
+            if (timer >= 4f)
+            {
+                tutorial2d.transform.Find("touch-cards").gameObject.SetActive(true);
+                if (timer >= 8f)
+                {
+                    tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
+                    timer = 0f;
+                }
+            }
+        }
+
         if (startedrunning == false && Input.anyKey == true)
         {
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 1));
             StartCoroutine(PlayMainTheme());
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
+            tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
         }
         if (startedrunning == true && !animator.GetBool("isrunning"))
         {
