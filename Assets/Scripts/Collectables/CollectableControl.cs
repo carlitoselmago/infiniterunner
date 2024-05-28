@@ -84,10 +84,6 @@ public class CollectableControl : MonoBehaviour
                         treballadordelmes_coins_index += 1;
                         StartCoroutine(hideachievement());
                     }
-                    else
-                    {
-                        Debug.Log("Skipped High Score Achievement!");
-                    }
                 }
         }
             
@@ -112,7 +108,6 @@ public class CollectableControl : MonoBehaviour
                 }
                 else
                 {
-                    //Debug.LogError("Skipped Time Achievement!");
                     Debug.Log("Skipped Time Achievement!");
                 }
 

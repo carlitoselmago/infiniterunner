@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
@@ -30,6 +31,8 @@ public class PlayerMove : MonoBehaviour
     public GameObject godmodevisual;
     public GameObject playerObject;
     public Rigidbody playerBody;
+    public GameObject startingText;
+    public GameObject tutorialText;
     private Animator animator;
 
     public GameObject mainCam;
@@ -78,13 +81,13 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject tutorial2d;
     private float timer;
+    private bool alreadyCrossedPanoptic = false;
     public AudioSource coinFX;
     public GameObject objectWithMoveScript;
 
     public GameObject MAP;
 
     public GameObject hearts;
-
     public GameObject heart;
 
      // List to store instantiated hearts
@@ -98,6 +101,15 @@ public class PlayerMove : MonoBehaviour
     public static bool startedrunning = false;
 
     private string tutorialcard = "";
+    private Dictionary<string, string> tutorialInstructions = new Dictionary<string, string>
+    {
+        { "crouch", "AJUP-TE!" },
+        { "jump", "SALTA!" },
+        { "left", "ESQUERRA!" },
+        { "right", "DRETA!" },
+        { "rocket", "AGAFA EL COET!" },
+        { "fly", "MANTÉN EL CONTACTE PER VOLAR" }
+    };
 
 
     void Start()
@@ -159,13 +171,19 @@ public class PlayerMove : MonoBehaviour
     {
         if (startedrunning == false)
         {
+            if (startingText.active == false)
+            {
+            startingText.GetComponent<Text>().text = "Agafa les eines i toca qualsevol engranatge";
+            startingText.SetActive(true);
+            }
             timer += Time.deltaTime;
             if (timer >= 3f)
             {
                 tutorial2d.transform.Find("touch-cards").gameObject.SetActive(true);
-                if (timer >= 7f)
+                if (timer >= 6f)
                 {
                     tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
+                    //startingText.SetActive(false);
                     timer = 0f;
                 }
             }
@@ -179,6 +197,7 @@ public class PlayerMove : MonoBehaviour
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
+            startingText.SetActive(false);
         }
         if (startedrunning == true && !animator.GetBool("isrunning"))
         {
@@ -334,6 +353,7 @@ public class PlayerMove : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        HideAllTutorialCards();
         if (other.gameObject.CompareTag("obstacle")) 
         {
             if (!godmode)
@@ -433,38 +453,43 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("pyramids") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying)
         {
             pyramidsTheme.Play();
         }
 
-        if (other.gameObject.CompareTag("cogfactory") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("cogfactory") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying)
         {
             cogFactorySFX.Play();
         }
 
-        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying)
+        if (other.gameObject.CompareTag("cogsfarm") && mainTheme.isPlaying == false)
         {
             cogsfarmSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !photosSFX.isPlaying)
+        if (other.gameObject.CompareTag("photos") && mainTheme.isPlaying == false && !photosSFX.isPlaying)
         {
             photosSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("backdoor") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying)
         {
             backDoorSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("panoptic")) // check if it works properly
+        if (other.gameObject.CompareTag("panoptic"))
         {
             float random = Random.value;
-           if (random >= 0.5f)
+            if (alreadyCrossedPanoptic == false)
             {
-                mainCam.GetComponent<Animator>().SetBool("panoptic", true);
                 StartCoroutine(ApplyGlissando());
+                alreadyCrossedPanoptic = true;
+            } else if (alreadyCrossedPanoptic == true) {
+               if (random >= 0.5f)
+             {
+                    StartCoroutine(ApplyGlissando());
+                }
             }
 
             if (!mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying)
@@ -473,7 +498,7 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
+        if (other.gameObject.CompareTag("canyon") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
         {
             canyonSFX.Play();
         }
@@ -510,12 +535,28 @@ public class PlayerMove : MonoBehaviour
             if (tutorialCardTransform != null)
             {
                 tutorialCardTransform.gameObject.SetActive(true);
+
+                // Display the corresponding instruction if it exists
+                if (tutorialInstructions.TryGetValue(tutorialcard, out string instruction))
+                {
+                    DisplayInstruction(instruction);
+                }
+                else
+                {
+                    Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
+                }
             }
             else
             {
                 Debug.LogError("Tutorial card not found: " + tutorialcard);
             }
         }
+    }
+
+    private void DisplayInstruction(string instruction)
+    {
+        tutorialText.GetComponent<Text>().text = instruction;
+        tutorialText.SetActive(true);
     }
 
     void normalhitbox()
@@ -634,6 +675,8 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator ApplyGlissando()
     {
+        mainCam.GetComponent<Animator>().SetBool("panoptic", true);
+
         float halfDuration = 4.0f;
         float elapsedTime = 0f;
 
@@ -758,6 +801,7 @@ public class PlayerMove : MonoBehaviour
 
     private void HideAllTutorialCards()
     {
+        tutorialText.SetActive(false);
         // Iterate over all direct children of the tutorial2D GameObject
         foreach (Transform child in tutorial2d.transform)
         {

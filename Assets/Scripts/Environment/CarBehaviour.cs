@@ -9,7 +9,7 @@ public class CarBehaviour : MonoBehaviour
     void Start()
     {
         animator.enabled = false;
-        interval = Random.Range(0f, 8f);
+        interval = Random.Range(0f, 4f);
         StartCoroutine(Activate());
     }
 
