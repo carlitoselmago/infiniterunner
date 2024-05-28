@@ -175,7 +175,7 @@ public class PlayerMove : MonoBehaviour
         if (startedrunning == false && Input.anyKey == true)
         {
             BGM.Play();
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 1));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0.7f));
             StartCoroutine(PlayMainTheme());
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
@@ -644,6 +644,7 @@ public class PlayerMove : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / halfDuration;
             BGM.pitch = Mathf.Lerp(1f, 5f, t);
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = t, targetVolume = 1f));
             yield return null;
         }
         elapsedTime = 0f;
@@ -654,6 +655,7 @@ public class PlayerMove : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / halfDuration;
             BGM.pitch = Mathf.Lerp(5.5f, 1f, t);
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = t, targetVolume = 0.7f));
             yield return null;
         }
         // Ensure the pitch is reset to the minimum value at the end
