@@ -62,7 +62,7 @@ public class CollectableControl : MonoBehaviour
     {
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount; //alternative for time tracking: elapsedTime
 
-        if (PlayerMove.startedrunning)
+        if (PlayerMove.startedrunning && PlayerMove.isDead == false)
         {
             elapsedTime += Time.deltaTime;
 
@@ -86,7 +86,6 @@ public class CollectableControl : MonoBehaviour
                     }
                     else
                     {
-                        //Debug.LogError("Skipped High Score Achievement!");
                         Debug.Log("Skipped High Score Achievement!");
                     }
                 }
