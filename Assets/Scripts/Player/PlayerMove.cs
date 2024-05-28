@@ -21,7 +21,7 @@ public class PlayerMove : MonoBehaviour
     public static int maxHealth = 3;
     public static int remainingHealth;
     private bool hit = false;
-    public bool isDead = false;
+    public static bool isDead = false;
     public bool godmode = false;
     public int flycoinsamount = 30;
 
@@ -569,7 +569,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider.enabled = false;
         yield return new WaitForSeconds(0.30f);
         boxCollider.enabled = true;
-        yield return new WaitForSeconds(1.15f);
+        yield return new WaitForSeconds(0.5f);
         animator.SetBool("ishurt", false);
     }
 
