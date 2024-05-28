@@ -35,6 +35,7 @@ public class PlayerMove : MonoBehaviour
     public GameObject mainCam;
 
     //sfx
+    public AudioSource HurtSFX;
     public AudioSource crashThud;
     public AudioSource BGM;
     public AudioSource mainTheme;
@@ -150,9 +151,7 @@ public class PlayerMove : MonoBehaviour
             Destroy(heartList[lastindex]);
 
             // Remove the heart from the list
-            heartList.RemoveAt(lastindex);
-
-       
+            heartList.RemoveAt(lastindex); 
     }
 
     void Update()
@@ -178,6 +177,7 @@ public class PlayerMove : MonoBehaviour
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0.7f));
             StartCoroutine(PlayMainTheme());
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
         }
         if (startedrunning == true && !animator.GetBool("isrunning"))
@@ -346,12 +346,11 @@ public class PlayerMove : MonoBehaviour
                 {
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     isDead = true;
-                    
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
                     HideAllTutorialCards();
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
-                      RemoveHeartsInReverseOrder();
+                    RemoveHeartsInReverseOrder();
                     // Disable this script
                     this.enabled = false;
                     
@@ -359,7 +358,7 @@ public class PlayerMove : MonoBehaviour
                 {
                     animator.SetBool("ishurt", true);
                     StartCoroutine(HurtSequence());
-                    crashThud.Play();
+                    HurtSFX.Play();
                     RemoveHeartsInReverseOrder();
                 }
                 hit = false;
@@ -394,9 +393,7 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("powerup") || (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
         {
-            //fly object
-            //Debug.Log("FLY COLLISION!!!!!!!!!!!!!!!!!!!!");
-            
+            //fly object            
             godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
@@ -545,7 +542,6 @@ public class PlayerMove : MonoBehaviour
         boxCollider.size = new Vector3(0.67f, 0.24f, 0.58f);
     }
 
-
     IEnumerator JumpSequence()
     {
         jumphitbox();
@@ -570,6 +566,9 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator HurtSequence()
     {
+        boxCollider.enabled = false;
+        yield return new WaitForSeconds(0.30f);
+        boxCollider.enabled = true;
         yield return new WaitForSeconds(1.15f);
         animator.SetBool("ishurt", false);
     }
