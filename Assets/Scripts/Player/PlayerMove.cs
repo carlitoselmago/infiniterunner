@@ -36,6 +36,7 @@ public class PlayerMove : MonoBehaviour
     private Animator animator;
 
     public GameObject mainCam;
+    public GameObject UI2;
 
     //sfx
     public AudioSource HurtSFX;
@@ -199,6 +200,9 @@ public class PlayerMove : MonoBehaviour
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
             startingText.SetActive(false);
+            //move to standalone script !!!
+            UI2.GetComponent<Text>().text = "BGM.Play(); \n " + "StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = volumeBGM, duration = 3, targetVolume = 0.7f)); \n" + "StartCoroutine(PlayMainTheme());\n";
+
         }
         if (startedrunning == true && !animator.GetBool("isrunning"))
         {
