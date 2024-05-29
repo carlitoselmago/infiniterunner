@@ -9,7 +9,7 @@ public class HurtMask : MonoBehaviour
     public IEnumerator Mask()
     {
         hurtMask.SetActive(true);
-        yield return new WaitForSeconds(0.45f);
+        yield return new WaitForSeconds(0.55f);
         hurtMask.SetActive(false);
     }
 }
