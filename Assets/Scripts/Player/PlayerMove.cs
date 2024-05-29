@@ -84,6 +84,7 @@ public class PlayerMove : MonoBehaviour
     private bool alreadyCrossedPanoptic = false;
     public AudioSource coinFX;
     public GameObject objectWithMoveScript;
+    public HurtMask hurtMaskScript;
 
     public GameObject MAP;
 
@@ -177,10 +178,10 @@ public class PlayerMove : MonoBehaviour
             startingText.SetActive(true);
             }
             timer += Time.deltaTime;
-            if (timer >= 3f)
+            if (timer >= 1f)
             {
                 tutorial2d.transform.Find("touch-cards").gameObject.SetActive(true);
-                if (timer >= 6f)
+                if (timer >= 7f)
                 {
                     tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
                     //startingText.SetActive(false);
@@ -359,6 +360,7 @@ public class PlayerMove : MonoBehaviour
             if (!godmode)
             {
                 hit = true;
+                StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
                 other.GetComponent<BoxCollider>().enabled = false;
