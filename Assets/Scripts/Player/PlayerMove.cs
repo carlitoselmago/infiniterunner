@@ -18,6 +18,7 @@ public class PlayerMove : MonoBehaviour
     public bool isFlying = false;
     public bool floating = false;
     public bool holding = false;
+    private bool mainThemeAlreadyPlaying = false;
 
     public static int maxHealth = 3;
     public static int remainingHealth;
@@ -36,7 +37,6 @@ public class PlayerMove : MonoBehaviour
     private Animator animator;
 
     public GameObject mainCam;
-    public GameObject UI2;
 
     //sfx
     public AudioSource HurtSFX;
@@ -109,9 +109,10 @@ public class PlayerMove : MonoBehaviour
         { "jump", "SALTA!" },
         { "left", "ESQUERRA!" },
         { "right", "DRETA!" },
-        { "rocket", "AGAFA EL COET!" },
-        { "fly", "MANTÉN EL CONTACTE PER VOLAR" }
+        { "rocket", "AGAFA EL COET!" }
     };
+
+    public PrintCode printCodeScript;
 
 
     void Start()
@@ -179,7 +180,7 @@ public class PlayerMove : MonoBehaviour
             startingText.SetActive(true);
             }
             timer += Time.deltaTime;
-            if (timer >= 1f)
+            if (timer >= 2f)
             {
                 tutorial2d.transform.Find("touch-cards").gameObject.SetActive(true);
                 if (timer >= 7f)
@@ -195,14 +196,15 @@ public class PlayerMove : MonoBehaviour
         {
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0.7f));
-            StartCoroutine(PlayMainTheme());
+            if (mainThemeAlreadyPlaying == false)
+            {
+                StartCoroutine(PlayMainTheme());
+            }
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
             startingText.SetActive(false);
-            //move to standalone script !!!
-            UI2.GetComponent<Text>().text = "BGM.Play(); \n " + "StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = volumeBGM, duration = 3, targetVolume = 0.7f)); \n" + "StartCoroutine(PlayMainTheme());\n";
-
+            printCodeScript.SetCodePrompt("start");
         }
         if (startedrunning == true && !animator.GetBool("isrunning"))
         {
@@ -235,6 +237,7 @@ public class PlayerMove : MonoBehaviour
                 {
                     pos = "center";
                 }
+                printCodeScript.SetCodePrompt("left");
             }
         }
 
@@ -255,6 +258,7 @@ public class PlayerMove : MonoBehaviour
                 {
                     pos = "center";
                 }
+                printCodeScript.SetCodePrompt("right");
             }
         }
 
@@ -285,10 +289,9 @@ public class PlayerMove : MonoBehaviour
             if (isRolling == false)
             {
                 crouchhitbox();
-                //transform.Translate(Vector3.up * Time.deltaTime * moveSpeed *-1);
-                //playerObject.GetComponent<Animator>().Play("Quick Roll To Run");
                 animator.SetBool("isrolling", true);
                 StartCoroutine(RollSequence());
+                printCodeScript.SetCodePrompt("crouch");
             }
         }
 
@@ -305,7 +308,6 @@ public class PlayerMove : MonoBehaviour
                 if (isJumping == false)
                 {
                     isJumping = true;
-                    //playerObject.GetComponent<Animator>().Play("Jump");
                     animator.SetBool("isjumping", true);
                     StartCoroutine(JumpSequence());
                 }
@@ -350,8 +352,6 @@ public class PlayerMove : MonoBehaviour
             {
                 // PerformFly();
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
-                //Debug.Log(startY);
-                //Debug.Log(targetHeight);
             }
         }
     }
@@ -364,6 +364,7 @@ public class PlayerMove : MonoBehaviour
             if (!godmode)
             {
                 hit = true;
+                printCodeScript.SetCodePrompt("dead");
                 StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
@@ -382,6 +383,7 @@ public class PlayerMove : MonoBehaviour
                     
                 } else if (hit == true && remainingHealth > 0) // hurt
                 {
+                    printCodeScript.SetCodePrompt("hurt");
                     animator.SetBool("ishurt", true);
                     StartCoroutine(HurtSequence());
                     HurtSFX.Play();
@@ -419,10 +421,12 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("powerup") || (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
         {
+            printCodeScript.SetCodePrompt("fly");
             //fly object            
             godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
+            Debug.Log("is playing: " + flyFX.isPlaying);
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
             mainCam.GetComponent<Animator>().SetBool("flying", true);
@@ -591,6 +595,7 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator JumpSequence()
     {
+        printCodeScript.SetCodePrompt("jumpsequence");
         jumphitbox();
         yield return new WaitForSeconds(0.30f);
         comingDown = true;
@@ -603,6 +608,7 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator RollSequence()
     {
+        printCodeScript.SetCodePrompt("rollsequence");
         yield return new WaitForSeconds(0.45f);
         standingUp = true;
         yield return new WaitForSeconds(0.45f);
@@ -682,6 +688,7 @@ public class PlayerMove : MonoBehaviour
     IEnumerator ApplyGlissando()
     {
         mainCam.GetComponent<Animator>().SetBool("panoptic", true);
+        printCodeScript.SetCodePrompt("panoptic");
 
         float halfDuration = 4.0f;
         float elapsedTime = 0f;
@@ -716,8 +723,12 @@ public class PlayerMove : MonoBehaviour
     {
         if (!mainTheme.isPlaying && !pyramidsTheme.isPlaying && !flyFX.isPlaying)
         {
-            yield return new WaitForSeconds(17);
+            yield return new WaitForSeconds(18);
             mainTheme.Play();
+            mainThemeAlreadyPlaying = true;
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 2, targetVolume = 0f)); //experimental
+            yield return new WaitForSeconds(50);
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 3, targetVolume = 1f)); //experimental - turn volume up again
         }
     }
 
