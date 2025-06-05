@@ -103,7 +103,7 @@ public class CollectableControl : MonoBehaviour
                     highSpeedSFX.Play();
                     dimVolumes();
                     lifeUp();
-                        StartCoroutine(SmoothSpeedIncrease(3f, 2f)); // smoothly add x speed over y seconds
+                        StartCoroutine(SmoothSpeedIncrease(1f, 2f)); // smoothly add x speed over y seconds
                         seconds_to_elapse_index += 1;
                     StartCoroutine(hideachievement());
                 }
