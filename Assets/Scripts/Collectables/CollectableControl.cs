@@ -54,7 +54,7 @@ public class CollectableControl : MonoBehaviour
         achievementUI.SetActive(false);
         lastAchievementText = "";
 
-        PlayerMove playerMove = player.GetComponent<PlayerMove>();
+        playerMove = player.GetComponent<PlayerMove>();
        
     }
 
@@ -103,7 +103,8 @@ public class CollectableControl : MonoBehaviour
                     highSpeedSFX.Play();
                     dimVolumes();
                     lifeUp();
-                    seconds_to_elapse_index += 1;
+                        StartCoroutine(SmoothSpeedIncrease(3f, 2f)); // smoothly add x speed over y seconds
+                        seconds_to_elapse_index += 1;
                     StartCoroutine(hideachievement());
                 }
                 else
@@ -125,7 +126,7 @@ public class CollectableControl : MonoBehaviour
 
     void lifeUp()
     {
-         PlayerMove playerMove = player.GetComponent<PlayerMove>();
+         //playerMove = player.GetComponent<PlayerMove>();
          playerMove.AddHeart();
          /*
         if (PlayerMove.remainingHealth <= PlayerMove.maxHealth)
@@ -151,4 +152,22 @@ public class CollectableControl : MonoBehaviour
         achievementUI.SetActive(false);
         achievementShown = false;
     }
+
+    IEnumerator SmoothSpeedIncrease(float increment, float duration)
+    {
+        float startSpeed = playerMove.moveSpeed;
+        float targetSpeed = startSpeed + increment;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            playerMove.moveSpeed = Mathf.Lerp(startSpeed, targetSpeed, elapsed / duration);
+            yield return null;
+        }
+
+        playerMove.moveSpeed = targetSpeed; // Ensure exact final value
+    }
+
 }
+
