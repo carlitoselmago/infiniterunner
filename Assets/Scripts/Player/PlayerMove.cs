@@ -20,6 +20,15 @@ public class PlayerMove : MonoBehaviour
     public bool holding = false;
     private bool mainThemeAlreadyPlaying = false;
 
+    // platform tracker
+    private float fallSpeed = 20.0f;
+    public LayerMask groundLayer;
+    // raycast
+    private float raycastHeightOffset = 0.5f;
+    private float rayLength = 1.0f;
+    private float verticalVelocity = 0f;
+    public bool isGrounded = false;
+
     public static int maxHealth = 3;
     public static int remainingHealth;
     private bool hit = false;
@@ -74,10 +83,6 @@ public class PlayerMove : MonoBehaviour
     private float originY;
     private float jumpedHeight;
 
-    private float speed = 2.0f; // Adjusted speed for a more natural feel
-
-    private float elapsedTime = 0.0f; // Track time since the start of the jump
-
     public GameObject flycoin;
 
     public GameObject tutorial2d;
@@ -92,7 +97,7 @@ public class PlayerMove : MonoBehaviour
     public GameObject hearts;
     public GameObject heart;
 
-     // List to store instantiated hearts
+    // List to store instantiated hearts
     public List<GameObject> heartList = new List<GameObject>();
 
     public float horizontalSpeed = 20f;
@@ -125,48 +130,52 @@ public class PlayerMove : MonoBehaviour
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
-        remainingHealth = 0;//maxHealth;
+        remainingHealth = 0;
         startedrunning = false;
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
 
         //set hearts based on amount of life
-          for (int i = 0; i < maxHealth; i++)
+        for (int i = 0; i < maxHealth; i++)
         {
             AddHeart();
         }
     }
 
-    public void AddHeart(){
-        if (heartList.Count< maxHealth){
-        Debug.Log("added heart!!!!");
-         // Instantiate the heart prefab at the specified location
-            GameObject clonedHeart = Instantiate(heart,  Vector3.zero, Quaternion.identity);
+    public void AddHeart()
+    {
+        if (heartList.Count < maxHealth)
+        {
+            Debug.Log("added heart!!!!");
+            // Instantiate the heart prefab at the specified location
+            GameObject clonedHeart = Instantiate(heart, Vector3.zero, Quaternion.identity);
 
             // Set the parent of the cloned heart
             clonedHeart.transform.SetParent(hearts.transform, false);
 
             // Optionally adjust the position if you want to stagger them or place them differently
-            clonedHeart.transform.localPosition = new Vector3(heartList.Count*50, 0, 0);
+            clonedHeart.transform.localPosition = new Vector3(heartList.Count * 50, 0, 0);
 
             // Get the Animator component of the cloned heart
             Animator heartAnimator = clonedHeart.GetComponent<Animator>();
             heartList.Add(clonedHeart);
             heartAnimator.SetBool("started", true);
-            remainingHealth+=1;
-        } else{
+            remainingHealth += 1;
+        }
+        else
+        {
             Debug.Log("Cannot add more hearts");
         }
     }
 
-  public void RemoveHeartsInReverseOrder()
+    public void RemoveHeartsInReverseOrder()
     {
-        int lastindex=heartList.Count - 1;
-         // Destroy the heart GameObject
-            Destroy(heartList[lastindex]);
+        int lastindex = heartList.Count - 1;
+        // Destroy the heart GameObject
+        Destroy(heartList[lastindex]);
 
-            // Remove the heart from the list
-            heartList.RemoveAt(lastindex); 
+        // Remove the heart from the list
+        heartList.RemoveAt(lastindex);
     }
 
     void Update()
@@ -176,8 +185,8 @@ public class PlayerMove : MonoBehaviour
         {
             if (startingText.active == false)
             {
-            startingText.GetComponent<Text>().text = "Agafa les eines i toca qualsevol engranatge";
-            startingText.SetActive(true);
+                startingText.GetComponent<Text>().text = "Agafa les eines i toca qualsevol engranatge";
+                startingText.SetActive(true);
             }
             timer += Time.deltaTime;
             if (timer >= 2f)
@@ -315,7 +324,7 @@ public class PlayerMove : MonoBehaviour
         }
         else
         { }
-
+        /*
         if (isJumping == true)
         {
             if (comingDown == false)
@@ -326,7 +335,8 @@ public class PlayerMove : MonoBehaviour
             {
                 //transform.Translate(Vector3.up * Time.deltaTime * -4.5f, Space.World);
             }
-        }
+        }*/
+
 
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
         {
@@ -354,12 +364,20 @@ public class PlayerMove : MonoBehaviour
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
             }
         }
+
+        //RAYCAST
+        UpdateGroundTracking();
+        if (!isJumping && !comingDown && !isFlying && !floating)
+        {
+            ApplyVerticalMovement();
+        }
+
     }
 
     void OnTriggerEnter(Collider other)
     {
         HideAllTutorialCards();
-        if (other.gameObject.CompareTag("obstacle")) 
+        if (other.gameObject.CompareTag("obstacle"))
         {
             if (!godmode)
             {
@@ -380,8 +398,9 @@ public class PlayerMove : MonoBehaviour
                     RemoveHeartsInReverseOrder();
                     // Disable this script
                     this.enabled = false;
-                    
-                } else if (hit == true && remainingHealth > 0) // hurt
+
+                }
+                else if (hit == true && remainingHealth > 0) // hurt
                 {
                     printCodeScript.SetCodePrompt("hurt");
                     animator.SetBool("ishurt", true);
@@ -391,7 +410,7 @@ public class PlayerMove : MonoBehaviour
                 }
                 hit = false;
             }
-              }
+        }
 
         if (other.gameObject.CompareTag("coin"))
         {
@@ -432,8 +451,8 @@ public class PlayerMove : MonoBehaviour
             mainCam.GetComponent<Animator>().SetBool("flying", true);
             if (!isFlying)
             {
-                //create array of coins
-                 // Calculate currentZ based on the relative position of the player to the map
+                // Create array of coins
+                // Calculate currentZ based on the relative position of the player to the map
                 float currentZ = MAP.transform.InverseTransformPoint(this.transform.position).z + 230;
                 Debug.Log(currentZ);
                 for (int i = 0; i < flycoinsamount; i++)
@@ -458,7 +477,7 @@ public class PlayerMove : MonoBehaviour
                 float carRandom = Random.value;
                 if (carRandom >= 0.5f)
                 {
-                child.gameObject.SetActive(true);
+                    child.gameObject.SetActive(true);
                 }
             }
         }
@@ -495,9 +514,11 @@ public class PlayerMove : MonoBehaviour
             {
                 StartCoroutine(ApplyGlissando());
                 alreadyCrossedPanoptic = true;
-            } else if (alreadyCrossedPanoptic == true) {
-               if (random >= 0.5f)
-             {
+            }
+            else if (alreadyCrossedPanoptic == true)
+            {
+                if (random >= 0.5f)
+                {
                     StartCoroutine(ApplyGlissando());
                 }
             }
@@ -522,14 +543,14 @@ public class PlayerMove : MonoBehaviour
         {
             if (!godmode)
             {
-                    other.GetComponent<BoxCollider>().enabled = false;
-                    mainCam.GetComponent<Animator>().SetBool("dead", true);
-                    animator.Play("Stumble Backwards");
-                    carCrashSFX.Play();
-                    HideAllTutorialCards();
-                    levelControl.GetComponent<EndRunSequence>().enabled = true;
-                    // Disable this script
-                    this.enabled = false;
+                other.GetComponent<BoxCollider>().enabled = false;
+                mainCam.GetComponent<Animator>().SetBool("dead", true);
+                animator.Play("Stumble Backwards");
+                carCrashSFX.Play();
+                HideAllTutorialCards();
+                levelControl.GetComponent<EndRunSequence>().enabled = true;
+                // Disable this script
+                this.enabled = false;
             }
         }
 
@@ -572,7 +593,7 @@ public class PlayerMove : MonoBehaviour
     void normalhitbox()
     {
         // Set new size
-        boxCollider.size = new Vector3(0.67f, 1, 0.58f);
+        boxCollider.size = new Vector3(0.67f, 1.15f, 0.58f);
         // Set new center position
         boxCollider.center = new Vector3(0, 0, -0.42f);
     }
@@ -580,7 +601,7 @@ public class PlayerMove : MonoBehaviour
     void jumphitbox()
     {
         // Set new center position
-        boxCollider.center = new Vector3(0, 1, -0.42f);
+        boxCollider.center = new Vector3(0, 1.15f, -0.42f);
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.78f, 0.58f);
     }
@@ -592,6 +613,7 @@ public class PlayerMove : MonoBehaviour
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.24f, 0.58f);
     }
+
 
     IEnumerator JumpSequence()
     {
@@ -648,13 +670,13 @@ public class PlayerMove : MonoBehaviour
 
         isFlying = false;
         startY = originY;
-        
+
         yield return new WaitForSeconds(1);
         floating = false;
         //set move speed back to initial
-        moveSpeed=initialmoveSpeed ;
+        moveSpeed = initialmoveSpeed;
 
-         // Destroy all instantiated coins
+        // Destroy all instantiated coins
         foreach (GameObject coin in instantiatedCoins)
         {
             Destroy(coin);
@@ -779,7 +801,7 @@ public class PlayerMove : MonoBehaviour
         return origin;
     }
 
-    private void PerformFly()
+    /*private void PerformFly()
     {
         float tweenspeed = 1.0f;
         // Calculate the new Y position with easing out effect
@@ -814,7 +836,7 @@ public class PlayerMove : MonoBehaviour
             transform.position = new Vector3(transform.position.x, startY, transform.position.z);
             //isFlying = false; // Consider renaming this flag to better suit your context, like isFalling or movementFinished
         }
-    }
+    }*/
 
     private void HideAllTutorialCards()
     {
@@ -824,6 +846,54 @@ public class PlayerMove : MonoBehaviour
         {
             // Disable the child GameObject
             child.gameObject.SetActive(false);
+        }
+    }
+
+    //RAYCAST
+    void UpdateGroundTracking()
+    {
+        // Calculate the bottom of the collider
+        float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
+
+        // Cast the ray from a bit above the feet
+        Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
+        Ray ray = new Ray(rayOrigin, Vector3.down);
+
+        //Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
+        {
+            //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag}");
+            isGrounded = true;
+
+            // New groundY calculation based on dynamic collider
+            float groundY = hit.point.y + (boxCollider.size.y / 2f) - boxCollider.center.y;
+
+            Vector3 pos = transform.position;
+            pos.y = groundY;
+            transform.position = pos;
+
+            verticalVelocity = 0f;
+        }
+        else
+        {
+            isGrounded = false;
+        }
+    }
+
+    void ApplyVerticalMovement()
+    {
+        if (!isGrounded)
+        {
+            verticalVelocity -= fallSpeed * Time.deltaTime;
+
+            Vector3 pos = transform.position;
+            pos.y += verticalVelocity * Time.deltaTime;
+            transform.position = pos;
+        }
+        else
+        {
+            verticalVelocity = 0f;
         }
     }
 }
