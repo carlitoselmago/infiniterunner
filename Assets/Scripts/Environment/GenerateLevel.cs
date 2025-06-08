@@ -62,7 +62,7 @@ public class GenerateLevel : MonoBehaviour
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
-        if (createdSections.Count > 5)
+        if (createdSections.Count > 6)
         {
             GameObject oldSection = createdSections.Dequeue();  // Remove the oldest section from the queue
             Destroy(oldSection);  // Destroy the oldest section object
