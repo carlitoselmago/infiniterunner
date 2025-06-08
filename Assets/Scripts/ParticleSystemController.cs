@@ -47,10 +47,10 @@ public class ParticleSystemController : MonoBehaviour
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
-            emission.rateOverTime = Mathf.Lerp(0, initialRate, elapsedTime / fadeDuration);
+            emission.rateOverTime = new ParticleSystem.MinMaxCurve(Mathf.Lerp(0, initialRate, elapsedTime / fadeDuration));
             yield return null;
         }
 
-        emission.rateOverTime = initialRate;
+        emission.rateOverTime = new ParticleSystem.MinMaxCurve(initialRate);
     }
 }
