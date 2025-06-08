@@ -132,6 +132,36 @@ public class PrintCode : MonoBehaviour
         }
     }
 
+    //CHATGPT FIX
+    void Update()
+    {
+        // Collect keys to reset after iteration
+        List<Text> keysToReset = new List<Text>();
+
+        foreach (var item in textTimeouts)
+        {
+            if (item.Value > 0f && Time.time > item.Value)
+            {
+                item.Key.gameObject.SetActive(false);
+                keysToReset.Add(item.Key);
+            }
+        }
+
+        // Modify the dictionary outside the loop
+        foreach (Text key in keysToReset)
+        {
+            textTimeouts[key] = 0f;
+        }
+
+        if (!string.IsNullOrEmpty(codePrompt) && printedCode.TryGetValue(codePrompt, out string code))
+        {
+            DisplayRandomText(code);
+            codePrompt = ""; // Reset codePrompt to avoid repeatedly setting text
+        }
+    }
+
+    /*
+     * PREVIOUS VERSION (MAYBE CAUSED ERROR
     void Update()
     {
         // Update timeouts and deactivate texts that have timed out
@@ -149,7 +179,7 @@ public class PrintCode : MonoBehaviour
             DisplayRandomText(code);
             codePrompt = ""; // Reset codePrompt to avoid repeatedly setting text
         }
-    }
+    }*/
 
     public void SetCodePrompt(string newCodePrompt)
     {
