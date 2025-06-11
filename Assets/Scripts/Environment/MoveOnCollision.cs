@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using UnityEngine;
 
 public class MoveOnCollision : MonoBehaviour
@@ -33,4 +33,5 @@ public class MoveOnCollision : MonoBehaviour
         // Set the flag to true indicating the object has moved
         hasMoved = true;
     }
-}
+}*/
+// Disabled on 11th June 2025
