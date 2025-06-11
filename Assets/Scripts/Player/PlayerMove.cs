@@ -19,15 +19,16 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public bool holding = false;
     private bool mainThemeAlreadyPlaying = false;
+    private bool constrained = false;
 
-    // platform tracker
+    // raycast
     private float fallSpeed = 20.0f;
     public LayerMask groundLayer;
-    // raycast
     private float raycastHeightOffset = 0.5f;
     private float rayLength = 1.0f;
     private float verticalVelocity = 0f;
     public bool isGrounded = false;
+    public bool isFalling = false;
 
     public static int maxHealth = 3;
     public static int remainingHealth;
@@ -130,6 +131,7 @@ public class PlayerMove : MonoBehaviour
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
+        constrained = false;
         remainingHealth = 0;
         startedrunning = false;
         godmodevisual.SetActive(false);
@@ -240,6 +242,7 @@ public class PlayerMove : MonoBehaviour
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
                 {
+                    if (constrained) return; // TO DO: Add pos interpolator in top of bool
                     pos = "left";
                 }
                 else if (pos == "right") // Pressing left when at right should go to center
@@ -261,6 +264,7 @@ public class PlayerMove : MonoBehaviour
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing right from center goes to right
                 {
+                    if (constrained) return;
                     pos = "right";
                 }
                 else if (pos == "left") // Pressing right when at left should go to center
@@ -287,7 +291,7 @@ public class PlayerMove : MonoBehaviour
 
         // Move the character to the target position
         transform.position = Vector3.MoveTowards(transform.position, new Vector3(targetpos, transform.position.y, transform.position.z), horizontalSpeed * Time.deltaTime);
-        // Ajupir-se
+        // Crouching
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
             startedrunning = true;
@@ -482,27 +486,27 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag("pyramids") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             pyramidsTheme.Play();
         }
 
-        if (other.gameObject.CompareTag("cogfactory") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("cogfactory") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             cogFactorySFX.Play();
         }
 
-        if (other.gameObject.CompareTag("cogsfarm") && mainTheme.isPlaying == false)
+        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying)
         {
             cogsfarmSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("photos") && mainTheme.isPlaying == false && !photosSFX.isPlaying)
+        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !photosSFX.isPlaying)
         {
             photosSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("backdoor") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying)
+        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             backDoorSFX.Play();
         }
@@ -529,34 +533,29 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag("canyon") && mainTheme.isPlaying == false && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
+        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
         {
             canyonSFX.Play();
         }
-
+        /*
         if (other.gameObject.CompareTag("claxon"))
         {
             claxonSFX.Play();
-        }
+        }*/
 
-        if (other.gameObject.CompareTag("car"))
+        if (other.gameObject.CompareTag("car") && !godmode)
         {
-            if (!godmode)
-            {
                 other.GetComponent<BoxCollider>().enabled = false;
                 mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.Play("Stumble Backwards");
                 carCrashSFX.Play();
                 HideAllTutorialCards();
                 levelControl.GetComponent<EndRunSequence>().enabled = true;
-                // Disable this script
-                this.enabled = false;
-            }
+                this.enabled = false;                // Disable this script
         }
 
         if (other.gameObject.CompareTag("tutorial"))
         {
-            // Hide all previous tutorial panels
             HideAllTutorialCards();
             // Get the tutorial card name
             tutorialcard = other.gameObject.name;
@@ -767,6 +766,12 @@ public class PlayerMove : MonoBehaviour
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
     }
 
+    public void SetConstrained(bool value)
+    {
+        constrained = value;
+        Debug.Log("Player constraint set to: " + constrained);
+    }
+
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
     {
         float fraction = Time.deltaTime * intspeed;
@@ -858,7 +863,6 @@ public class PlayerMove : MonoBehaviour
         // Cast the ray from a bit above the feet
         Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
         Ray ray = new Ray(rayOrigin, Vector3.down);
-
         //Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
 
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
@@ -872,7 +876,6 @@ public class PlayerMove : MonoBehaviour
             Vector3 pos = transform.position;
             pos.y = groundY;
             transform.position = pos;
-
             verticalVelocity = 0f;
         }
         else
@@ -886,7 +889,8 @@ public class PlayerMove : MonoBehaviour
         if (!isGrounded)
         {
             verticalVelocity -= fallSpeed * Time.deltaTime;
-
+            isFalling = true;
+            animator.SetBool("isfalling", true);
             Vector3 pos = transform.position;
             pos.y += verticalVelocity * Time.deltaTime;
             transform.position = pos;
@@ -894,6 +898,11 @@ public class PlayerMove : MonoBehaviour
         else
         {
             verticalVelocity = 0f;
+            if (isFalling)
+            {
+                animator.SetBool("isfalling", false);
+                isFalling = false;
+            }
         }
     }
 }
