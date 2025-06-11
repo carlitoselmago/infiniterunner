@@ -40,7 +40,7 @@ public class EndRunSequence : MonoBehaviour
         endCoinCount.GetComponent<Animator>().enabled = true;
         endCoinCount.GetComponent<Animator>().Play("FadeOutText");
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
         SceneManager.LoadScene(0);
     }
 }

@@ -1,16 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class test_colliders : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
    public float speed = 5.0f;
 
     void Update()
@@ -23,7 +14,6 @@ public class test_colliders : MonoBehaviour
         transform.position += movement * speed * Time.deltaTime;
     }
 
-    
     void OnTriggerEnter(Collider other){
          //Output the Collider's GameObject's name
           Debug.Log("Entered collision with " + other.gameObject.name);
