@@ -19,17 +19,16 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public bool holding = false;
     private bool mainThemeAlreadyPlaying = false;
-    //private bool constrained = false;
-    //block constrain
+    // move constrains (from Constrain.cs)
     private bool blockLeft = false;
     private bool blockCenter = false;
     private bool blockRight = false;
 
     // raycast
-    private float fallSpeed = 20.0f;
     public LayerMask groundLayer;
-    private float raycastHeightOffset = 0.5f;
+    private float fallSpeed = 20.0f;
     private float rayLength = 1.0f;
+    private float raycastHeightOffset = 0.5f;
     private float verticalVelocity = 0f;
     public bool isGrounded = false;
     public bool isFalling = false;
@@ -248,7 +247,7 @@ public class PlayerMove : MonoBehaviour
                     if (blockLeft) return;
                     pos = "left";
                 }
-                else if (pos == "right") // Pressing left when at right should go to center
+                else if (pos == "right") // Pressing left when at right goes to center
                 {
                     if (blockCenter) return;
                     pos = "center";
@@ -271,7 +270,7 @@ public class PlayerMove : MonoBehaviour
                     if (blockRight) return;
                     pos = "right";
                 }
-                else if (pos == "left") // Pressing right when at left should go to center
+                else if (pos == "left") // Pressing right when at left goes to center
                 {
                     if (blockCenter) return;
                     pos = "center";
@@ -296,6 +295,7 @@ public class PlayerMove : MonoBehaviour
 
         // Move the character to the target position
         transform.position = Vector3.MoveTowards(transform.position, new Vector3(targetpos, transform.position.y, transform.position.z), horizontalSpeed * Time.deltaTime);
+
         // Crouching
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
@@ -331,25 +331,23 @@ public class PlayerMove : MonoBehaviour
                 }
             }
         }
-        else
-        { }
-        /*
-        if (isJumping == true)
+
+        // Flying
+        if (floating)
         {
-            if (comingDown == false)
+            jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
+        }
+        else
+        {
+            if (isFlying)
             {
-                //transform.Translate(Vector3.up * Time.deltaTime * 4.5f, Space.World);
+                startY = interpolateValueY(true, startY, targetHeight, 1f);
             }
-            else
-            {
-                //transform.Translate(Vector3.up * Time.deltaTime * -4.5f, Space.World);
-            }
-        }*/
+        }
 
-
+        // Holding
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
         {
-            //hold
             tutorial2d.transform.Find("fly").gameObject.SetActive(false);
             holding = true;
             startedrunning = true;
@@ -359,28 +357,12 @@ public class PlayerMove : MonoBehaviour
             holding = false;
         }
 
-        // fly
-        if (floating)
-        {
-            // PerformFall();
-            jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
-        }
-        else
-        {
-            if (isFlying)
-            {
-                // PerformFly();
-                startY = interpolateValueY(true, startY, targetHeight, 1f);
-            }
-        }
-
-        //RAYCAST
+        // RAYCAST
         UpdateGroundTracking();
         if (!isJumping && !comingDown && !isFlying && !floating)
         {
             ApplyVerticalMovement();
         }
-
     }
 
     void OnTriggerEnter(Collider other)
@@ -405,8 +387,7 @@ public class PlayerMove : MonoBehaviour
                     HideAllTutorialCards();
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
                     RemoveHeartsInReverseOrder();
-                    // Disable this script
-                    this.enabled = false;
+                    this.enabled = false; // Disable this script
 
                 }
                 else if (hit == true && remainingHealth > 0) // hurt
@@ -463,13 +444,12 @@ public class PlayerMove : MonoBehaviour
                 // Create array of coins
                 // Calculate currentZ based on the relative position of the player to the map
                 float currentZ = MAP.transform.InverseTransformPoint(this.transform.position).z + 230;
-                Debug.Log(currentZ);
+                //Debug.Log(currentZ);
                 for (int i = 0; i < flycoinsamount; i++)
                 {
                     GameObject newcoin = Instantiate(flycoin, Vector3.zero, Quaternion.identity);
                     newcoin.transform.localPosition = new Vector3(this.transform.position.x, targetHeight, currentZ + (i * 3));
                     newcoin.transform.SetParent(MAP.transform, false);
-
                     // Add new coin to the list
                     instantiatedCoins.Add(newcoin);
                 }
@@ -542,11 +522,11 @@ public class PlayerMove : MonoBehaviour
         {
             canyonSFX.Play();
         }
-        /*
+        
         if (other.gameObject.CompareTag("claxon"))
         {
             claxonSFX.Play();
-        }*/
+        }
 
         if (other.gameObject.CompareTag("car") && !godmode)
         {
@@ -556,7 +536,7 @@ public class PlayerMove : MonoBehaviour
                 carCrashSFX.Play();
                 HideAllTutorialCards();
                 levelControl.GetComponent<EndRunSequence>().enabled = true;
-                this.enabled = false;                // Disable this script
+                this.enabled = false; // Disable this script
         }
 
         if (other.gameObject.CompareTag("tutorial"))
@@ -571,7 +551,7 @@ public class PlayerMove : MonoBehaviour
             {
                 tutorialCardTransform.gameObject.SetActive(true);
 
-                // Display the corresponding instruction if it exists
+                // Display the corresponding instruction
                 if (tutorialInstructions.TryGetValue(tutorialcard, out string instruction))
                 {
                     DisplayInstruction(instruction);
@@ -624,7 +604,6 @@ public class PlayerMove : MonoBehaviour
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.24f, 0.58f);
     }
-
 
     IEnumerator JumpSequence()
     {
@@ -778,7 +757,7 @@ public class PlayerMove : MonoBehaviour
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
     }
 
-    /*public void SetConstrained(bool value)
+    /*public void SetConstrained(bool value) // Function to receive a bool from another script (Constrained.cs)
     {
         constrained = value;
         Debug.Log("Player constraint set to: " + constrained);
@@ -818,55 +797,17 @@ public class PlayerMove : MonoBehaviour
         return origin;
     }
 
-    /*private void PerformFly()
-    {
-        float tweenspeed = 1.0f;
-        // Calculate the new Y position with easing out effect
-        float newY = Mathf.Lerp(startY, targetHeight, 1 - Mathf.Pow(1 - Time.deltaTime * tweenspeed, 3));
-
-        // Apply the new Y position
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-
-        // Optionally update startY to continue the movement from the current position
-        startY = newY;
-    }
-
-    private void PerformFall()
-    {
-        elapsedTime += Time.deltaTime;
-        float timeFraction = elapsedTime / (5); // Time fraction over the total duration
-
-        if (timeFraction < 2f)
-        {
-            // Ease out effect using Mathf.SmoothStep for smoother transition
-            float initialY = jumpedHeight;//startY + jumpedHeight; // Start falling from this height
-
-            float newY = Mathf.SmoothStep(initialY, startY, timeFraction);
-
-            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-            moveSpeed -= 0.01f; // Increase move speed (assuming it's needed for your context)
-            Debug.Log("falling............");
-        }
-        else
-        {
-            // Ensure it ends exactly at the startY and stop the fall
-            transform.position = new Vector3(transform.position.x, startY, transform.position.z);
-            //isFlying = false; // Consider renaming this flag to better suit your context, like isFalling or movementFinished
-        }
-    }*/
-
     private void HideAllTutorialCards()
     {
         tutorialText.SetActive(false);
         // Iterate over all direct children of the tutorial2D GameObject
         foreach (Transform child in tutorial2d.transform)
         {
-            // Disable the child GameObject
             child.gameObject.SetActive(false);
         }
     }
 
-    //RAYCAST
+    // RAYCAST
     void UpdateGroundTracking()
     {
         // Calculate the bottom of the collider
@@ -912,7 +853,7 @@ public class PlayerMove : MonoBehaviour
             verticalVelocity = 0f;
             if (isFalling)
             {
-                animator.SetBool("isfalling", false);
+                animator.SetBool("isfalling", false);   //back to running
                 isFalling = false;
             }
         }
