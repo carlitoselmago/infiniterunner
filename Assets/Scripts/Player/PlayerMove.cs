@@ -19,7 +19,11 @@ public class PlayerMove : MonoBehaviour
     public bool floating = false;
     public bool holding = false;
     private bool mainThemeAlreadyPlaying = false;
-    private bool constrained = false;
+    //private bool constrained = false;
+    //block constrain
+    private bool blockLeft = false;
+    private bool blockCenter = false;
+    private bool blockRight = false;
 
     // raycast
     private float fallSpeed = 20.0f;
@@ -131,7 +135,6 @@ public class PlayerMove : MonoBehaviour
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
-        constrained = false;
         remainingHealth = 0;
         startedrunning = false;
         godmodevisual.SetActive(false);
@@ -242,11 +245,12 @@ public class PlayerMove : MonoBehaviour
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
                 {
-                    if (constrained) return; // TO DO: Add pos interpolator in top of bool
+                    if (blockLeft) return;
                     pos = "left";
                 }
                 else if (pos == "right") // Pressing left when at right should go to center
                 {
+                    if (blockCenter) return;
                     pos = "center";
                 }
                 printCodeScript.SetCodePrompt("left");
@@ -264,11 +268,12 @@ public class PlayerMove : MonoBehaviour
             {
                 if (pos == "center" && transform.position.x == 0f) // Pressing right from center goes to right
                 {
-                    if (constrained) return;
+                    if (blockRight) return;
                     pos = "right";
                 }
                 else if (pos == "left") // Pressing right when at left should go to center
                 {
+                    if (blockCenter) return;
                     pos = "center";
                 }
                 printCodeScript.SetCodePrompt("right");
@@ -589,6 +594,13 @@ public class PlayerMove : MonoBehaviour
         tutorialText.SetActive(true);
     }
 
+    public void SetConstrainedPositions(bool left, bool center, bool right)
+    {
+        blockLeft = left;
+        blockCenter = center;
+        blockRight = right;
+    }
+
     void normalhitbox()
     {
         // Set new size
@@ -766,11 +778,11 @@ public class PlayerMove : MonoBehaviour
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
     }
 
-    public void SetConstrained(bool value)
+    /*public void SetConstrained(bool value)
     {
         constrained = value;
         Debug.Log("Player constraint set to: " + constrained);
-    }
+    }*/
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
     {
@@ -890,7 +902,7 @@ public class PlayerMove : MonoBehaviour
         {
             verticalVelocity -= fallSpeed * Time.deltaTime;
             isFalling = true;
-            animator.SetBool("isfalling", true);
+            animator.SetBool("isfalling", true);    // jumping down animation
             Vector3 pos = transform.position;
             pos.y += verticalVelocity * Time.deltaTime;
             transform.position = pos;
