@@ -57,7 +57,7 @@ public class GenerateLevel : MonoBehaviour
 
     void GenerateSection()
     {
-         secNum = Random.Range(0, section.Length);
+        secNum = Random.Range(0, section.Length);
         GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;

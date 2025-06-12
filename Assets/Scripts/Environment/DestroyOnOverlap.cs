@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class DestroyOnOverlap : MonoBehaviour
 {
@@ -32,4 +32,4 @@ public class DestroyOnOverlap : MonoBehaviour
         Debug.Log($"Destroyed object: {obj.name}");
         Destroy(obj);
     }
-}
+}*/
