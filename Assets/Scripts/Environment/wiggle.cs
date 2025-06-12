@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class FloatingAndRotating : MonoBehaviour
 {
@@ -25,3 +25,4 @@ public class FloatingAndRotating : MonoBehaviour
         transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
     }
 }
+*/
