@@ -2,43 +2,52 @@ using UnityEngine;
 
 public class ParachuteDescent : MonoBehaviour
 {
-    [SerializeField] private float targetY = -3.67f;
-    [SerializeField] private float fallSpeed = 1.5f;
+    // Descent Settings
+    private float targetY = -3.67f;
+    public float fallSpeed = 1.5f;
+
+    // Float & Rotate Settings
+    private float amplitude = 0.5f;
+    private float frequency = 1f;
+    private float rotationSpeed = 50f;
 
     private bool isDescending = true;
-    private wiggle wiggleScript;
+    private Vector3 finalPosition;
+    private float floatStartTime;
 
     void Start()
     {
-        wiggleScript = GetComponent<wiggle>();
-        if (wiggleScript != null)
-        {
-            wiggleScript.enabled = false; // Prevent early activation
-        }
+        finalPosition = transform.localPosition;
     }
 
     void Update()
     {
         if (isDescending)
         {
-            Vector3 currentPosition = transform.position;
+            Vector3 current = transform.position;
 
-            if (currentPosition.y > targetY)
+            if (current.y > targetY)
             {
-                float newY = Mathf.MoveTowards(currentPosition.y, targetY, fallSpeed * Time.deltaTime);
-                transform.position = new Vector3(currentPosition.x, newY, currentPosition.z);
+                float newY = Mathf.MoveTowards(current.y, targetY, fallSpeed * Time.deltaTime);
+                transform.position = new Vector3(current.x, newY, current.z);
             }
             else
             {
-                transform.position = new Vector3(currentPosition.x, targetY, currentPosition.z);
+                // Lock final Y position, remember start time for sine wave
+                transform.position = new Vector3(current.x, targetY, current.z);
+                finalPosition = transform.localPosition;
+                floatStartTime = Time.time;
                 isDescending = false;
-
-                if (wiggleScript != null)
-                {
-                    wiggleScript.enabled = true;
-                    wiggleScript.Initialize(transform.localPosition); // Pass in final position
-                }
             }
+        }
+        else
+        {
+            // Wiggling phase
+            float tempY = amplitude * Mathf.Sin((Time.time - floatStartTime) * frequency);
+            transform.localPosition = new Vector3(finalPosition.x, finalPosition.y + tempY, finalPosition.z);
+
+            // Optional: rotate smoothly
+            transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
         }
     }
 }
