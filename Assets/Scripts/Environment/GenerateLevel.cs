@@ -6,6 +6,7 @@ public class GenerateLevel : MonoBehaviour
 {
     public int stepamount=100;
     public GameObject templatesparent;
+    //public GameObject doubleSection;
     private GameObject[] section;
     public AudioSource mainTheme;
     
@@ -41,7 +42,6 @@ public class GenerateLevel : MonoBehaviour
     }
 }
 
-
   void Update()
     {
         // Check if the map has moved enough to require a new section
@@ -51,8 +51,6 @@ public class GenerateLevel : MonoBehaviour
             GenerateSection();
             generatedSections ++;
         }
-
-
     }
 
     void GenerateSection()

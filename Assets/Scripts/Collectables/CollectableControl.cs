@@ -103,7 +103,7 @@ public class CollectableControl : MonoBehaviour
                     highSpeedSFX.Play();
                     dimVolumes();
                     lifeUp();
-                        StartCoroutine(SmoothSpeedIncrease(2f, 2f)); // smoothly add x speed over y seconds
+                        //StartCoroutine(SmoothSpeedIncrease(2f, 2f)); // smoothly add x speed over y seconds
                         seconds_to_elapse_index += 1;
                     StartCoroutine(hideachievement());
                 }
@@ -140,7 +140,7 @@ public class CollectableControl : MonoBehaviour
         achievementShown = false;
     }
 
-    IEnumerator SmoothSpeedIncrease(float increment, float duration)
+    /*IEnumerator SmoothSpeedIncrease(float increment, float duration)
     {
         float startSpeed = playerMove.moveSpeed;
         float targetSpeed = startSpeed + increment;
@@ -154,6 +154,6 @@ public class CollectableControl : MonoBehaviour
         }
 
         playerMove.moveSpeed = targetSpeed; // Ensure exact final value
-    }
+    }*/
 
 }
