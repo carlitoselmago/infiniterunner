@@ -103,7 +103,7 @@ public class CollectableControl : MonoBehaviour
                     highSpeedSFX.Play();
                     dimVolumes();
                     lifeUp();
-                        StartCoroutine(SmoothSpeedIncrease(1f, 2f)); // smoothly add x speed over y seconds
+                        StartCoroutine(SmoothSpeedIncrease(2f, 2f)); // smoothly add x speed over y seconds
                         seconds_to_elapse_index += 1;
                     StartCoroutine(hideachievement());
                 }
@@ -126,20 +126,7 @@ public class CollectableControl : MonoBehaviour
 
     void lifeUp()
     {
-         //playerMove = player.GetComponent<PlayerMove>();
          playerMove.AddHeart();
-         /*
-        if (PlayerMove.remainingHealth <= PlayerMove.maxHealth)
-        {
-            //PlayerMove.remainingHealth++;
-            Debug.Log("Extra life!");
-           
-           
-        } else
-        {
-            Debug.Log("Health is maxed.");
-        }
-        */
     }
 
     IEnumerator hideachievement()
@@ -170,4 +157,3 @@ public class CollectableControl : MonoBehaviour
     }
 
 }
-
