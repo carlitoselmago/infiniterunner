@@ -15,7 +15,6 @@ public class test_colliders : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider other){
-         //Output the Collider's GameObject's name
           Debug.Log("Entered collision with " + other.gameObject.name);
     }
 }
