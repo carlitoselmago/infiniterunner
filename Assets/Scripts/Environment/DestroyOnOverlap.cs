@@ -33,7 +33,7 @@ public class DestroyOnOverlap : MonoBehaviour
         Destroy(obj);
     }
 }*/
-
+/*
 using UnityEngine;
 
 public class DestroyOnOverlap : MonoBehaviour
@@ -93,3 +93,4 @@ public class DestroyOnOverlap : MonoBehaviour
         Destroy(obj);
     }
 }
+*/
