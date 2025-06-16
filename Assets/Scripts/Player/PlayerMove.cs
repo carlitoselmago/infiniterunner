@@ -79,7 +79,7 @@ public class PlayerMove : MonoBehaviour
     private float targetVolume;
 
     public GameObject levelControl;
-    public GameObject triggeredObject;
+    //public GameObject triggeredObject;
     private BoxCollider boxCollider;
 
     private float targetHeight = 17.0f;
@@ -93,7 +93,7 @@ public class PlayerMove : MonoBehaviour
     private float timer;
     private bool alreadyCrossedPanoptic = false;
     public AudioSource coinFX;
-    public GameObject objectWithMoveScript;
+    //public GameObject objectWithMoveScript;
     public HurtMask hurtMaskScript;
 
     public GameObject MAP;
@@ -175,7 +175,6 @@ public class PlayerMove : MonoBehaviour
     public void RemoveHeartsInReverseOrder()
     {
         int lastindex = heartList.Count - 1;
-        // Destroy the heart GameObject
         Destroy(heartList[lastindex]);
 
         // Remove the heart from the list
@@ -458,19 +457,6 @@ public class PlayerMove : MonoBehaviour
             isFlying = true;
         }
 
-        if (other.gameObject.CompareTag("Trigger"))
-        {
-            Debug.Log("BRDIGE TRIGGER");
-            foreach (Transform child in triggeredObject.transform)
-            {
-                float carRandom = Random.value;
-                if (carRandom >= 0.5f)
-                {
-                    child.gameObject.SetActive(true);
-                }
-            }
-        }
-
         if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             pyramidsTheme.Play();
@@ -659,7 +645,8 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         isFlying = false;
-        startY = originY;
+        //startY = originY;
+        //ApplyVerticalMovement();
 
         yield return new WaitForSeconds(1);
         floating = false;

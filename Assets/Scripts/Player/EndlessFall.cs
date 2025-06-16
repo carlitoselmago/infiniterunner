@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EndlessFall : MonoBehaviour
 {
-    public float decelerationRate = 550f;
+    public float decelerationRate = 850f;
     public PlayerMove player;
     public GameObject levelControl;
     public Animator playerAnimator;
