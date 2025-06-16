@@ -6,7 +6,6 @@ public class GenerateLevel : MonoBehaviour
 {
     public int stepamount=100;
     public GameObject templatesparent;
-    //public GameObject doubleSection;
     private GameObject[] section;
     public AudioSource mainTheme;
     
@@ -57,22 +56,42 @@ public class GenerateLevel : MonoBehaviour
     {
         secNum = Random.Range(0, section.Length);
         GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
+        if (secNum == 28 || secNum == 29)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
+        {
+            stepamount = 200;
+            Debug.Log("Double section created");
+            Debug.Log(secNum);
+        }
+        else
+        {
+            stepamount = 100;
+        }
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
+
         if (createdSections.Count > 6)
         {
             GameObject oldSection = createdSections.Dequeue();  // Remove the oldest section from the queue
             Destroy(oldSection);  // Destroy the oldest section object
         }
-        // yield return new WaitForSeconds(3);
         creatingSection = false;
     }
 
       void InstantiateInitialSection()
     {
         GameObject newSection = Instantiate(section[Random.Range(0, section.Length)], new Vector3(0, 0, zPos), Quaternion.identity);
-         // Set the parent of the instantiated child to MAP
+        if (secNum == 28 || secNum == 29)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
+        {
+            stepamount = 200;
+            Debug.Log("Double section created");
+            Debug.Log(secNum);
+        }
+        else
+        {
+            stepamount = 100;
+        }
+        // Set the parent of the instantiated child to MAP
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;
         createdSections.Enqueue(newSection);

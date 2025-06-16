@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Animation player used for the falling cogs scene
 public class RandomAnimationPlayer : MonoBehaviour
 {
     public Animator animator;
@@ -15,20 +16,13 @@ public class RandomAnimationPlayer : MonoBehaviour
 
     void Update()
     {
-        // Increment timer
         timer += Time.deltaTime;
 
-        // Check if it's time to play a new animation
         if (timer >= interval)
         {
-            // Randomly select an animation
             int randomIndex = Random.Range(0, animationNames.Length);
             string randomAnimation = animationNames[randomIndex];
-
-            // Play the selected animation
             animator.Play(randomAnimation);
-
-            // Reset timer
             timer = 0f;
         }
     }

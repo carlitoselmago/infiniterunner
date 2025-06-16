@@ -27,7 +27,7 @@ public class PlayerMove : MonoBehaviour
     // raycast
     public LayerMask groundLayer;
     private float fallSpeed = 20.0f;
-    private float rayLength = 1.0f;
+    private float rayLength = 2.0f;
     private float raycastHeightOffset = 0.5f;
     private float verticalVelocity = 0f;
     public bool isGrounded = false;
@@ -314,7 +314,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         // Jumping
-        if (isFlying == false)
+        if (!isFlying)
         {
             if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))
             {
@@ -808,7 +808,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     // RAYCAST
-    void UpdateGroundTracking()
+    /*void UpdateGroundTracking()
     {
         // Calculate the bottom of the collider
         float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
@@ -830,6 +830,33 @@ public class PlayerMove : MonoBehaviour
             pos.y = groundY;
             transform.position = pos;
             verticalVelocity = 0f;
+        }
+        else
+        {
+            isGrounded = false;
+        }
+    }*/
+
+    void UpdateGroundTracking()
+    {
+        float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
+        Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
+        Ray ray = new Ray(rayOrigin, Vector3.down);
+        //Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
+        {
+            //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag}");
+            isGrounded = true;
+
+            if (!isFlying && !floating && !isJumping)
+            {
+                float groundY = hit.point.y + (boxCollider.size.y / 2f) - boxCollider.center.y;
+                Vector3 pos = transform.position;
+                pos.y = groundY;
+                transform.position = pos;
+                verticalVelocity = 0f;
+            }
         }
         else
         {
