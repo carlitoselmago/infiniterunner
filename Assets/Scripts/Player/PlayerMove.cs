@@ -27,8 +27,8 @@ public class PlayerMove : MonoBehaviour
     // raycast
     public LayerMask groundLayer;
     private float fallSpeed = 20.0f;
-    private float rayLength = 2.0f;
-    private float raycastHeightOffset = 0.5f;
+    public float rayLength = 0.7f;
+    public float raycastHeightOffset = 0.5f;
     private float verticalVelocity = 0f;
     public bool isGrounded = false;
     public bool isFalling = false;
@@ -322,7 +322,7 @@ public class PlayerMove : MonoBehaviour
                 {
                     tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
                 }
-                if (isJumping == false)
+                if (!isJumping)
                 {
                     isJumping = true;
                     animator.SetBool("isjumping", true);
@@ -573,6 +573,8 @@ public class PlayerMove : MonoBehaviour
         boxCollider.size = new Vector3(0.67f, 1.15f, 0.58f);
         // Set new center position
         boxCollider.center = new Vector3(0, 0, -0.42f);
+        rayLength = 1.0f;
+        raycastHeightOffset = 0.5f;
     }
 
     void jumphitbox()
@@ -581,6 +583,8 @@ public class PlayerMove : MonoBehaviour
         boxCollider.center = new Vector3(0, 1.15f, -0.42f);
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.78f, 0.58f);
+        rayLength = 4.0f;
+        raycastHeightOffset = -0.5f;
     }
 
     void crouchhitbox()
@@ -658,7 +662,6 @@ public class PlayerMove : MonoBehaviour
         {
             Destroy(coin);
         }
-
         // Clear the list
         instantiatedCoins.Clear();
     }
@@ -794,42 +797,17 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+
+
+
+
     // RAYCAST
-    /*void UpdateGroundTracking()
-    {
-        // Calculate the bottom of the collider
-        float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
-
-        // Cast the ray from a bit above the feet
-        Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
-        Ray ray = new Ray(rayOrigin, Vector3.down);
-        //Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
-        {
-            //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag}");
-            isGrounded = true;
-
-            // New groundY calculation based on dynamic collider
-            float groundY = hit.point.y + (boxCollider.size.y / 2f) - boxCollider.center.y;
-
-            Vector3 pos = transform.position;
-            pos.y = groundY;
-            transform.position = pos;
-            verticalVelocity = 0f;
-        }
-        else
-        {
-            isGrounded = false;
-        }
-    }*/
-
     void UpdateGroundTracking()
     {
         float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
         Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
         Ray ray = new Ray(rayOrigin, Vector3.down);
-        //Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
+        Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
 
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
         {

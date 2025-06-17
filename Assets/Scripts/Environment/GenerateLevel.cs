@@ -31,6 +31,7 @@ public class GenerateLevel : MonoBehaviour
     {
         GameObject child = templatesparent.transform.GetChild(i).gameObject;
         child.transform.localPosition = Vector3.zero;  // Reset the position of each child
+        child.SetActive(false); // Set to inactive until it is instantiated
         section[i] = child;
     }
 
@@ -55,17 +56,21 @@ public class GenerateLevel : MonoBehaviour
     void GenerateSection()
     {
         secNum = Random.Range(0, section.Length);
-        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
+
         if (secNum == 28 || secNum == 29)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
         {
             stepamount = 200;
-            Debug.Log("Double section created");
+            Debug.Log($"Double section created: {secNum}");
             Debug.Log(secNum);
         }
         else
         {
             stepamount = 100;
         }
+
+        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
+        newSection.SetActive(true);
+
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
@@ -80,7 +85,8 @@ public class GenerateLevel : MonoBehaviour
 
       void InstantiateInitialSection()
     {
-        GameObject newSection = Instantiate(section[Random.Range(0, section.Length)], new Vector3(0, 0, zPos), Quaternion.identity);
+        secNum = Random.Range(0, section.Length);
+
         if (secNum == 28 || secNum == 29)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
         {
             stepamount = 200;
@@ -91,6 +97,10 @@ public class GenerateLevel : MonoBehaviour
         {
             stepamount = 100;
         }
+
+        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
+        newSection.SetActive(true);
+
         // Set the parent of the instantiated child to MAP
         newSection.transform.SetParent(MAP.transform, false);
         zPos += stepamount;
