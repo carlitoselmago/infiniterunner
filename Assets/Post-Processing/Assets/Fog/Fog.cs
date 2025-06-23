@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+/*using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 public class Fog : MonoBehaviour {
@@ -33,4 +31,4 @@ public class Fog : MonoBehaviour {
         fogMat.SetFloat("_FogOffset", fogOffset);
         Graphics.Blit(source, destination, fogMat);
     }
-}
+}*/

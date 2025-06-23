@@ -66,6 +66,8 @@ public class PlayerMove : MonoBehaviour
     public AudioSource canyonSFX;
     public AudioSource claxonSFX;
     public AudioSource carCrashSFX;
+    public AudioSource cardboard1;
+    public AudioSource cardboard2;
 
     //pitch shifter for flying timeout
     private float startingPitch = 1.5f;
@@ -480,6 +482,18 @@ public class PlayerMove : MonoBehaviour
         if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
         {
             backDoorSFX.Play();
+        }
+
+        if (other.gameObject.CompareTag("cardboard"))
+        {
+            float chance = Random.value;
+            if (chance < 0.5f)
+            {
+                cardboard1.Play();
+            } else
+            {
+                cardboard2.Play();
+            }
         }
 
         if (other.gameObject.CompareTag("panoptic"))

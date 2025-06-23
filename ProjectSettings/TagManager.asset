@@ -24,6 +24,7 @@ TagManager:
   - ground
   - Ground
   - fall
+  - cardboard
   layers:
   - Default
   - TransparentFX

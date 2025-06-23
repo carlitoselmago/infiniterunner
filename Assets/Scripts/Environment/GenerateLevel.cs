@@ -56,11 +56,16 @@ public class GenerateLevel : MonoBehaviour
     {
         secNum = Random.Range(0, section.Length);
 
-        if (secNum == 28 || secNum == 29 || secNum == 33)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
+        if (secNum == 28 || secNum == 33)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
         {
             stepamount = 200;
             Debug.Log($"Double section created: {secNum}");
             Debug.Log(secNum);
+        }
+        else if (secNum == 29)
+        {
+            stepamount = 215;
+            Debug.Log("Train section created");
         }
         else
         {
@@ -86,11 +91,15 @@ public class GenerateLevel : MonoBehaviour
     {
         secNum = Random.Range(0, section.Length);
 
-        if (secNum == 28 || secNum == 29 || secNum == 33)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
+        if (secNum == 28 || secNum == 33)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
         {
             stepamount = 200;
             Debug.Log("Double section created");
             Debug.Log(secNum);
+        } else if (secNum == 29)
+        {
+            stepamount = 215;
+            Debug.Log("Train section created");
         }
         else
         {
