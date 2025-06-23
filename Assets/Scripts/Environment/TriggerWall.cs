@@ -3,6 +3,7 @@
 public class TriggerWall : MonoBehaviour
 {
     public GameObject triggeredObject;
+    //public GameObject setInactiveObject;
 
     void OnTriggerEnter(Collider other)
     {
@@ -10,6 +11,7 @@ public class TriggerWall : MonoBehaviour
         {
             Debug.Log("TRIGGER");
             triggeredObject.SetActive(true);
+            //setInactiveObject.SetActive(false);
         }
     }
 }
