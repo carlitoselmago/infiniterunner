@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
 {
-    public int stepamount=100;
+    public int stepamount = 100;
     public GameObject templatesparent;
     private GameObject[] section;
     public AudioSource mainTheme;
@@ -61,7 +61,7 @@ public class GenerateLevel : MonoBehaviour
             if (secNum == 29)   //secNum29 is template30 (frontal train tunnel)
             {
                 stepamount = 235;
-                Debug.Log("Train section created");
+                Debug.Log($"Train section created: {secNum}");
             }
             else
             {
@@ -81,7 +81,7 @@ public class GenerateLevel : MonoBehaviour
         zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
 
-        if (createdSections.Count > 6)
+        if (createdSections.Count > 8)
         {
             GameObject oldSection = createdSections.Dequeue();  // Remove the oldest section from the queue
             Destroy(oldSection);  // Destroy the oldest section object
@@ -98,7 +98,7 @@ public class GenerateLevel : MonoBehaviour
             if (secNum == 29)   //secNum29 is template30 (frontal train tunnel)
             {
                 stepamount = 235;
-                Debug.Log("Train section created");
+                Debug.Log($"Train section created: {secNum}");
             }
             else
             {
