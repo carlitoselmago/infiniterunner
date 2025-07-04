@@ -33,7 +33,7 @@ public class PlayerMove : MonoBehaviour
     public bool isGrounded = false;
     public bool isFalling = false;
 
-    public static int maxHealth = 3;
+    public static int maxHealth = 5;
     public static int remainingHealth;
     private bool hit = false;
     public static bool isDead = false;
@@ -737,9 +737,9 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator PlayMainTheme()
     {
+        yield return new WaitForSeconds(18);
         if (!mainTheme.isPlaying && !pyramidsTheme.isPlaying && !flyFX.isPlaying)
         {
-            yield return new WaitForSeconds(18);
             mainTheme.Play();
             mainThemeAlreadyPlaying = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 2, targetVolume = 0f)); //experimental
