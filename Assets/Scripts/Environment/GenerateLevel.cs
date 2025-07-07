@@ -56,7 +56,7 @@ public class GenerateLevel : MonoBehaviour
     {
         secNum = Random.Range(0, section.Length);
 
-        if (secNum == 28 || secNum == 29 || secNum == 33)   // secNum 28 and 33 correspond to template29 and 34 (double length section)
+        if (secNum == 28 || secNum == 29 || secNum == 33 || secNum == 38)   // secNum 28 and 33 correspond to template29 and 34 (double length section)
         {
             if (secNum == 29)   //secNum29 is template30 (frontal train tunnel)
             {
@@ -93,7 +93,7 @@ public class GenerateLevel : MonoBehaviour
     {
         secNum = Random.Range(0, section.Length);
 
-        if (secNum == 28 || secNum == 33)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
+        if (secNum == 28 || secNum == 33 || secNum == 38)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
         {
             if (secNum == 29)   //secNum29 is template30 (frontal train tunnel)
             {
@@ -120,3 +120,97 @@ public class GenerateLevel : MonoBehaviour
         createdSections.Enqueue(newSection);
     }
 }
+/*
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GenerateLevel : MonoBehaviour
+{
+    public GameObject templatesparent;
+    public AudioSource mainTheme;
+    public GameObject MAP;
+
+    public int stepamount = 100; // Default fallback length
+    private int zPos = 200;
+    private int secNum;
+
+    private GameObject[] section;
+    private Queue<GameObject> createdSections = new Queue<GameObject>();
+
+    public int generatedSections = 0;
+    public bool creatingSection = false;
+
+    void Start()
+    {
+        // Initialize the section array from the templates
+        section = new GameObject[templatesparent.transform.childCount];
+        for (int i = 0; i < templatesparent.transform.childCount; i++)
+        {
+            GameObject child = templatesparent.transform.GetChild(i).gameObject;
+            child.transform.localPosition = Vector3.zero;
+            child.SetActive(false);
+            section[i] = child;
+        }
+
+        // Preload initial sections
+        for (int i = 0; i < 4; i++)
+        {
+            InstantiateInitialSection();
+        }
+    }
+
+    void Update()
+    {
+        if (MAP.transform.position.z < -zPos + (stepamount * 4) && !creatingSection)
+        {
+            creatingSection = true;
+            GenerateSection();
+            generatedSections++;
+        }
+    }
+
+    void GenerateSection()
+    {
+        secNum = Random.Range(0, section.Length);
+        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
+        newSection.SetActive(true);
+        newSection.transform.SetParent(MAP.transform, false);
+
+        UpdateZPosFromChunk(newSection);
+        createdSections.Enqueue(newSection);
+
+        if (createdSections.Count > 8)
+        {
+            Destroy(createdSections.Dequeue());
+        }
+
+        creatingSection = false;
+    }
+
+    void InstantiateInitialSection()
+    {
+        secNum = Random.Range(0, section.Length);
+        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
+        newSection.SetActive(true);
+        newSection.transform.SetParent(MAP.transform, false);
+
+        UpdateZPosFromChunk(newSection);
+        createdSections.Enqueue(newSection);
+    }
+
+    void UpdateZPosFromChunk(GameObject section)
+    {
+        Chunk chunk = section.GetComponent<Chunk>();
+        if (chunk != null && chunk.endPoint != null)
+        {
+            float chunkLength = chunk.endPoint.position.z - section.transform.position.z;
+            zPos += Mathf.RoundToInt(chunkLength);
+            stepamount = Mathf.RoundToInt(chunkLength); // Optional: keep this updated
+        }
+        else
+        {
+            Debug.LogWarning($"Chunk or endPoint missing on section {section.name}. Using default stepamount.");
+            zPos += stepamount;
+        }
+    }
+}*/

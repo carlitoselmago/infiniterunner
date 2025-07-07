@@ -7,15 +7,6 @@ public class DestroyObject : MonoBehaviour
 
     void Start()
     {
-        Collider[] hits = Physics.OverlapBox(transform.position, transform.localScale / 2, Quaternion.identity);
-
-        foreach (Collider hit in hits)
-        {
-            if (hit.gameObject == destroyedObject)
-            {
-                Destroy(destroyedObject);
-                Debug.Log($"Object destroyed at spawn: {destroyedObject.name}");
-            }
-        }
+        Destroy(destroyedObject);
     }
 }
