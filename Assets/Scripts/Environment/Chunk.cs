@@ -3,6 +3,7 @@ using UnityEngine;
 public class Chunk : MonoBehaviour
 {
     public Transform endPoint;
+    public static int chunkLength = 200;
 
     void OnDrawGizmos()
     {

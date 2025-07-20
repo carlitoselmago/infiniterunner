@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CollectCoin : MonoBehaviour
 {
-    public AudioSource coinFX;
+    //public AudioSource coinFX;
     void OnTriggerEnter(Collider other)
     {
        // coinFX.Play();

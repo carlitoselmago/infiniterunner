@@ -7,6 +7,6 @@ public class DestroyObject : MonoBehaviour
 
     void Start()
     {
-        Destroy(destroyedObject);
+        destroyedObject.SetActive(false);
     }
 }
