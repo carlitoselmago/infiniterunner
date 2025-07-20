@@ -186,6 +186,12 @@ public class PlayerMove : MonoBehaviour
     void Update()
 
     {
+        // Quit the game
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         if (startedrunning == false)
         {
             if (startingText.active == false)
@@ -358,7 +364,7 @@ public class PlayerMove : MonoBehaviour
             holding = false;
         }
 
-        // RAYCAST
+        // Raycast
         UpdateGroundTracking();
         if (!isJumping && !comingDown && !isFlying && !floating)
         {
@@ -388,7 +394,7 @@ public class PlayerMove : MonoBehaviour
                     HideAllTutorialCards();
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
                     RemoveHeartsInReverseOrder();
-                    this.enabled = false; // Disable this script
+                    this.enabled = false;
 
                 }
                 else if (hit == true && remainingHealth > 0) // hurt
@@ -811,10 +817,6 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-
-
-
-
     // RAYCAST
     void UpdateGroundTracking()
     {
@@ -825,7 +827,7 @@ public class PlayerMove : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
         {
-            //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag}");
+            //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag});
             isGrounded = true;
 
             if (!isFlying && !floating && !isJumping)
