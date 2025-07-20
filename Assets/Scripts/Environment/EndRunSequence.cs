@@ -10,6 +10,7 @@ public class EndRunSequence : MonoBehaviour
     public GameObject endScreen;
     public GameObject fadeOut;
     public GameObject gameOverText;
+    public GameObject highScoreDisplay;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
     private string exposedParameter;
@@ -31,15 +32,19 @@ public class EndRunSequence : MonoBehaviour
         yield return new WaitForSeconds(1);
         gameOverFX.Play();
         endCoinCount.GetComponent<Text>().text = "Has recollit " + CollectableControl.coinCount + " monedes. \n" + CollectableControl.lastAchievementText;
+        highScoreDisplay.GetComponent<Text>().text = CollectableControl.highScoreText;
         endCoinCount.SetActive(true);
+        highScoreDisplay.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(2);
         gameOverText.GetComponent<Animator>().enabled = true;
         gameOverText.GetComponent<Animator>().Play("FadeOutText");
         endCoinCount.GetComponent<Animator>().enabled = true;
         endCoinCount.GetComponent<Animator>().Play("FadeOutText");
+        highScoreDisplay.GetComponent<Animator>().enabled = true;
+        highScoreDisplay.GetComponent<Animator>().Play("FadeOutText");
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(2.5f);
         SceneManager.LoadScene(0);
     }
 }
