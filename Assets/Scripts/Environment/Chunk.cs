@@ -2,17 +2,12 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
-    public Transform endPoint;
-    public static int chunkLength = 200;
+    public int chunkNum;
+    public int chunkLength;
 
-    void OnDrawGizmos()
+    private void OnEnable()
     {
-        if (endPoint != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(endPoint.position, 0.5f);
-            Gizmos.DrawLine(endPoint.position, endPoint.position + endPoint.forward * 2);
-        }
+        GenerateLevel generator = FindObjectOfType<GenerateLevel>();
+        generator.UpdateZPos(chunkLength);
     }
-
 }

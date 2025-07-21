@@ -52,39 +52,25 @@ public class GenerateLevel : MonoBehaviour
         }
     }
 
+    public void UpdateZPos(int addedLength)
+    {
+        zPos += addedLength;
+    }
+
     void GenerateSection()
     {
         secNum = Random.Range(0, section.Length);
-
-        if (secNum == 28 || secNum == 29 || secNum == 33 || secNum == 38)   // secNum 28 and 33 correspond to template29 and 34 (double length section)
-        {
-            if (secNum == 29)   //secNum29 is template30 (frontal train tunnel)
-            {
-                stepamount = 235;
-                Debug.Log($"Train section created: {secNum}");
-            }
-            else
-            {
-                stepamount = 200;
-                Debug.Log($"Double section created: {secNum}");
-            }
-        }
-        else
-        {
-            stepamount = 100;
-        }
-
         GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
         newSection.SetActive(true);
 
         newSection.transform.SetParent(MAP.transform, false);
-        zPos += stepamount;
         createdSections.Enqueue(newSection);  // Add the new section to the queue
 
         if (createdSections.Count > 8)
         {
             GameObject oldSection = createdSections.Dequeue();  // Remove the oldest section from the queue
-            Destroy(oldSection);  // Destroy the oldest section object
+            oldSection.SetActive(false);
+            //Destroy(oldSection);  // Destroy the oldest section object
         }
         creatingSection = false;
     }
@@ -92,125 +78,11 @@ public class GenerateLevel : MonoBehaviour
       void InstantiateInitialSection()
     {
         secNum = Random.Range(0, section.Length);
-
-        if (secNum == 28 || secNum == 33 || secNum == 38)   // secNum 28 and 29 correspond to template29 and 30 (double length section)
-        {
-            if (secNum == 29)   //secNum29 is template30 (frontal train tunnel)
-            {
-                stepamount = 235;
-                Debug.Log($"Train section created: {secNum}");
-            }
-            else
-            {
-                stepamount = 200;
-                Debug.Log($"Double section created: {secNum}");
-            }
-        }
-        else
-        {
-            stepamount = 100;
-        }
-
         GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
         newSection.SetActive(true);
 
         // Set the parent of the instantiated child to MAP
         newSection.transform.SetParent(MAP.transform, false);
-        zPos += stepamount;
         createdSections.Enqueue(newSection);
     }
 }
-/*
-using System.Collections.Generic;
-using UnityEngine;
-
-public class GenerateLevel : MonoBehaviour
-{
-    public GameObject templatesparent;
-    public AudioSource mainTheme;
-    public GameObject MAP;
-
-    public int stepamount = 100; // Default fallback length
-    private int zPos = 200;
-    private int secNum;
-
-    private GameObject[] section;
-    private Queue<GameObject> createdSections = new Queue<GameObject>();
-
-    public int generatedSections = 0;
-    public bool creatingSection = false;
-
-    void Start()
-    {
-        // Initialize the section array from the templates
-        section = new GameObject[templatesparent.transform.childCount];
-        for (int i = 0; i < templatesparent.transform.childCount; i++)
-        {
-            GameObject child = templatesparent.transform.GetChild(i).gameObject;
-            child.transform.localPosition = Vector3.zero;
-            child.SetActive(false);
-            section[i] = child;
-        }
-
-        // Preload initial sections
-        for (int i = 0; i < 4; i++)
-        {
-            InstantiateInitialSection();
-        }
-    }
-
-    void Update()
-    {
-        if (MAP.transform.position.z < -zPos + (stepamount * 4) && !creatingSection)
-        {
-            creatingSection = true;
-            GenerateSection();
-            generatedSections++;
-        }
-    }
-
-    void GenerateSection()
-    {
-        secNum = Random.Range(0, section.Length);
-        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
-        newSection.SetActive(true);
-        newSection.transform.SetParent(MAP.transform, false);
-
-        UpdateZPosFromChunk(newSection);
-        createdSections.Enqueue(newSection);
-
-        if (createdSections.Count > 8)
-        {
-            Destroy(createdSections.Dequeue());
-        }
-
-        creatingSection = false;
-    }
-
-    void InstantiateInitialSection()
-    {
-        secNum = Random.Range(0, section.Length);
-        GameObject newSection = Instantiate(section[secNum], new Vector3(0, 0, zPos), Quaternion.identity);
-        newSection.SetActive(true);
-        newSection.transform.SetParent(MAP.transform, false);
-
-        UpdateZPosFromChunk(newSection);
-        createdSections.Enqueue(newSection);
-    }
-
-    void UpdateZPosFromChunk(GameObject section)
-    {
-        Chunk chunk = section.GetComponent<Chunk>();
-        if (chunk != null && chunk.endPoint != null)
-        {
-            float chunkLength = chunk.endPoint.position.z - section.transform.position.z;
-            zPos += Mathf.RoundToInt(chunkLength);
-            stepamount = Mathf.RoundToInt(chunkLength); // Optional: keep this updated
-        }
-        else
-        {
-            Debug.LogWarning($"Chunk or endPoint missing on section {section.name}. Using default stepamount.");
-            zPos += stepamount;
-        }
-    }
-}*/
