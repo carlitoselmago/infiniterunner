@@ -127,6 +127,7 @@ public class CollectableControl : MonoBehaviour
 
         if (PlayerMove.isDead)
         {
+            //Debug.Log("Player is dead.");
             if (coinCount > highScore && !highscoreChecked)
             {
                     highScore = coinCount;
@@ -140,6 +141,7 @@ public class CollectableControl : MonoBehaviour
             {
                 highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
                 highscoreChecked = true;
+                Debug.Log("No new score");
             }
         }
     }
