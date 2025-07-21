@@ -81,6 +81,7 @@ public class PlayerMove : MonoBehaviour
     private float targetVolume;
 
     public GameObject levelControl;
+    public CollectableControl collectableControl;
     //public GameObject triggeredObject;
     private BoxCollider boxCollider;
 
@@ -140,7 +141,7 @@ public class PlayerMove : MonoBehaviour
         startedrunning = false;
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
-
+        collectableControl = FindObjectOfType<CollectableControl>();
         //set hearts based on amount of life
         for (int i = 0; i < maxHealth; i++)
         {
@@ -385,8 +386,9 @@ public class PlayerMove : MonoBehaviour
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
                 other.GetComponent<BoxCollider>().enabled = false;
-                if (remainingHealth <= 0) // dead
+                if (remainingHealth <= 0)
                 {
+                    collectableControl.HandlePlayerDeath();
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     isDead = true;
                     animator.Play("Stumble Backwards");
@@ -395,9 +397,9 @@ public class PlayerMove : MonoBehaviour
                     levelControl.GetComponent<EndRunSequence>().enabled = true;
                     RemoveHeartsInReverseOrder();
                     this.enabled = false;
-
                 }
-                else if (hit == true && remainingHealth > 0) // hurt
+
+                else if (hit && remainingHealth > 0) // hurt
                 {
                     printCodeScript.SetCodePrompt("hurt");
                     animator.SetBool("ishurt", true);

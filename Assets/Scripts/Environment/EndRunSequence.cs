@@ -17,7 +17,7 @@ public class EndRunSequence : MonoBehaviour
     private float duration;
     private float targetVolume;
 
-    void Start()
+    void OnEnable()
     {
         StartCoroutine(EndSequence());
     }

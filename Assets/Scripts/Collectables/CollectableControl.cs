@@ -17,7 +17,6 @@ public class CollectableControl : MonoBehaviour
     public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200 };
     private int treballadordelmes_coins_index = 0;
     private int highScore;
-    private bool highscoreChecked = false;
     public static bool highScoreAchieved = false;
 
     //time vars
@@ -63,8 +62,31 @@ public class CollectableControl : MonoBehaviour
 
         // Load saved high score
         highScore = SessionData.sessionHighScore;
+        Debug.Log("Last High Score: ");
+        Debug.Log(highScore);
 
         playerMove = player.GetComponent<PlayerMove>();
+    }
+
+    public void HandlePlayerDeath()
+    {
+        if (coinCount > highScore)
+        {
+            highScore = coinCount;
+            SessionData.sessionHighScore = highScore;
+            highScoreText = "NOU RÈCORD!";
+            Debug.Log("New high score saved: " + highScore);
+        }
+        else if (coinCount < highScore)
+        {
+            highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
+            Debug.Log("Under last score");
+        }
+        else
+        {
+            highScoreText = "";
+            Debug.Log("No new score.");
+        }
     }
 
     void Update()
@@ -120,28 +142,7 @@ public class CollectableControl : MonoBehaviour
                 {
                     Debug.Log("Skipped Time Achievement!");
                 }
-
                 }
-            }
-        }
-
-        if (PlayerMove.isDead)
-        {
-            //Debug.Log("Player is dead.");
-            if (coinCount > highScore && !highscoreChecked)
-            {
-                    highScore = coinCount;
-                    SessionData.sessionHighScore = highScore;
-
-                    Debug.Log("New high score saved: " + highScore);
-                    highscoreChecked = true;
-                    highScoreText = "NOU RÈCORD!";
-                }
-            else if (coinCount < highScore && !highscoreChecked)
-            {
-                highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
-                highscoreChecked = true;
-                Debug.Log("No new score");
             }
         }
     }
