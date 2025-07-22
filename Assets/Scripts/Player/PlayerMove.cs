@@ -394,7 +394,8 @@ public class PlayerMove : MonoBehaviour
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
                     HideAllTutorialCards();
-                    levelControl.GetComponent<EndRunSequence>().enabled = true;
+                    StartCoroutine(EnableEndSequenceSafely());
+                    //levelControl.GetComponent<EndRunSequence>().enabled = true;
                     RemoveHeartsInReverseOrder();
                     this.enabled = false;
                 }
@@ -767,6 +768,12 @@ public class PlayerMove : MonoBehaviour
         godmodevisual.SetActive(false);
         godmodevisual.GetComponent<ToggleShield>().enabled = false;
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
+    }
+
+    private IEnumerator EnableEndSequenceSafely()
+    {
+        yield return null; // wait one frame
+        levelControl.GetComponent<EndRunSequence>().enabled = true;
     }
 
     /*public void SetConstrained(bool value) // Function to receive a bool from another script (Constrained.cs)
