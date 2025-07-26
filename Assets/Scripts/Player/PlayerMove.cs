@@ -393,6 +393,7 @@ public class PlayerMove : MonoBehaviour
                     isDead = true;
                     animator.Play("Stumble Backwards");
                     crashThud.Play();
+                    levelControl.GetComponent<GenerateSandstorm>().enabled = false;
                     HideAllTutorialCards();
                     StartCoroutine(EnableEndSequenceSafely());
                     //levelControl.GetComponent<EndRunSequence>().enabled = true;
@@ -707,7 +708,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         BGM.pitch = endingPitch;
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1f));
     }
 
     IEnumerator ApplyGlissando()

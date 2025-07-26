@@ -7,6 +7,7 @@ using UnityEngine.Audio;
 public class CollectableControl : MonoBehaviour
 {
     public GameObject player;
+    public GameObject levelControl;
     public static int coinCount;
     public GameObject coinCountDisplay;
 
@@ -18,6 +19,7 @@ public class CollectableControl : MonoBehaviour
     private int treballadordelmes_coins_index = 0;
     private int highScore;
     public static bool highScoreAchieved = false;
+    public bool firstAchievementMet = false;
 
     //time vars
     private float elapsedTime = 0f;
@@ -135,8 +137,13 @@ public class CollectableControl : MonoBehaviour
                     dimVolumes();
                     lifeUp();
                         //StartCoroutine(SmoothSpeedIncrease(2f, 2f)); // smoothly add x speed over y seconds
-                        seconds_to_elapse_index += 1;
-                    StartCoroutine(hideachievement());
+                    seconds_to_elapse_index += 1;
+                        if (seconds_to_elapse_index == 1)
+                        {
+                            firstAchievementMet = true;
+                            levelControl.GetComponent<GenerateSandstorm>().StartSandstormGeneration();
+                        }
+                        StartCoroutine(hideachievement());
                 }
                 else
                 {

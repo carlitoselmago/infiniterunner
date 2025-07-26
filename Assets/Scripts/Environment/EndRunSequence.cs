@@ -11,6 +11,7 @@ public class EndRunSequence : MonoBehaviour
     public GameObject fadeOut;
     public GameObject gameOverText;
     public GameObject highScoreDisplay;
+    public GameObject levelControl;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
     private string exposedParameter;
@@ -28,6 +29,9 @@ public class EndRunSequence : MonoBehaviour
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 1.5f, targetVolume = 0));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 0));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = 1.5f, targetVolume = 0f));
+        levelControl.GetComponent<GenerateSandstorm>().enabled = false;
+
         endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
         gameOverFX.Play();
