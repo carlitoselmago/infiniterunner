@@ -7,15 +7,21 @@ public class WaterTrigger : MonoBehaviour
     public Volume triggeredVolume;
     public float transitionDuration = 0.3f;
     public GameObject splashSound;
+    public CollectableControl collectableControl;
 
     private Coroutine transitionCoroutine;
+
+    private void Start()
+    {
+        collectableControl = FindObjectOfType<CollectableControl>();
+    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Underwater");
-
+            //Debug.Log("Underwater");
+            collectableControl.HandlePlayerDeath();
             triggeredVolume.gameObject.SetActive(true);
             splashSound.SetActive(true);
             if (transitionCoroutine != null)

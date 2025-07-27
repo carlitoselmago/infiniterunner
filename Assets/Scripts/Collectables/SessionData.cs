@@ -1,4 +1,4 @@
 public static class SessionData
 {
-    public static int sessionHighScore = 0;
+    public static int sessionHighScore = 5;
 }

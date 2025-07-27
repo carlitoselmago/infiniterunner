@@ -17,7 +17,7 @@ public class CollectableControl : MonoBehaviour
     public GameObject achievementEndUIsubtext;
     public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200 };
     private int treballadordelmes_coins_index = 0;
-    private int highScore;
+    public int highScore;
     public static bool highScoreAchieved = false;
     public bool firstAchievementMet = false;
 
@@ -75,11 +75,12 @@ public class CollectableControl : MonoBehaviour
         if (coinCount > highScore)
         {
             highScore = coinCount;
+            highScoreAchieved = true;
             SessionData.sessionHighScore = highScore;
             highScoreText = "NOU RÈCORD!";
             Debug.Log("New high score saved: " + highScore);
         }
-        else if (coinCount < highScore)
+        else if (coinCount <= highScore)
         {
             highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
             Debug.Log("Under last score");
@@ -104,7 +105,6 @@ public class CollectableControl : MonoBehaviour
                 if (coinCount == treballadordelmes_coins[treballadordelmes_coins_index])
                 {
                   if (1==1){
-                   // if (achievementShown == false) {
                         string compliment = compliments[treballadordelmes_coins_index];
                         lastAchievementText = "TREBALLADORA " + compliment + "!";
                         achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
@@ -136,7 +136,6 @@ public class CollectableControl : MonoBehaviour
                     highSpeedSFX.Play();
                     dimVolumes();
                     lifeUp();
-                        //StartCoroutine(SmoothSpeedIncrease(2f, 2f)); // smoothly add x speed over y seconds
                     seconds_to_elapse_index += 1;
                         if (seconds_to_elapse_index == 1)
                         {
@@ -176,21 +175,5 @@ public class CollectableControl : MonoBehaviour
         achievementUI.SetActive(false);
         achievementShown = false;
     }
-
-    /*IEnumerator SmoothSpeedIncrease(float increment, float duration)
-    {
-        float startSpeed = playerMove.moveSpeed;
-        float targetSpeed = startSpeed + increment;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            playerMove.moveSpeed = Mathf.Lerp(startSpeed, targetSpeed, elapsed / duration);
-            yield return null;
-        }
-
-        playerMove.moveSpeed = targetSpeed; // Ensure exact final value
-    }*/
 
 }

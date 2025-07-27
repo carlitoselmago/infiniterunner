@@ -545,7 +545,9 @@ public class PlayerMove : MonoBehaviour
                 animator.Play("Stumble Backwards");
                 carCrashSFX.Play();
                 HideAllTutorialCards();
-                levelControl.GetComponent<EndRunSequence>().enabled = true;
+                collectableControl.HandlePlayerDeath();
+                StartCoroutine(EnableEndSequenceSafely());
+                //levelControl.GetComponent<EndRunSequence>().enabled = true;
                 this.enabled = false; // Disable this script
         }
 

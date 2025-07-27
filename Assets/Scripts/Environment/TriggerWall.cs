@@ -9,7 +9,7 @@ public class TriggerWall : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("TRIGGER");
+            //Debug.Log("TRIGGER");
             triggeredObject.SetActive(true);
             //setInactiveObject.SetActive(false);
         }
