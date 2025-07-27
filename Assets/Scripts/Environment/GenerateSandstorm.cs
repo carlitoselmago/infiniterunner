@@ -19,7 +19,7 @@ public class GenerateSandstorm : MonoBehaviour
     private float duration;
     private float targetVolume;
     public AudioSource sandstormFX;
-
+    public AudioSource endStormSFX;
 
     [Header("Settings")]
     public float fadeDuration = 5f;
@@ -81,6 +81,8 @@ public class GenerateSandstorm : MonoBehaviour
             StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
             StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 0f));
+            yield return new WaitForSeconds(1);
+            endStormSFX.Play();
             yield return new WaitForSeconds(fadeDuration);
             sandstormFX.Stop();
             //Debug.Log("Sandstorm is over.");
@@ -115,8 +117,8 @@ public class GenerateSandstorm : MonoBehaviour
 
         while (elapsed < duration)
         {
-            float alpha = Mathf.Lerp(from, to, elapsed / duration);
             sandstormVolume.weight = Mathf.Lerp(from, to, elapsed / duration);
+            float alpha = Mathf.Lerp(from, to, elapsed / (duration/2));
             sandstormMaterial.SetFloat("_GlobalAlpha", alpha);
 
             elapsed += Time.deltaTime;
