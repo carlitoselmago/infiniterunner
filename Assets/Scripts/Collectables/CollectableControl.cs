@@ -10,6 +10,7 @@ public class CollectableControl : MonoBehaviour
     public GameObject levelControl;
     public static int coinCount;
     public GameObject coinCountDisplay;
+    public bool savingPlayerPrefences = true;  //if false, high scores are reset every day
 
     //achievements vars
     public GameObject achievementUI;
@@ -63,9 +64,8 @@ public class CollectableControl : MonoBehaviour
         highScoreText = "";
 
         // Load saved high score
+        SessionData.LoadHighScore(savingPlayerPrefences);
         highScore = SessionData.sessionHighScore;
-        Debug.Log("Last High Score: ");
-        Debug.Log(highScore);
 
         playerMove = player.GetComponent<PlayerMove>();
     }
@@ -77,6 +77,9 @@ public class CollectableControl : MonoBehaviour
             highScore = coinCount;
             highScoreAchieved = true;
             SessionData.sessionHighScore = highScore;
+            if (savingPlayerPrefences) { 
+            SessionData.UpdateHighScore(highScore, savingPlayerPrefences);
+            }
             highScoreText = "NOU RÈCORD!";
             Debug.Log("New high score saved: " + highScore);
         }
@@ -144,12 +147,14 @@ public class CollectableControl : MonoBehaviour
                         }
                         StartCoroutine(hideachievement());
                 }
-                else
-                {
-                    Debug.Log("Skipped Time Achievement!");
-                }
                 }
             }
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SessionData.ClearHighScore();
+            highScore = 0;
+            Debug.Log("High score reset.");
         }
     }
 

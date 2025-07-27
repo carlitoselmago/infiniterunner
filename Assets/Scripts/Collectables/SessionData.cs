@@ -1,4 +1,28 @@
+using UnityEngine;
+
 public static class SessionData
 {
-    public static int sessionHighScore = 5;
+    private const string HighScoreKey = "HighScore";
+    public static int sessionHighScore = 0;
+
+    public static void LoadHighScore(bool usePrefs)
+    {
+        sessionHighScore = usePrefs ? PlayerPrefs.GetInt(HighScoreKey, 0) : 0;
+    }
+
+    public static void UpdateHighScore(int score, bool usePrefs)
+    {
+        sessionHighScore = score;
+        if (usePrefs)
+        {
+            PlayerPrefs.SetInt(HighScoreKey, sessionHighScore);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public static void ClearHighScore()
+    {
+        sessionHighScore = 0;
+        PlayerPrefs.DeleteKey(HighScoreKey);
+    }
 }
