@@ -34,8 +34,8 @@ public class GenerateLevel : MonoBehaviour
         section[i] = child;
     }
 
-    // Preload 3 sections at the start of the game
-    for (int i = 0; i < 4; i++)
+    // Preload 4 sections at the start of the game
+    for (int i = 0; i < 5; i++)
     {
         InstantiateInitialSection();
     }
