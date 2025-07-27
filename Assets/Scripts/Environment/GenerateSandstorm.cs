@@ -68,7 +68,7 @@ public class GenerateSandstorm : MonoBehaviour
             particles.SetActive(true);
             StartCoroutine(FadeFog(minFogDensity, maxFogDensity, fadeDuration));
             StartCoroutine(FadeVolumeAndParticles(0f, 1f, fadeDuration));
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 1f));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 1.2f));
             sandstormFX.Play();
             yield return new WaitForSeconds(fadeDuration / 2);
             sandstormText.SetActive(true);
