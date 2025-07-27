@@ -12,9 +12,6 @@ public class PlayerMove : MonoBehaviour
     public bool isJumping = false;
     public bool comingDown = false;
     public bool isRolling = false;
-    public bool standingUp = false;
-    public static bool canFly = false;
-    public bool nowCanFly = false;
     public bool isFlying = false;
     public bool floating = false;
     public bool holding = false;
@@ -82,7 +79,6 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject levelControl;
     public CollectableControl collectableControl;
-    //public GameObject triggeredObject;
     private BoxCollider boxCollider;
 
     private float targetHeight = 17.0f;
@@ -96,7 +92,6 @@ public class PlayerMove : MonoBehaviour
     private float timer;
     private bool alreadyCrossedPanoptic = false;
     public AudioSource coinFX;
-    //public GameObject objectWithMoveScript;
     public HurtMask hurtMaskScript;
 
     public GameObject MAP;
@@ -217,7 +212,7 @@ public class PlayerMove : MonoBehaviour
         {
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0.7f));
-            if (mainThemeAlreadyPlaying == false)
+            if (!mainThemeAlreadyPlaying)
             {
                 StartCoroutine(PlayMainTheme());
             }
@@ -227,7 +222,7 @@ public class PlayerMove : MonoBehaviour
             startingText.SetActive(false);
             printCodeScript.SetCodePrompt("start");
         }
-        if (startedrunning == true && !animator.GetBool("isrunning"))
+        if (startedrunning && !animator.GetBool("isrunning"))
         {
             animator.SetBool("isrunning", true);
         }
@@ -312,8 +307,9 @@ public class PlayerMove : MonoBehaviour
             {
                 tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             }
-            if (isRolling == false)
+            if (!isRolling)
             {
+                isRolling = true;
                 crouchhitbox();
                 animator.SetBool("isrolling", true);
                 StartCoroutine(RollSequence());
@@ -367,7 +363,7 @@ public class PlayerMove : MonoBehaviour
 
         // Raycast
         UpdateGroundTracking();
-        if (!isJumping && !comingDown && !isFlying && !floating)
+        if (!isJumping && !isFlying && !floating)
         {
             ApplyVerticalMovement();
         }
@@ -446,7 +442,6 @@ public class PlayerMove : MonoBehaviour
             godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
-            Debug.Log("is playing: " + flyFX.isPlaying);
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
             mainCam.GetComponent<Animator>().SetBool("flying", true);
@@ -455,13 +450,11 @@ public class PlayerMove : MonoBehaviour
                 // Create array of coins
                 // Calculate currentZ based on the relative position of the player to the map
                 float currentZ = MAP.transform.InverseTransformPoint(this.transform.position).z + 230;
-                //Debug.Log(currentZ);
                 for (int i = 0; i < flycoinsamount; i++)
                 {
                     GameObject newcoin = Instantiate(flycoin, Vector3.zero, Quaternion.identity);
                     newcoin.transform.localPosition = new Vector3(this.transform.position.x, targetHeight, currentZ + (i * 3));
                     newcoin.transform.SetParent(MAP.transform, false);
-                    // Add new coin to the list
                     instantiatedCoins.Add(newcoin);
                 }
                 StartCoroutine(FlyTimeout());
@@ -495,28 +488,18 @@ public class PlayerMove : MonoBehaviour
         }
 
         if (other.gameObject.CompareTag("cardboard"))
-        {
-            float chance = Random.value;
-            if (chance < 0.5f)
-            {
-                cardboard1.Play();
-            } else
-            {
-                cardboard2.Play();
-            }
-        }
+            (Random.value < 0.5f ? cardboard1 : cardboard2).Play();
 
         if (other.gameObject.CompareTag("panoptic"))
         {
-            float random = Random.value;
-            if (alreadyCrossedPanoptic == false)
+            if (!alreadyCrossedPanoptic)
             {
                 StartCoroutine(ApplyGlissando());
                 alreadyCrossedPanoptic = true;
             }
-            else if (alreadyCrossedPanoptic == true)
+            else if (alreadyCrossedPanoptic)
             {
-                if (random >= 0.5f)
+                if (Random.value >= 0.5f)
                 {
                     StartCoroutine(ApplyGlissando());
                 }
@@ -547,7 +530,6 @@ public class PlayerMove : MonoBehaviour
                 HideAllTutorialCards();
                 collectableControl.HandlePlayerDeath();
                 StartCoroutine(EnableEndSequenceSafely());
-                //levelControl.GetComponent<EndRunSequence>().enabled = true;
                 this.enabled = false; // Disable this script
         }
 
@@ -573,10 +555,6 @@ public class PlayerMove : MonoBehaviour
                     Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
                 }
             }
-            else
-            {
-                Debug.LogError("Tutorial card not found: " + tutorialcard);
-            }
         }
     }
 
@@ -599,7 +577,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider.size = new Vector3(0.67f, 1.15f, 0.58f);
         // Set new center position
         boxCollider.center = new Vector3(0, 0, -0.42f);
-        rayLength = 1.0f;
+        rayLength = 0.7f;
         raycastHeightOffset = 0.5f;
     }
 
@@ -609,7 +587,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider.center = new Vector3(0, 1.15f, -0.42f);
         // Set new size
         boxCollider.size = new Vector3(0.67f, 0.78f, 0.58f);
-        rayLength = 4.0f;
+        rayLength = 0.3f;
         raycastHeightOffset = -0.5f;
     }
 
@@ -638,7 +616,6 @@ public class PlayerMove : MonoBehaviour
     {
         printCodeScript.SetCodePrompt("rollsequence");
         yield return new WaitForSeconds(0.45f);
-        standingUp = true;
         yield return new WaitForSeconds(0.45f);
         isRolling = false;
         animator.SetBool("isrolling", false);
@@ -648,7 +625,7 @@ public class PlayerMove : MonoBehaviour
     IEnumerator HurtSequence()
     {
         boxCollider.enabled = false;
-        yield return new WaitForSeconds(0.30f);
+        yield return new WaitForSeconds(0.3f);
         boxCollider.enabled = true;
         yield return new WaitForSeconds(0.5f);
         animator.SetBool("ishurt", false);
@@ -676,7 +653,6 @@ public class PlayerMove : MonoBehaviour
 
         isFlying = false;
         //startY = originY;
-        //ApplyVerticalMovement();
 
         yield return new WaitForSeconds(1);
         floating = false;
@@ -741,7 +717,6 @@ public class PlayerMove : MonoBehaviour
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = t, targetVolume = 0.7f));
             yield return null;
         }
-        // Ensure the pitch is reset to the minimum value at the end
         BGM.pitch = endingPitch;
         yield return new WaitForSeconds(6);
         mainCam.GetComponent<Animator>().SetBool("panoptic", false);
@@ -789,7 +764,6 @@ public class PlayerMove : MonoBehaviour
     {
         float fraction = Time.deltaTime * intspeed;
 
-        // Check the type of easing
         if (easingOut)
         {
             // Easing out: movement starts quickly and slows down
