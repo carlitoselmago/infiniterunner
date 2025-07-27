@@ -7,15 +7,12 @@ public class PlaySoundOnTrigger : MonoBehaviour
 
     void Start()
     {
-        if (targetWithAudio != null)
-        {
-            audioSource = targetWithAudio.GetComponent<AudioSource>();
-        }
+    audioSource = targetWithAudio.GetComponent<AudioSource>();
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && audioSource != null && !audioSource.isPlaying)
+        if (other.CompareTag("Player"))
         {
             audioSource.Play();
         }
