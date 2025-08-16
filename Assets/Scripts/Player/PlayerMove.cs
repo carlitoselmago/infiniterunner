@@ -29,6 +29,7 @@ public class PlayerMove : MonoBehaviour
     private float verticalVelocity = 0f;
     public bool isGrounded = false;
     public bool isFalling = false;
+    public bool isInTheMine = false;
 
     public static int maxHealth = 5;
     public static int remainingHealth;
@@ -531,6 +532,20 @@ public class PlayerMove : MonoBehaviour
                 collectableControl.HandlePlayerDeath();
                 StartCoroutine(EnableEndSequenceSafely());
                 this.enabled = false; // Disable this script
+        }
+
+        if (other.gameObject.CompareTag("minewall"))        //remove if not used
+        {
+            other.GetComponent<BoxCollider>().enabled = false;
+            mainCam.GetComponent<Animator>().SetBool("dead", true);
+            animator.Play("Stumble Backwards");
+            //carCrashSFX.Play();       // Replace by stone SFX
+            Transform child = playerObject.transform.Find("rocks");
+            child.gameObject.SetActive(true);
+            HideAllTutorialCards();
+            collectableControl.HandlePlayerDeath();
+            StartCoroutine(EnableEndSequenceSafely());
+            this.enabled = false; // Disable this script
         }
 
         if (other.gameObject.CompareTag("tutorial"))

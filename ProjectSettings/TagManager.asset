@@ -25,6 +25,7 @@ TagManager:
   - Ground
   - fall
   - cardboard
+  - minewall
   layers:
   - Default
   - TransparentFX
