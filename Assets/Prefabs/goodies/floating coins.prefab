@@ -44,6 +44,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7743781249034579510}
     m_Modifications:
+    - target: {fileID: 931026688306638456, guid: daf43925e8c8eed4fac39059670daca8,
+        type: 3}
+      propertyPath: m_TagString
+      value: floating coin
+      objectReference: {fileID: 0}
     - target: {fileID: 2590347227980764641, guid: daf43925e8c8eed4fac39059670daca8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -207,6 +212,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7743781249034579510}
     m_Modifications:
+    - target: {fileID: 931026688306638456, guid: daf43925e8c8eed4fac39059670daca8,
+        type: 3}
+      propertyPath: m_TagString
+      value: floating coin
+      objectReference: {fileID: 0}
     - target: {fileID: 2590347227980764641, guid: daf43925e8c8eed4fac39059670daca8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -370,6 +380,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7743781249034579510}
     m_Modifications:
+    - target: {fileID: 931026688306638456, guid: daf43925e8c8eed4fac39059670daca8,
+        type: 3}
+      propertyPath: m_TagString
+      value: floating coin
+      objectReference: {fileID: 0}
     - target: {fileID: 2590347227980764641, guid: daf43925e8c8eed4fac39059670daca8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -533,6 +548,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7743781249034579510}
     m_Modifications:
+    - target: {fileID: 931026688306638456, guid: daf43925e8c8eed4fac39059670daca8,
+        type: 3}
+      propertyPath: m_TagString
+      value: floating coin
+      objectReference: {fileID: 0}
     - target: {fileID: 2590347227980764641, guid: daf43925e8c8eed4fac39059670daca8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -696,6 +716,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7743781249034579510}
     m_Modifications:
+    - target: {fileID: 931026688306638456, guid: daf43925e8c8eed4fac39059670daca8,
+        type: 3}
+      propertyPath: m_TagString
+      value: floating coin
+      objectReference: {fileID: 0}
     - target: {fileID: 2590347227980764641, guid: daf43925e8c8eed4fac39059670daca8,
         type: 3}
       propertyPath: m_LocalScale.x
