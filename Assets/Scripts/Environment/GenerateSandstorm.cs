@@ -29,6 +29,7 @@ public class GenerateSandstorm : MonoBehaviour
     public float maxParticleAlpha = 1f;
     public float chance = 0.5f;
     public bool generatingSandstorm = false;
+    public bool sandstormActive = true;
 
     private void Awake()
     {
@@ -56,44 +57,45 @@ public class GenerateSandstorm : MonoBehaviour
 
     IEnumerator GenerateTheSandstorm(float prewait)
     {
-        float randomWait = Random.Range(0f, 40f);
-
-        yield return new WaitForSeconds(prewait + randomWait); // delay before attempting to generate sandstorm
-        if (Random.value > chance)
+        if (sandstormActive) // don't generate if underground in the mines
         {
-            //Debug.Log("Generating Sandstorm");
-            generatingSandstorm = true;
+            float randomWait = Random.Range(0f, 40f);
 
-            sandstormParticles.Play();
-            particles.SetActive(true);
-            StartCoroutine(FadeFog(minFogDensity, maxFogDensity, fadeDuration));
-            StartCoroutine(FadeVolumeAndParticles(0f, 1f, fadeDuration));
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 1.2f));
-            sandstormFX.Play();
-            yield return new WaitForSeconds(fadeDuration / 2);
-            sandstormText.SetActive(true);
-            yield return new WaitForSeconds(3);
-            sandstormText.SetActive(false);
+            yield return new WaitForSeconds(prewait + randomWait); // delay before attempting to generate sandstorm
+            if (Random.value > chance)
+            {
+                //Debug.Log("Generating Sandstorm");
+                generatingSandstorm = true;
 
-            yield return new WaitForSeconds(Random.Range(10f, Random.Range(30f, 60f)));
+                sandstormParticles.Play();
+                particles.SetActive(true);
+                StartCoroutine(FadeFog(minFogDensity, maxFogDensity, fadeDuration));
+                StartCoroutine(FadeVolumeAndParticles(0f, 1f, fadeDuration));
+                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 1.2f));
+                sandstormFX.Play();
+                yield return new WaitForSeconds(fadeDuration / 2);
+                sandstormText.SetActive(true);
+                yield return new WaitForSeconds(3);
+                sandstormText.SetActive(false);
 
-            //stop sandstorm
-            StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
-            StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 0f));
-            yield return new WaitForSeconds(1);
-            endStormSFX.Play();
-            yield return new WaitForSeconds(fadeDuration);
-            sandstormFX.Stop();
-            //Debug.Log("Sandstorm is over.");
-            generatingSandstorm = false;
+                yield return new WaitForSeconds(Random.Range(10f, Random.Range(30f, 60f)));
 
-            StartCoroutine(GenerateTheSandstorm(30f));
-        }
-        else
-        {
-            //Debug.Log("Skipped Sandstrom based on chance");
-            StartCoroutine(GenerateTheSandstorm(10f));
+                //stop sandstorm
+                StopTheSandstorm();
+                yield return new WaitForSeconds(1);
+                endStormSFX.Play();
+                yield return new WaitForSeconds(fadeDuration);
+                sandstormFX.Stop();
+                //Debug.Log("Sandstorm is over.");
+                generatingSandstorm = false;
+
+                StartCoroutine(GenerateTheSandstorm(30f));
+            }
+            else
+            {
+                //Debug.Log("Skipped Sandstrom based on chance");
+                StartCoroutine(GenerateTheSandstorm(10f));
+            }
         }
     }
 
@@ -131,6 +133,13 @@ public class GenerateSandstorm : MonoBehaviour
         {
             sandstormParticles.Stop();
         }
+    }
+
+    public void StopTheSandstorm()
+    {
+        StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
+        StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 0f));
     }
 
 }

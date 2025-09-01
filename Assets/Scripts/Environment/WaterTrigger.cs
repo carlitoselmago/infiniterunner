@@ -20,7 +20,7 @@ public class WaterTrigger : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            //Debug.Log("Underwater");
+            Debug.Log("Underwater");
             collectableControl.HandlePlayerDeath();
             triggeredVolume.gameObject.SetActive(true);
             splashSound.SetActive(true);

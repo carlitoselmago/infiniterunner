@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1282543009955406276}
   - component: {fileID: 2200954439169617471}
   - component: {fileID: 5489878115159256079}
-  - component: {fileID: 7416914347404890489}
   - component: {fileID: 6752307803045784006}
   m_Layer: 0
   m_Name: Log
@@ -86,23 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7416914347404890489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8816966303516742595}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 954edd9a44741496c8d55abd4c617d31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  thePlayer: {fileID: 0}
-  charModel: {fileID: 0}
-  crashThud: {fileID: 0}
-  mainCam: {fileID: 0}
-  levelControl: {fileID: 0}
 --- !u!65 &6752307803045784006
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -8,20 +8,22 @@ public class PlayerMove : MonoBehaviour
 {
     public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
-    public float leftRightSpeed = 10.0f;
+    public float horizontalSpeed = 20f;
+    //public float leftRightSpeed = 10.0f;
     public bool isJumping = false;
-    public bool comingDown = false;
     public bool isRolling = false;
     public bool isFlying = false;
     public bool floating = false;
     public bool holding = false;
     private bool mainThemeAlreadyPlaying = false;
-    // move constrains (from Constrain.cs)
-    private bool blockLeft = false;
-    private bool blockCenter = false;
-    private bool blockRight = false;
+
+    [Header("Constrains")]  //(from Constrain.cs)
+    public bool blockLeft = false;
+    public bool blockCenter = false;
+    public bool blockRight = false;
 
     // raycast
+    [Header("Raycast")]
     public LayerMask groundLayer;
     private float fallSpeed = 20.0f;
     public float rayLength = 0.7f;
@@ -29,20 +31,21 @@ public class PlayerMove : MonoBehaviour
     private float verticalVelocity = 0f;
     public bool isGrounded = false;
     public bool isFalling = false;
-    public bool isInTheMine = false;
 
+    [Header("Health")]
     public static int maxHealth = 5;
     public static int remainingHealth;
     private bool hit = false;
     public static bool isDead = false;
     public bool godmode = false;
-    public int flycoinsamount = 30;
 
+    public GameObject flycoin;
+    public int flycoinsamount = 30;
     private List<GameObject> instantiatedCoins = new List<GameObject>();
 
     public GameObject godmodevisual;
     public GameObject playerObject;
-    public Rigidbody playerBody;
+    public Rigidbody playerBody;        // assign root Rigidbody
     public GameObject startingText;
     public GameObject tutorialText;
     private Animator animator;
@@ -50,6 +53,7 @@ public class PlayerMove : MonoBehaviour
     public GameObject mainCam;
 
     //sfx
+    [Header("SFX")]
     public AudioSource HurtSFX;
     public AudioSource crashThud;
     public AudioSource BGM;
@@ -80,14 +84,20 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject levelControl;
     public CollectableControl collectableControl;
-    private BoxCollider boxCollider;
+
+    // IMPORTANT: main physics collider (non-trigger). Keep this always enabled to avoid sinking.
+    public BoxCollider boxCollider;
+
+    // jump trigger colliders now live on child HitLogic; player will toggle them via hitLogic.UseJumpHitbox
+    public HitLogic hitLogic; // assign the child HitLogic in inspector or it will auto-find
+    //public BoxCollider jumpCollider;
 
     private float targetHeight = 17.0f;
     private float startY;
     private float originY;
     private float jumpedHeight;
 
-    public GameObject flycoin;
+    private float jumpStarted;
 
     public GameObject tutorial2d;
     private float timer;
@@ -99,15 +109,10 @@ public class PlayerMove : MonoBehaviour
 
     public GameObject hearts;
     public GameObject heart;
-
-    // List to store instantiated hearts
     public List<GameObject> heartList = new List<GameObject>();
-
-    public float horizontalSpeed = 20f;
 
     public string pos = "center";
     private float targetpos = 0f;
-
     public static bool startedrunning = false;
 
     private string tutorialcard = "";
@@ -126,10 +131,34 @@ public class PlayerMove : MonoBehaviour
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
-        boxCollider = GetComponent<BoxCollider>();
+
+        // Ensure playerBody assigned
+        if (playerBody == null) playerBody = GetComponent<Rigidbody>();
+
+        // Find main non-trigger collider (boxCollider) if not assigned
+        if (boxCollider == null)
+        {
+            BoxCollider[] all = GetComponentsInChildren<BoxCollider>();
+            foreach (var c in all)
+            {
+                if (!c.isTrigger) { boxCollider = c; break; }
+            }
+        }
+
+        // Find HitLogic child if not assigned
+        if (hitLogic == null)
+        {
+            hitLogic = GetComponentInChildren<HitLogic>();
+        }
+
+        // Ensure hitboxes default state: normal hitbox active, jump hitbox off
+        if (hitLogic != null)
+            hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
+        //hitLogic.UseJumpHitbox(false);
+
         startY = transform.position.y;
         originY = startY;
-        normalhitbox();
+        //normalhitbox();
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
@@ -138,6 +167,7 @@ public class PlayerMove : MonoBehaviour
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
         collectableControl = FindObjectOfType<CollectableControl>();
+
         //set hearts based on amount of life
         for (int i = 0; i < maxHealth; i++)
         {
@@ -149,17 +179,10 @@ public class PlayerMove : MonoBehaviour
     {
         if (heartList.Count < maxHealth)
         {
-            Debug.Log("added heart!!!!");
-            // Instantiate the heart prefab at the specified location
+            //Debug.Log("added heart!!!!");
             GameObject clonedHeart = Instantiate(heart, Vector3.zero, Quaternion.identity);
-
-            // Set the parent of the cloned heart
             clonedHeart.transform.SetParent(hearts.transform, false);
-
-            // Optionally adjust the position if you want to stagger them or place them differently
             clonedHeart.transform.localPosition = new Vector3(heartList.Count * 50, 0, 0);
-
-            // Get the Animator component of the cloned heart
             Animator heartAnimator = clonedHeart.GetComponent<Animator>();
             heartList.Add(clonedHeart);
             heartAnimator.SetBool("started", true);
@@ -175,23 +198,20 @@ public class PlayerMove : MonoBehaviour
     {
         int lastindex = heartList.Count - 1;
         Destroy(heartList[lastindex]);
-
-        // Remove the heart from the list
         heartList.RemoveAt(lastindex);
     }
 
     void Update()
 
     {
-        // Quit the game
+        // Quit the game (Escape)
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             Application.Quit();
-        }
 
-        if (startedrunning == false)
+        // Start sequence (Idle)
+        if (!startedrunning)
         {
-            if (startingText.active == false)
+            if (!startingText.activeSelf)
             {
                 startingText.GetComponent<Text>().text = "Agafa les eines i toca qualsevol engranatge";
                 startingText.SetActive(true);
@@ -209,44 +229,35 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (startedrunning == false && Input.anyKey == true)
+        if (!startedrunning && Input.anyKey)
         {
             BGM.Play();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0.7f));
-            if (!mainThemeAlreadyPlaying)
-            {
-                StartCoroutine(PlayMainTheme());
-            }
+            if (!mainThemeAlreadyPlaying) StartCoroutine(PlayMainTheme());
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
             startingText.SetActive(false);
             printCodeScript.SetCodePrompt("start");
         }
+
         if (startedrunning && !animator.GetBool("isrunning"))
-        {
             animator.SetBool("isrunning", true);
-        }
+
         if (animator.GetBool("isrunning"))
-        {
             MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
-        }
 
         if (playerBody.IsSleeping())
-        {
             playerBody.WakeUp();
-        }
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        // Left
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             startedrunning = true;
-            if (tutorialcard == "left")
-            {
-                tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
-            }
+            if (tutorialcard == "left") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
-                if (pos == "center" && transform.position.x == 0f) // Pressing left from center goes to left
+                if (pos == "center") // Pressing left from center goes to left
                 {
                     if (blockLeft) return;
                     pos = "left";
@@ -260,16 +271,14 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        // Right
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             startedrunning = true;
-            if (tutorialcard == "right")
-            {
-                tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
-            }
+            if (tutorialcard == "right") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
-                if (pos == "center" && transform.position.x == 0f) // Pressing right from center goes to right
+                if (pos == "center") // Pressing right from center goes to right
                 {
                     if (blockRight) return;
                     pos = "right";
@@ -286,32 +295,24 @@ public class PlayerMove : MonoBehaviour
         // pos interpolator
         switch (pos)
         {
-            case "left":
-                targetpos = -3f;
-                break;
-            case "center":
-                targetpos = 0f;
-                break;
-            case "right":
-                targetpos = 3f;
-                break;
+            case "left": targetpos = -3f; break;
+            case "center": targetpos = 0f; break;
+            case "right": targetpos = 3f; break;
         }
 
-        // Move the character to the target position
+        // Move horizontally without touching Y
         transform.position = Vector3.MoveTowards(transform.position, new Vector3(targetpos, transform.position.y, transform.position.z), horizontalSpeed * Time.deltaTime);
 
         // Crouching
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
             startedrunning = true;
-            if (tutorialcard == "crouch")
-            {
-                tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
-            }
+            if (tutorialcard == "crouch") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isRolling)
             {
-                isRolling = true;
-                crouchhitbox();
+                //isRolling = true;
+                SetCrouching(true);
+                //crouchhitbox();
                 animator.SetBool("isrolling", true);
                 StartCoroutine(RollSequence());
                 printCodeScript.SetCodePrompt("crouch");
@@ -319,35 +320,34 @@ public class PlayerMove : MonoBehaviour
         }
 
         // Jumping
-        if (!isFlying)
-        {
-            if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))
+        if (!isJumping && !isFlying && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)))
             {
                 startedrunning = true;
-                if (tutorialcard == "jump")
-                {
-                    tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
-                }
-                if (!isJumping)
-                {
-                    isJumping = true;
-                    animator.SetBool("isjumping", true);
-                    StartCoroutine(JumpSequence());
-                }
+                if (tutorialcard == "jump") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+
+            SetJumping(true);
+            jumpStarted = Time.time;  // Track start time
+            animator.SetTrigger("jump");
+            printCodeScript.SetCodePrompt("jumpsequence");
+            }
+
+        // Jump timing fallback (so we don't rely solely on animator transitions)
+        if (isJumping)
+        {
+            float jumpDuration = 0.75f; // set to your clip length
+            if (Time.time - jumpStarted >= jumpDuration)
+            {
+                SetJumping(false);
             }
         }
 
         // Flying
         if (floating)
-        {
             jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
-        }
         else
         {
             if (isFlying)
-            {
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
-            }
         }
 
         // Holding
@@ -357,22 +357,20 @@ public class PlayerMove : MonoBehaviour
             holding = true;
             startedrunning = true;
         }
-        else
-        {
-            holding = false;
-        }
+        else holding = false;
 
-        // Raycast
+        // Raycast ground detection
         UpdateGroundTracking();
         if (!isJumping && !isFlying && !floating)
-        {
             ApplyVerticalMovement();
-        }
     }
 
-    void OnTriggerEnter(Collider other)
+    // ---------- Trigger processing forwarded from HitLogic (child) ----------
+    // This method replaces the old OnTriggerEnter. HitLogic will call this.
+    public void ProcessTrigger(Collider other)
     {
         HideAllTutorialCards();
+
         if (other.gameObject.CompareTag("obstacle"))
         {
             if (!godmode)
@@ -382,7 +380,9 @@ public class PlayerMove : MonoBehaviour
                 StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
-                other.GetComponent<BoxCollider>().enabled = false;
+                var bc = other.GetComponent<BoxCollider>();
+                if (bc != null) bc.enabled = false;
+
                 if (remainingHealth <= 0)
                 {
                     collectableControl.HandlePlayerDeath();
@@ -393,7 +393,6 @@ public class PlayerMove : MonoBehaviour
                     levelControl.GetComponent<GenerateSandstorm>().enabled = false;
                     HideAllTutorialCards();
                     StartCoroutine(EnableEndSequenceSafely());
-                    //levelControl.GetComponent<EndRunSequence>().enabled = true;
                     RemoveHeartsInReverseOrder();
                     this.enabled = false;
                 }
@@ -423,23 +422,15 @@ public class PlayerMove : MonoBehaviour
             coinFX.Play();
 
             // pitch shift of collected floating coins
-            if (coinFX.pitch < 2)
-            {
-                coinFX.pitch += 0.2f;
-            }
-            else
-            {
-                coinFX.pitch = 1;
-            }
+            if (coinFX.pitch < 2) coinFX.pitch += 0.2f; else coinFX.pitch = 1;
             StartCoroutine(PitchShiftTimeout());
             CollectableControl.coinCount += 1;
             other.gameObject.SetActive(false);
         }
 
-        if (other.gameObject.CompareTag("powerup") || (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+        if (other.gameObject.CompareTag("powerup") || (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
         {
             printCodeScript.SetCodePrompt("fly");
-            //fly object            
             godmode = true;
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
             flyFX.Play();
@@ -461,35 +452,20 @@ public class PlayerMove : MonoBehaviour
                 StartCoroutine(FlyTimeout());
             }
             isFlying = true;
+            playerBody.isKinematic = true;
         }
 
-        if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
-        {
-            pyramidsTheme.Play();
-        }
+        if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying) pyramidsTheme.Play();
 
-        if (other.gameObject.CompareTag("cogfactory") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
-        {
-            cogFactorySFX.Play();
-        }
+        if (other.gameObject.CompareTag("cogfactory") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying) cogFactorySFX.Play();
 
-        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying)
-        {
-            cogsfarmSFX.Play();
-        }
+        if (other.gameObject.CompareTag("cogsfarm") && !mainTheme.isPlaying) cogsfarmSFX.Play();
 
-        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !photosSFX.isPlaying)
-        {
-            photosSFX.Play();
-        }
+        if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !photosSFX.isPlaying) photosSFX.Play();
 
-        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying)
-        {
-            backDoorSFX.Play();
-        }
+        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying) backDoorSFX.Play();
 
-        if (other.gameObject.CompareTag("cardboard"))
-            (Random.value < 0.5f ? cardboard1 : cardboard2).Play();
+        if (other.gameObject.CompareTag("cardboard")) (Random.value < 0.5f ? cardboard1 : cardboard2).Play();
 
         if (other.gameObject.CompareTag("panoptic"))
         {
@@ -500,31 +476,20 @@ public class PlayerMove : MonoBehaviour
             }
             else if (alreadyCrossedPanoptic)
             {
-                if (Random.value >= 0.5f)
-                {
-                    StartCoroutine(ApplyGlissando());
-                }
+                if (Random.value >= 0.5f) StartCoroutine(ApplyGlissando());
             }
 
-            if (!mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying)
-            {
-                panopticSFX.Play();
-            }
+            if (!mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying) panopticSFX.Play();
         }
 
-        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying)
-        {
-            canyonSFX.Play();
-        }
+        if (other.gameObject.CompareTag("canyon") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !canyonSFX.isPlaying) canyonSFX.Play();
         
-        if (other.gameObject.CompareTag("claxon"))
-        {
-            claxonSFX.Play();
-        }
+        if (other.gameObject.CompareTag("claxon")) claxonSFX.Play();
 
         if (other.gameObject.CompareTag("car") && !godmode)
         {
-                other.GetComponent<BoxCollider>().enabled = false;
+                var cb = other.GetComponent<BoxCollider>();
+                if (cb != null) cb.enabled = false;
                 mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.Play("Stumble Backwards");
                 carCrashSFX.Play();
@@ -534,41 +499,33 @@ public class PlayerMove : MonoBehaviour
                 this.enabled = false; // Disable this script
         }
 
-        if (other.gameObject.CompareTag("minewall"))        //remove if not used
+        if (other.gameObject.CompareTag("minewall"))
         {
-            other.GetComponent<BoxCollider>().enabled = false;
+            var cb = other.GetComponent<BoxCollider>();
+            if (cb != null) cb.enabled = false;
             mainCam.GetComponent<Animator>().SetBool("dead", true);
             animator.Play("Stumble Backwards");
-            //carCrashSFX.Play();       // Replace by stone SFX
             Transform child = playerObject.transform.Find("rocks");
             child.gameObject.SetActive(true);
+            Debug.Log("Entered in minewall collision with " + other);
             HideAllTutorialCards();
             collectableControl.HandlePlayerDeath();
             StartCoroutine(EnableEndSequenceSafely());
-            this.enabled = false; // Disable this script
+            this.enabled = false;
         }
 
         if (other.gameObject.CompareTag("tutorial"))
         {
             HideAllTutorialCards();
-            // Get the tutorial card name
             tutorialcard = other.gameObject.name;
-
-            // Assuming tutorial2d is a Transform, find a child and set it active
             Transform tutorialCardTransform = tutorial2d.transform.Find(tutorialcard);
             if (tutorialCardTransform != null)
             {
                 tutorialCardTransform.gameObject.SetActive(true);
-
-                // Display the corresponding instruction
                 if (tutorialInstructions.TryGetValue(tutorialcard, out string instruction))
-                {
                     DisplayInstruction(instruction);
-                }
                 else
-                {
                     Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
-                }
             }
         }
     }
@@ -586,45 +543,34 @@ public class PlayerMove : MonoBehaviour
         blockRight = right;
     }
 
-    void normalhitbox()
+    public void SetJumping (bool jumping)
     {
-        // Set new size
-        boxCollider.size = new Vector3(0.67f, 1.15f, 0.58f);
-        // Set new center position
-        boxCollider.center = new Vector3(0, 0, -0.42f);
-        rayLength = 0.7f;
-        raycastHeightOffset = 0.5f;
+        isJumping = jumping;
+        if (hitLogic != null)
+        {
+            if (jumping)
+            {
+                gameObject.layer = LayerMask.NameToLayer("PlayerJumping");
+                hitLogic.EnableHitbox(HitLogic.HitboxType.Jump);
+            }
+            else
+            {
+                gameObject.layer = LayerMask.NameToLayer("Player");
+                hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
+            }
+        }
     }
 
-    void jumphitbox()
+    public void SetCrouching(bool crouching)
     {
-        // Set new center position
-        boxCollider.center = new Vector3(0, 1.15f, -0.42f);
-        // Set new size
-        boxCollider.size = new Vector3(0.67f, 0.78f, 0.58f);
-        rayLength = 0.3f;
-        raycastHeightOffset = -0.5f;
-    }
-
-    void crouchhitbox()
-    {
-        // Set new center position
-        boxCollider.center = new Vector3(0, -0.22f, -0.42f);
-        // Set new size
-        boxCollider.size = new Vector3(0.67f, 0.24f, 0.58f);
-    }
-
-    IEnumerator JumpSequence()
-    {
-        printCodeScript.SetCodePrompt("jumpsequence");
-        jumphitbox();
-        yield return new WaitForSeconds(0.30f);
-        comingDown = true;
-        yield return new WaitForSeconds(0.30f);
-        isJumping = false;
-        comingDown = false;
-        animator.SetBool("isjumping", false);
-        normalhitbox();
+        isRolling = crouching;
+        if (hitLogic != null)
+        {
+            if (crouching)
+                hitLogic.EnableHitbox(HitLogic.HitboxType.Crouch);
+            else
+                hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
+        }
     }
 
     IEnumerator RollSequence()
@@ -632,16 +578,19 @@ public class PlayerMove : MonoBehaviour
         printCodeScript.SetCodePrompt("rollsequence");
         yield return new WaitForSeconds(0.45f);
         yield return new WaitForSeconds(0.45f);
-        isRolling = false;
+        SetCrouching(false);
+        //isRolling = false;
         animator.SetBool("isrolling", false);
-        normalhitbox();
+        //normalhitbox();
     }
 
     IEnumerator HurtSequence()
     {
-        boxCollider.enabled = false;
+        //boxCollider.enabled = false;
+        hitLogic.EnableHitbox(HitLogic.HitboxType.None);
         yield return new WaitForSeconds(0.3f);
-        boxCollider.enabled = true;
+        //boxCollider.enabled = true;
+        hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
         yield return new WaitForSeconds(0.5f);
         animator.SetBool("ishurt", false);
     }
@@ -652,12 +601,10 @@ public class PlayerMove : MonoBehaviour
         tutorial2d.transform.Find("fly").gameObject.SetActive(true);
 
         yield return new WaitForSeconds(5);
-        tutorial2d.transform.Find("fly").gameObject.SetActive(false); //show tutorial
+        tutorial2d.transform.Find("fly").gameObject.SetActive(false);
 
-        while (holding)
-        {
-            yield return new WaitForSeconds(1);
-        }
+        while (holding) yield return new WaitForSeconds(1);
+
         mainCam.GetComponent<Animator>().SetBool("flying", false);
         StartCoroutine(delayedGodmodeOff());
         StartCoroutine(ChangePitchOverTime());
@@ -667,19 +614,12 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         isFlying = false;
-        //startY = originY;
-
         yield return new WaitForSeconds(1);
         floating = false;
-        //set move speed back to initial
         moveSpeed = initialmoveSpeed;
+        playerBody.isKinematic = false;
 
-        // Destroy all instantiated coins
-        foreach (GameObject coin in instantiatedCoins)
-        {
-            Destroy(coin);
-        }
-        // Clear the list
+        foreach (GameObject coin in instantiatedCoins) coin.SetActive(false);
         instantiatedCoins.Clear();
     }
 
@@ -769,68 +709,51 @@ public class PlayerMove : MonoBehaviour
         levelControl.GetComponent<EndRunSequence>().enabled = true;
     }
 
-    /*public void SetConstrained(bool value) // Function to receive a bool from another script (Constrained.cs)
-    {
-        constrained = value;
-        Debug.Log("Player constraint set to: " + constrained);
-    }*/
-
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
     {
         float fraction = Time.deltaTime * intspeed;
 
         if (easingOut)
         {
-            // Easing out: movement starts quickly and slows down
             fraction = 1 - Mathf.Pow(1 - fraction, 3);
-            if (moveSpeed < 30 - 0f)
-            {
-                moveSpeed += fraction * 10;
-            }
+            if (moveSpeed < 30 - 0f) moveSpeed += fraction * 10;
         }
         else
         {
-            // Easing in: movement starts slowly and speeds up
             fraction = Mathf.Pow(fraction, 0.9f); // Adjust the power to make the easing smoother (the smaller the faster)
-            if (moveSpeed > 12.0f)
-            {
-                moveSpeed -= fraction * 2;
-            }
+            if (moveSpeed > 12.0f) moveSpeed -= fraction * 2;
         }
 
-        // Interpolate based on the currentY and targetY using the calculated fraction
         float currentY = Mathf.Lerp(origin, target, fraction);
-
-        // Update the GameObject's position
         transform.position = new Vector3(transform.position.x, currentY, transform.position.z);
         origin = currentY;
-
         return origin;
     }
 
     private void HideAllTutorialCards()
     {
         tutorialText.SetActive(false);
-        // Iterate over all direct children of the tutorial2D GameObject
-        foreach (Transform child in tutorial2d.transform)
-        {
-            child.gameObject.SetActive(false);
-        }
+        foreach (Transform child in tutorial2d.transform) child.gameObject.SetActive(false);
     }
 
     // RAYCAST
+    
     void UpdateGroundTracking()
     {
+        if (boxCollider == null) return;
         float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
         Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
         Ray ray = new Ray(rayOrigin, Vector3.down);
         Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
 
+        // Optional test: remove Ray definition and replace if statement by this:
+        //if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
+
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
         {
             //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag});
             isGrounded = true;
-
+            /*
             if (!isFlying && !floating && !isJumping)
             {
                 float groundY = hit.point.y + (boxCollider.size.y / 2f) - boxCollider.center.y;
@@ -838,7 +761,7 @@ public class PlayerMove : MonoBehaviour
                 pos.y = groundY;
                 transform.position = pos;
                 verticalVelocity = 0f;
-            }
+            }*/
         }
         else
         {
@@ -846,20 +769,17 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    // review so falling stops or eases out playerMove (falling without the map scrolling)
     void ApplyVerticalMovement()
     {
         if (!isGrounded)
         {
-            verticalVelocity -= fallSpeed * Time.deltaTime;
             isFalling = true;
-            animator.SetBool("isfalling", true);    // jumping down animation
-            Vector3 pos = transform.position;
-            pos.y += verticalVelocity * Time.deltaTime;
-            transform.position = pos;
+            animator.SetBool("isfalling", true);
+            playerBody.AddForce(Vector3.down * 10f, ForceMode.Acceleration);
         }
         else
         {
-            verticalVelocity = 0f;
             if (isFalling)
             {
                 animator.SetBool("isfalling", false);   //back to running

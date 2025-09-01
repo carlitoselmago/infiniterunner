@@ -6,6 +6,7 @@ public class EndlessFall : MonoBehaviour
     private float decelerationRate = 1000f;
     public PlayerMove player;
     public GameObject levelControl;
+    private GenerateLevel generateLevel;
     public Animator playerAnimator;
     public CollectableControl collectableControl;
 
@@ -14,13 +15,16 @@ public class EndlessFall : MonoBehaviour
     private void Start()
     {
         collectableControl = FindObjectOfType<CollectableControl>();
+        generateLevel = levelControl.GetComponent<GenerateLevel>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (generateLevel.inMine) return;
+
         if (!isFalling && other.CompareTag("Player"))
         {
-            //Debug.Log("FALLING!");
+            Debug.Log("FALLING!");
             isFalling = true;
             StartCoroutine(HandleEndlessFall());
         }
@@ -29,7 +33,7 @@ public class EndlessFall : MonoBehaviour
     private IEnumerator HandleEndlessFall()
     {
         float originalSpeed = player.moveSpeed;
-        playerAnimator.SetBool("isendlesslyfalling", true);
+        playerAnimator.SetTrigger("endlessfall");
         collectableControl.HandlePlayerDeath();
         levelControl.GetComponent<EndRunSequence>().enabled = true;
 

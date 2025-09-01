@@ -30,14 +30,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Mine
   - Water
   - UI
   - Ground
   - Slope
-  - 
-  - 
-  - 
+  - TriggerCollider
+  - PlayerJumping
+  - Player
   - 
   - 
   - 
