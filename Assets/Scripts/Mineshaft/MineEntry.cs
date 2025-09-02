@@ -6,8 +6,6 @@ public class MineEntry : MonoBehaviour
     public bool isExit = false; // define entry or exit point
     public GameObject levelControl;
     private GenerateLevel generateLevel; // centralized script for inMine bool
-                                         //public GameObject walkTunnel;
-                                         //public GameObject minecartTunnel;
 
     void Start()
     {

@@ -9,12 +9,12 @@ public class PlayerMove : MonoBehaviour
     public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float horizontalSpeed = 20f;
-    //public float leftRightSpeed = 10.0f;
     public bool isJumping = false;
     public bool isRolling = false;
     public bool isFlying = false;
     public bool floating = false;
     public bool holding = false;
+    public static bool onMinecart = false;
     private bool mainThemeAlreadyPlaying = false;
 
     [Header("Constrains")]  //(from Constrain.cs)
@@ -25,10 +25,8 @@ public class PlayerMove : MonoBehaviour
     // raycast
     [Header("Raycast")]
     public LayerMask groundLayer;
-    private float fallSpeed = 20.0f;
     public float rayLength = 0.7f;
     public float raycastHeightOffset = 0.5f;
-    private float verticalVelocity = 0f;
     public bool isGrounded = false;
     public bool isFalling = false;
 
@@ -56,6 +54,8 @@ public class PlayerMove : MonoBehaviour
     [Header("SFX")]
     public AudioSource HurtSFX;
     public AudioSource crashThud;
+    public AudioSource minecartCrashSFX;
+    public AudioSource minecartShiftLaneSFX;
     public AudioSource BGM;
     public AudioSource mainTheme;
     public AudioSource pyramidsTheme;
@@ -88,9 +88,7 @@ public class PlayerMove : MonoBehaviour
     // IMPORTANT: main physics collider (non-trigger). Keep this always enabled to avoid sinking.
     public BoxCollider boxCollider;
 
-    // jump trigger colliders now live on child HitLogic; player will toggle them via hitLogic.UseJumpHitbox
     public HitLogic hitLogic; // assign the child HitLogic in inspector or it will auto-find
-    //public BoxCollider jumpCollider;
 
     private float targetHeight = 17.0f;
     private float startY;
@@ -104,6 +102,7 @@ public class PlayerMove : MonoBehaviour
     private bool alreadyCrossedPanoptic = false;
     public AudioSource coinFX;
     public HurtMask hurtMaskScript;
+    public Minecart minecartObject;
 
     public GameObject MAP;
 
@@ -158,6 +157,7 @@ public class PlayerMove : MonoBehaviour
 
         startY = transform.position.y;
         originY = startY;
+        onMinecart = false;
         //normalhitbox();
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
@@ -267,6 +267,8 @@ public class PlayerMove : MonoBehaviour
                     if (blockCenter) return;
                     pos = "center";
                 }
+                if (onMinecart)
+                    minecartShiftLaneSFX.Play(); // experimental
                 printCodeScript.SetCodePrompt("left");
             }
         }
@@ -288,6 +290,8 @@ public class PlayerMove : MonoBehaviour
                     if (blockCenter) return;
                     pos = "center";
                 }
+                if (onMinecart)
+                    minecartShiftLaneSFX.Play(); // experimental
                 printCodeScript.SetCodePrompt("right");
             }
         }
@@ -336,9 +340,7 @@ public class PlayerMove : MonoBehaviour
         {
             float jumpDuration = 0.75f; // set to your clip length
             if (Time.time - jumpStarted >= jumpDuration)
-            {
                 SetJumping(false);
-            }
         }
 
         // Flying
@@ -365,8 +367,7 @@ public class PlayerMove : MonoBehaviour
             ApplyVerticalMovement();
     }
 
-    // ---------- Trigger processing forwarded from HitLogic (child) ----------
-    // This method replaces the old OnTriggerEnter. HitLogic will call this.
+    // Trigger processing forwarded from HitLogic (child)
     public void ProcessTrigger(Collider other)
     {
         HideAllTutorialCards();
@@ -388,7 +389,7 @@ public class PlayerMove : MonoBehaviour
                     collectableControl.HandlePlayerDeath();
                     mainCam.GetComponent<Animator>().SetBool("dead", true);
                     isDead = true;
-                    animator.Play("Stumble Backwards");
+                    animator.SetTrigger("die");
                     crashThud.Play();
                     levelControl.GetComponent<GenerateSandstorm>().enabled = false;
                     HideAllTutorialCards();
@@ -491,7 +492,7 @@ public class PlayerMove : MonoBehaviour
                 var cb = other.GetComponent<BoxCollider>();
                 if (cb != null) cb.enabled = false;
                 mainCam.GetComponent<Animator>().SetBool("dead", true);
-                animator.Play("Stumble Backwards");
+                animator.SetTrigger("die");
                 carCrashSFX.Play();
                 HideAllTutorialCards();
                 collectableControl.HandlePlayerDeath();
@@ -504,7 +505,15 @@ public class PlayerMove : MonoBehaviour
             var cb = other.GetComponent<BoxCollider>();
             if (cb != null) cb.enabled = false;
             mainCam.GetComponent<Animator>().SetBool("dead", true);
-            animator.Play("Stumble Backwards");
+            if (onMinecart)
+            {
+                animator.SetTrigger("minecartcollision");
+                minecartCrashSFX.Play();
+                minecartObject.minecartSFX.Stop();
+            }
+            else
+                animator.SetTrigger("die");
+            carCrashSFX.Play();
             Transform child = playerObject.transform.Find("rocks");
             child.gameObject.SetActive(true);
             Debug.Log("Entered in minewall collision with " + other);
@@ -579,17 +588,13 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(0.45f);
         yield return new WaitForSeconds(0.45f);
         SetCrouching(false);
-        //isRolling = false;
         animator.SetBool("isrolling", false);
-        //normalhitbox();
     }
 
     IEnumerator HurtSequence()
     {
-        //boxCollider.enabled = false;
         hitLogic.EnableHitbox(HitLogic.HitboxType.None);
         yield return new WaitForSeconds(0.3f);
-        //boxCollider.enabled = true;
         hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
         yield return new WaitForSeconds(0.5f);
         animator.SetBool("ishurt", false);
@@ -749,24 +754,8 @@ public class PlayerMove : MonoBehaviour
         // Optional test: remove Ray definition and replace if statement by this:
         //if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
 
-        if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer))
-        {
-            //Debug.Log($"[Raycast] Hit: {hit.collider.name}, Tag: {hit.collider.tag});
-            isGrounded = true;
-            /*
-            if (!isFlying && !floating && !isJumping)
-            {
-                float groundY = hit.point.y + (boxCollider.size.y / 2f) - boxCollider.center.y;
-                Vector3 pos = transform.position;
-                pos.y = groundY;
-                transform.position = pos;
-                verticalVelocity = 0f;
-            }*/
-        }
-        else
-        {
-            isGrounded = false;
-        }
+        if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer)) isGrounded = true;
+        else isGrounded = false;
     }
 
     // review so falling stops or eases out playerMove (falling without the map scrolling)

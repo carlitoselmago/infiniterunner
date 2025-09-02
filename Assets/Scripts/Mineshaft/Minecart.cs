@@ -12,6 +12,9 @@ public class Minecart : MonoBehaviour
     public GameObject animatedMinecart;
     public GameObject MAP;
 
+    public AudioSource minecartSFX; // experimental
+
+
     private void Start()
     {
         playerRb = player.GetComponent<Rigidbody>();
@@ -26,6 +29,7 @@ public class Minecart : MonoBehaviour
             playerRb.constraints = RigidbodyConstraints.FreezeRotationX /*| RigidbodyConstraints.FreezeRotationZ*/; //or RigidbodyConstraints.None;
             StartCoroutine(ChangeSpeed(true));
             nonAnimatedMinecart.SetActive(false);
+            PlayerMove.onMinecart = true;
         }
     }
 
@@ -54,6 +58,7 @@ public class Minecart : MonoBehaviour
             yield return StartCoroutine(ChangeSpeed(false));
             playerAnimator.SetBool("isdrivingminecart", false);
             playerAnimator.SetTrigger("jumpoffminecart");
+            PlayerMove.onMinecart = false;
             playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
             animatedMinecart.transform.SetParent(MAP.transform, true); //leave cart behind
         }

@@ -24,6 +24,7 @@ public class DisableOnContact : MonoBehaviour
 }*/
 //
 
+/*
 using UnityEngine;
 
 public class DisableOnContact : MonoBehaviour
@@ -53,3 +54,4 @@ public class DisableOnContact : MonoBehaviour
         other.gameObject.SetActive(false);
     }
 }
+*/

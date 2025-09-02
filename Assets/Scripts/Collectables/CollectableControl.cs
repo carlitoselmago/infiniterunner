@@ -72,6 +72,7 @@ public class CollectableControl : MonoBehaviour
 
     public void HandlePlayerDeath()
     {
+        Debug.Log("Collectable Control: Handling Player Death");
         if (coinCount > highScore)
         {
             highScore = coinCount;
