@@ -13,6 +13,8 @@ public class GenerateTunnel : MonoBehaviour
         if (other.CompareTag("Player") && !triggered)
         {
             triggered = true;
+            minecartTunnel.SetActive(true);
+/*
             float activatedSection = Random.Range(0f, 1f);
 
             if (activatedSection >= 0.5f)
@@ -26,7 +28,7 @@ public class GenerateTunnel : MonoBehaviour
                 minecartTunnel.SetActive(true);
                 walkTunnel.SetActive(false);
                 Debug.Log("Minecart tunnel activated");
-            }
+            }*/
         }
     }
 

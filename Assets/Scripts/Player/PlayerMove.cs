@@ -261,14 +261,22 @@ public class PlayerMove : MonoBehaviour
                 {
                     if (blockLeft) return;
                     pos = "left";
+                    if (onMinecart)
+                    {
+                        minecartShiftLaneSFX.panStereo = -0.7f;
+                        minecartShiftLaneSFX.Play();
+                    }
                 }
                 else if (pos == "right") // Pressing left when at right goes to center
                 {
                     if (blockCenter) return;
                     pos = "center";
+                    if (onMinecart)
+                    {
+                        minecartShiftLaneSFX.panStereo = 0f;
+                        minecartShiftLaneSFX.Play();
+                    }
                 }
-                if (onMinecart)
-                    minecartShiftLaneSFX.Play(); // experimental
                 printCodeScript.SetCodePrompt("left");
             }
         }
@@ -284,14 +292,22 @@ public class PlayerMove : MonoBehaviour
                 {
                     if (blockRight) return;
                     pos = "right";
+                    if (onMinecart)
+                    {
+                        minecartShiftLaneSFX.panStereo = 0.7f;
+                        minecartShiftLaneSFX.Play();
+                    }
                 }
                 else if (pos == "left") // Pressing right when at left goes to center
                 {
                     if (blockCenter) return;
                     pos = "center";
+                    if (onMinecart)
+                    {
+                        minecartShiftLaneSFX.panStereo = 0f;
+                        minecartShiftLaneSFX.Play();
+                    }
                 }
-                if (onMinecart)
-                    minecartShiftLaneSFX.Play(); // experimental
                 printCodeScript.SetCodePrompt("right");
             }
         }
@@ -489,7 +505,7 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("car") && !godmode)
         {
-                var cb = other.GetComponent<BoxCollider>();
+                var cb = other.GetComponent<Collider>();
                 if (cb != null) cb.enabled = false;
                 mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.SetTrigger("die");
@@ -502,7 +518,7 @@ public class PlayerMove : MonoBehaviour
 
         if (other.gameObject.CompareTag("minewall"))
         {
-            var cb = other.GetComponent<BoxCollider>();
+            var cb = other.GetComponent<Collider>();
             if (cb != null) cb.enabled = false;
             mainCam.GetComponent<Animator>().SetBool("dead", true);
             if (onMinecart)
