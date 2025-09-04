@@ -17,9 +17,7 @@ public class HitLogic : MonoBehaviour
         // Ensure we have a kinematic Rigidbody so triggers reliably fire:
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb == null)
-        {
             rb = gameObject.AddComponent<Rigidbody>();
-        }
         rb.isKinematic = true;
         rb.useGravity = false;
     }

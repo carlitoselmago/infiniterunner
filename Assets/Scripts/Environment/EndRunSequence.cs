@@ -14,9 +14,9 @@ public class EndRunSequence : MonoBehaviour
     public GameObject levelControl;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
-    private string exposedParameter;
-    private float duration;
-    private float targetVolume;
+    //private string exposedParameter;
+    //private float duration;
+    //private float targetVolume;
 
     void OnEnable()
     {
@@ -26,10 +26,10 @@ public class EndRunSequence : MonoBehaviour
     IEnumerator EndSequence()
     {
         yield return new WaitForSeconds(0.33f);
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 1.5f, targetVolume = 0));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 0));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 0));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = 1.5f, targetVolume = 0f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 1.5f, 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1.5f, 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 1.5f, 0));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 1.5f, 0f));
         levelControl.GetComponent<GenerateSandstorm>().enabled = false;
 
         endScreen.SetActive(true);

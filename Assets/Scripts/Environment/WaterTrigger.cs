@@ -10,6 +10,7 @@ public class WaterTrigger : MonoBehaviour
     public CollectableControl collectableControl;
 
     private Coroutine transitionCoroutine;
+    private bool triggered = false;
 
     private void Start()
     {
@@ -18,8 +19,9 @@ public class WaterTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player") && !triggered)
         {
+            triggered = true;
             Debug.Log("Underwater");
             collectableControl.HandlePlayerDeath();
             triggeredVolume.gameObject.SetActive(true);

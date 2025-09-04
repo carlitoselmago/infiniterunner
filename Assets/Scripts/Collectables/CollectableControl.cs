@@ -48,9 +48,9 @@ public class CollectableControl : MonoBehaviour
 
     //audio mixer
     public AudioMixer audioMixer;
-    private string exposedParameter;
+    /*private string exposedParameter;
     private float duration;
-    private float targetVolume;
+    private float targetVolume;*/
     public AudioSource highScoreSFX;
     public AudioSource highSpeedSFX;
     private PlayerMove playerMove;
@@ -73,6 +73,21 @@ public class CollectableControl : MonoBehaviour
     public void HandlePlayerDeath()
     {
         Debug.Log("Collectable Control: Handling Player Death");
+
+        //TODO experimental !!!
+        // Disable physics on endless fall only
+        // Disable physics collider to prevent collisions with Ground while sinking (check for consistency)
+        /*
+        BoxCollider box = player.GetComponent<BoxCollider>();
+        if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
+        {
+            if (box.enabled)
+            {
+                box.enabled = false;
+                Debug.Log("Player BoxCollider disabled.");
+            }
+        }*/
+
         if (coinCount > highScore)
         {
             highScore = coinCount;
@@ -161,9 +176,9 @@ public class CollectableControl : MonoBehaviour
 
     void dimVolumes()
     {
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 0.5f, targetVolume = 0.15f));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 0.5f, targetVolume = 0.25f));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 0.5f, targetVolume = 0.25f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 0.5f, 0.15f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 0.5f, 0.25f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 0.5f, 0.25f));
     }
 
     void lifeUp()
@@ -174,9 +189,9 @@ public class CollectableControl : MonoBehaviour
     IEnumerator hideachievement()
     {
         yield return new WaitForSeconds(2);
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 2, targetVolume = 0.75f));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 1f));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 2, targetVolume = 1f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 2, 0.75f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 2, 1f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 2, 1f));
         yield return new WaitForSeconds(3);
         achievementUI.SetActive(false);
         achievementShown = false;

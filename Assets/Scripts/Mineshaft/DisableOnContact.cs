@@ -1,4 +1,8 @@
-/*using UnityEngine;
+/*
+ * REMOVE
+ * 
+ * 
+ * /*using UnityEngine;
 
 public class DisableOnContact : MonoBehaviour
 {

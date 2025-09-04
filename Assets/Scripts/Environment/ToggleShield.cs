@@ -6,17 +6,12 @@ public class ToggleShield : MonoBehaviour
     public Renderer shield;
     public float flashInterval = 0.25f;
     public float onDuration = 0.25f;
-
-    private float timer = 0f;
     private Coroutine toggleCoroutine;
 
     private void OnEnable()
     {
-        // Ensure the shield is always enabled when the script is activated
         if (toggleCoroutine != null)
-        {
             StopCoroutine(toggleCoroutine);
-        }
         toggleCoroutine = StartCoroutine(ToggleShieldCoroutine());
     }
 

@@ -120,9 +120,7 @@ public class PrintCode : MonoBehaviour
         childTextComponents = canvasText.GetComponentsInChildren<Text>(true);
 
         if (childTextComponents.Length != 10)
-        {
             Debug.LogError("canvasText should have exactly 10 child objects with Text components.");
-        }
 
         // Ensure all children are initially inactive and setup their timeout
         foreach (Text text in childTextComponents)
@@ -149,9 +147,7 @@ public class PrintCode : MonoBehaviour
 
         // Modify the dictionary outside the loop
         foreach (Text key in keysToReset)
-        {
             textTimeouts[key] = 0f;
-        }
 
         if (!string.IsNullOrEmpty(codePrompt) && printedCode.TryGetValue(codePrompt, out string code))
         {
@@ -197,9 +193,7 @@ public class PrintCode : MonoBehaviour
         foreach (Text child in childTextComponents)
         {
             if (!child.gameObject.activeSelf)
-            {
                 inactiveTexts.Add(child);
-            }
         }
 
         if (inactiveTexts.Count == 0)

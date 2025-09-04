@@ -27,9 +27,7 @@ public class RotateY : MonoBehaviour
 
             // Prevent overshooting
             if (totalRotated + rotationThisFrame > rotationDegree)
-            {
                 rotationThisFrame = rotationDegree - totalRotated;
-            }
 
             // Apply direction
             float actualRotation = rotationThisFrame * rotateDirection;

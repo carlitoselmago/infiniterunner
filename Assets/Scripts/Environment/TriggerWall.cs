@@ -7,7 +7,7 @@ public class TriggerWall : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player") && !triggered)
         {
             //Debug.Log("TRIGGER");
             triggeredObject.SetActive(true);

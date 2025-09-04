@@ -23,13 +23,7 @@ public class ActivateAllDisplays : MonoBehaviour
         }
 
         for (int i = 1; i < Display.displays.Length; i++)
-        {
             Display.displays[i].Activate();
-        }
     }
 
-    void Update()
-    {
-
-    }
 }
