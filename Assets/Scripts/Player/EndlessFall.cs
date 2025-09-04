@@ -6,7 +6,6 @@ public class EndlessFall : MonoBehaviour
     private float decelerationRate = 1000f;
     public PlayerMove player;
     public GameObject levelControl;
-    private GenerateLevel generateLevel;
     public Animator playerAnimator;
     public CollectableControl collectableControl;
 
@@ -15,12 +14,11 @@ public class EndlessFall : MonoBehaviour
     private void Start()
     {
         collectableControl = FindObjectOfType<CollectableControl>();
-        generateLevel = levelControl.GetComponent<GenerateLevel>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (generateLevel.inMine) return;
+        if (MineData.endlessFallDisabled) return;
 
         if (!isFalling && other.CompareTag("Player"))
         {
@@ -32,8 +30,25 @@ public class EndlessFall : MonoBehaviour
 
     private IEnumerator HandleEndlessFall()
     {
-        float originalSpeed = player.moveSpeed;
         playerAnimator.SetTrigger("endlessfall");
+        playerAnimator.SetBool("isrunning", false);
+        playerAnimator.SetBool("isfalling", false);
+
+        Debug.Log("Handling endless fall...");
+
+        //TODO experimental !!!
+        // Disable physics on endless fall only
+        // Disable physics collider to prevent collisions with Ground while sinking (check for consistency)
+        // Try: Remove section to ensure it is the problem. Probably returning null on the player.
+        BoxCollider box = player.GetComponent<BoxCollider>();
+        if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
+        {
+            if (box.enabled)
+            {
+                box.enabled = false;
+                Debug.Log("... Player BoxCollider disabled during fall.");
+            }
+        }
         collectableControl.HandlePlayerDeath();
         levelControl.GetComponent<EndRunSequence>().enabled = true;
 

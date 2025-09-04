@@ -15,9 +15,9 @@ public class GenerateSandstorm : MonoBehaviour
 
     //audio mixer
     public AudioMixer audioMixer;
-    private string exposedParameter;
+    /*private string exposedParameter;
     private float duration;
-    private float targetVolume;
+    private float targetVolume;*/
     public AudioSource sandstormFX;
     public AudioSource endStormSFX;
 
@@ -57,9 +57,12 @@ public class GenerateSandstorm : MonoBehaviour
 
     IEnumerator GenerateTheSandstorm(float prewait)
     {
-        if (sandstormActive) // don't generate if underground in the mines
+        if (!MineData.isInTheMine)
+        //if (sandstormActive) // don't generate if underground in the mines
         {
             float randomWait = Random.Range(0f, 40f);
+
+            sandstormActive = true; // test flag
 
             yield return new WaitForSeconds(prewait + randomWait); // delay before attempting to generate sandstorm
             if (Random.value > chance)
@@ -71,7 +74,7 @@ public class GenerateSandstorm : MonoBehaviour
                 particles.SetActive(true);
                 StartCoroutine(FadeFog(minFogDensity, maxFogDensity, fadeDuration));
                 StartCoroutine(FadeVolumeAndParticles(0f, 1f, fadeDuration));
-                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 1.2f));
+                StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 1.2f));
                 sandstormFX.Play();
                 yield return new WaitForSeconds(fadeDuration / 2);
                 sandstormText.SetActive(true);
@@ -93,9 +96,12 @@ public class GenerateSandstorm : MonoBehaviour
             }
             else
             {
-                //Debug.Log("Skipped Sandstrom based on chance");
+                Debug.Log("Skipped Sandstrom based on chance");
                 StartCoroutine(GenerateTheSandstorm(10f));
             }
+        } else
+        {
+            sandstormActive = false; //test flag
         }
     }
 
@@ -130,16 +136,15 @@ public class GenerateSandstorm : MonoBehaviour
         sandstormVolume.weight = to;
         sandstormMaterial.SetFloat("_GlobalAlpha", to);
         if (to == 0f)
-        {
             sandstormParticles.Stop();
-        }
+
     }
 
     public void StopTheSandstorm()
     {
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSandstorm", duration = fadeDuration, targetVolume = 0f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
     }
 
 }

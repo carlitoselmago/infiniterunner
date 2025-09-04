@@ -47,6 +47,7 @@ public class PlayerMove : MonoBehaviour
     public GameObject startingText;
     public GameObject tutorialText;
     private Animator animator;
+    private Animator camAnimator;
 
     public GameObject mainCam;
 
@@ -78,9 +79,9 @@ public class PlayerMove : MonoBehaviour
 
     //audio mixer
     public AudioMixer audioMixer;
-    private string exposedParameter;
+    /*private string exposedParameter;
     private float duration;
-    private float targetVolume;
+    private float targetVolume;*/
 
     public GameObject levelControl;
     public CollectableControl collectableControl;
@@ -130,6 +131,7 @@ public class PlayerMove : MonoBehaviour
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
+        camAnimator = mainCam.GetComponent<Animator>();
 
         // Ensure playerBody assigned
         if (playerBody == null) playerBody = GetComponent<Rigidbody>();
@@ -139,21 +141,16 @@ public class PlayerMove : MonoBehaviour
         {
             BoxCollider[] all = GetComponentsInChildren<BoxCollider>();
             foreach (var c in all)
-            {
                 if (!c.isTrigger) { boxCollider = c; break; }
-            }
         }
 
         // Find HitLogic child if not assigned
         if (hitLogic == null)
-        {
             hitLogic = GetComponentInChildren<HitLogic>();
-        }
 
         // Ensure hitboxes default state: normal hitbox active, jump hitbox off
         if (hitLogic != null)
             hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
-        //hitLogic.UseJumpHitbox(false);
 
         startY = transform.position.y;
         originY = startY;
@@ -232,10 +229,10 @@ public class PlayerMove : MonoBehaviour
         if (!startedrunning && Input.anyKey)
         {
             BGM.Play();
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = 3, targetVolume = 0.7f));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 3, 0.7f));
             if (!mainThemeAlreadyPlaying) StartCoroutine(PlayMainTheme());
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 1.5f, targetVolume = 1));
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 1.5f, targetVolume = 1));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1.5f, 1));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 1.5f, 1));
             tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
             startingText.SetActive(false);
             printCodeScript.SetCodePrompt("start");
@@ -354,7 +351,7 @@ public class PlayerMove : MonoBehaviour
         // Jump timing fallback (so we don't rely solely on animator transitions)
         if (isJumping)
         {
-            float jumpDuration = 0.75f; // set to your clip length
+            float jumpDuration = 0.7f; // set to your clip length
             if (Time.time - jumpStarted >= jumpDuration)
                 SetJumping(false);
         }
@@ -403,7 +400,8 @@ public class PlayerMove : MonoBehaviour
                 if (remainingHealth <= 0)
                 {
                     collectableControl.HandlePlayerDeath();
-                    mainCam.GetComponent<Animator>().SetBool("dead", true);
+                    camAnimator.SetBool("dead", true);
+                    //mainCam.GetComponent<Animator>().SetBool("dead", true);
                     isDead = true;
                     animator.SetTrigger("die");
                     crashThud.Play();
@@ -449,11 +447,12 @@ public class PlayerMove : MonoBehaviour
         {
             printCodeScript.SetCodePrompt("fly");
             godmode = true;
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 2, targetVolume = 0));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 2, 0));
             flyFX.Play();
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
-            mainCam.GetComponent<Animator>().SetBool("flying", true);
+            camAnimator.SetBool("flying", true);
+            //mainCam.GetComponent<Animator>().SetBool("flying", true);
             if (!isFlying)
             {
                 // Create array of coins
@@ -507,7 +506,8 @@ public class PlayerMove : MonoBehaviour
         {
                 var cb = other.GetComponent<Collider>();
                 if (cb != null) cb.enabled = false;
-                mainCam.GetComponent<Animator>().SetBool("dead", true);
+                camAnimator.SetBool("dead", true);
+                //mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.SetTrigger("die");
                 carCrashSFX.Play();
                 HideAllTutorialCards();
@@ -520,7 +520,8 @@ public class PlayerMove : MonoBehaviour
         {
             var cb = other.GetComponent<Collider>();
             if (cb != null) cb.enabled = false;
-            mainCam.GetComponent<Animator>().SetBool("dead", true);
+            camAnimator.SetBool("dead", true);
+            //mainCam.GetComponent<Animator>().SetBool("dead", true);
             if (onMinecart)
             {
                 animator.SetTrigger("minecartcollision");
@@ -626,7 +627,8 @@ public class PlayerMove : MonoBehaviour
 
         while (holding) yield return new WaitForSeconds(1);
 
-        mainCam.GetComponent<Animator>().SetBool("flying", false);
+        camAnimator.SetBool("flying", false);
+        //mainCam.GetComponent<Animator>().SetBool("flying", false);
         StartCoroutine(delayedGodmodeOff());
         StartCoroutine(ChangePitchOverTime());
         floating = true;
@@ -662,12 +664,13 @@ public class PlayerMove : MonoBehaviour
         }
 
         BGM.pitch = endingPitch;
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeThemes", duration = 3, targetVolume = 1f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 3, 1f));
     }
 
     IEnumerator ApplyGlissando()
     {
-        mainCam.GetComponent<Animator>().SetBool("panoptic", true);
+        camAnimator.SetBool("panoptic", true);
+        //mainCam.GetComponent<Animator>().SetBool("panoptic", true);
         printCodeScript.SetCodePrompt("panoptic");
 
         float halfDuration = 4.0f;
@@ -679,7 +682,7 @@ public class PlayerMove : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / halfDuration;
             BGM.pitch = Mathf.Lerp(1f, 5f, t);
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = t, targetVolume = 1f));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", t, 1f));
             yield return null;
         }
         elapsedTime = 0f;
@@ -690,12 +693,13 @@ public class PlayerMove : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / halfDuration;
             BGM.pitch = Mathf.Lerp(5.5f, 1f, t);
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeBGM", duration = t, targetVolume = 0.7f));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", t, 0.7f));
             yield return null;
         }
         BGM.pitch = endingPitch;
         yield return new WaitForSeconds(6);
-        mainCam.GetComponent<Animator>().SetBool("panoptic", false);
+        camAnimator.SetBool("panoptic", false);
+        //mainCam.GetComponent<Animator>().SetBool("panoptic", false);
     }
 
     IEnumerator PlayMainTheme()
@@ -705,9 +709,9 @@ public class PlayerMove : MonoBehaviour
         {
             mainTheme.Play();
             mainThemeAlreadyPlaying = true;
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 2, targetVolume = 0f)); //experimental
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 2, 0f)); //experimental
             yield return new WaitForSeconds(50);
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, exposedParameter = "volumeSFX", duration = 3, targetVolume = 1f)); //experimental - turn volume up again
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 3, 1f)); //experimental - turn volume up again
         }
     }
 
