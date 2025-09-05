@@ -22,7 +22,7 @@ public class EndlessFall : MonoBehaviour
 
         if (!isFalling && other.CompareTag("Player"))
         {
-            Debug.Log("FALLING!");
+            Debug.Log("ENDLESS FALLING!");
             isFalling = true;
             StartCoroutine(HandleEndlessFall());
         }

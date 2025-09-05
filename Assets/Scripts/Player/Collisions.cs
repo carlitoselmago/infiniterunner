@@ -1,9 +1,9 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-// INCORRECT
+// INCORRECT REMOVE
 public class Collisions : MonoBehaviour
 {
 
@@ -302,7 +302,7 @@ public class Collisions : MonoBehaviour
                         Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
                     }
                 }
-            }*/
+            }
         }
 
 
@@ -321,3 +321,4 @@ public class Collisions : MonoBehaviour
 
 
 }
+*/

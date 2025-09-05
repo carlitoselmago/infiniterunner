@@ -19,9 +19,7 @@ public class Constrain : MonoBehaviour
                 Debug.LogError("Constrain: Player object found but no PlayerMove script attached.");
         }
         else
-        {
             Debug.LogError("Constrain: No GameObject with tag 'Player' found in the scene.");
-        }
     }
 
     void OnTriggerEnter(Collider other)

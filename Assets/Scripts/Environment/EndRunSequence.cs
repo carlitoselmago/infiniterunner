@@ -14,9 +14,6 @@ public class EndRunSequence : MonoBehaviour
     public GameObject levelControl;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
-    //private string exposedParameter;
-    //private float duration;
-    //private float targetVolume;
 
     void OnEnable()
     {

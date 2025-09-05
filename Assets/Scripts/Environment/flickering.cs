@@ -18,26 +18,20 @@ public class Flickering : MonoBehaviour
     private void Start()
     {
         if (energyShield)
-        {
             shield = GetComponent<Renderer>();
-        }
 
         // If the GameObject is enabled at the start, start the flickering coroutine
         if (gameObject.activeInHierarchy)
-        {
             flickerCoroutine = StartCoroutine(Flicker());
-        }
     }
 
     private void OnEnable()
     {
-        // Start the coroutine when the GameObject is enabled
         flickerCoroutine = StartCoroutine(Flicker());
     }
 
     private void OnDisable()
     {
-        // Stop the coroutine when the GameObject is disabled
         if (flickerCoroutine != null)
         {
             StopCoroutine(flickerCoroutine);
@@ -58,10 +52,7 @@ public class Flickering : MonoBehaviour
                 pointLight.intensity = Random.Range(minIntensity, maxIntensity);
 
                 if (energyShield)
-                {
-                    // Toggle the renderer
                     shield.enabled = !shield.enabled;
-                }
 
                 // Wait for a short time
                 yield return new WaitForSeconds(Random.Range(0.05f, 0.1f));
@@ -76,8 +67,6 @@ public class Flickering : MonoBehaviour
     {
         isFlickering = !isFlickering;
         if (!isFlickering && shield)
-        {
             shield.enabled = true; // Ensure renderer is enabled when flickering is off
-        }
     }
 }

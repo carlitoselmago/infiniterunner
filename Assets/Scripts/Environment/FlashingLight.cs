@@ -12,24 +12,19 @@ public class FlashingLight : MonoBehaviour
     {
         timer += Time.deltaTime;
 
-        // Check if it's time to toggle the light
         if (timer >= flashInterval)
         {
             isLightOn = !isLightOn;
             GetComponent<Light>().enabled = isLightOn;
             timer = 0f;
 
-            // If the light is now on, schedule turning it off
             if (isLightOn)
-            {
                 Invoke("TurnLightOff", onDuration);
-            }
         }
     }
 
     void TurnLightOff()
     {
-        // Turn the light off after the specified duration
         GetComponent<Light>().enabled = false;
     }
 }

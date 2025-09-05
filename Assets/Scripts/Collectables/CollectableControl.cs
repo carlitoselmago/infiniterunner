@@ -74,20 +74,6 @@ public class CollectableControl : MonoBehaviour
     {
         Debug.Log("Collectable Control: Handling Player Death");
 
-        //TODO experimental !!!
-        // Disable physics on endless fall only
-        // Disable physics collider to prevent collisions with Ground while sinking (check for consistency)
-        /*
-        BoxCollider box = player.GetComponent<BoxCollider>();
-        if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
-        {
-            if (box.enabled)
-            {
-                box.enabled = false;
-                Debug.Log("Player BoxCollider disabled.");
-            }
-        }*/
-
         if (coinCount > highScore)
         {
             highScore = coinCount;
