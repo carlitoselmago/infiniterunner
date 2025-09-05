@@ -9,7 +9,9 @@ public class EndlessFall : MonoBehaviour
     public Animator playerAnimator;
     public CollectableControl collectableControl;
 
+    public bool overrideMine = false;   // set true for deep falling trigger (fallback in case the player accidentally sinks through ground)
     private bool isFalling = false;
+    private bool triggered = false;
 
     private void Start()
     {
@@ -18,11 +20,12 @@ public class EndlessFall : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (MineData.endlessFallDisabled) return;
+        if (MineData.endlessFallDisabled && !overrideMine) return;
 
-        if (!isFalling && other.CompareTag("Player"))
+        if (!isFalling && other.CompareTag("Player") && !triggered)
         {
             Debug.Log("ENDLESS FALLING!");
+            triggered = true;
             isFalling = true;
             StartCoroutine(HandleEndlessFall());
         }
