@@ -3,6 +3,7 @@ using UnityEngine;
 public class Constrain : MonoBehaviour
 {
     private PlayerMove player;
+    private bool triggered = false;
 
     // Set which positions are constrained in the Inspector
     public bool constrainLeft = false;
@@ -24,7 +25,8 @@ public class Constrain : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player") && player != null)
+        if (other.gameObject.CompareTag("Player") && player != null && !triggered)
+            triggered = true;
             player.SetConstrainedPositions(constrainLeft, constrainCenter, constrainRight);
     }
 }
