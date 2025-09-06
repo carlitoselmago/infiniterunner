@@ -45,12 +45,10 @@ public class CollectableControl : MonoBehaviour
     private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL", "MORIRÀS TREBALLANT" };
 
     public bool achievementShown = false; //used to prevent collisions between score and time achievements
+    public bool runtimeHighScoreTriggered = false;
 
-    //audio mixer
+    //audio
     public AudioMixer audioMixer;
-    /*private string exposedParameter;
-    private float duration;
-    private float targetVolume;*/
     public AudioSource highScoreSFX;
     public AudioSource highSpeedSFX;
     private PlayerMove playerMove;
@@ -79,9 +77,8 @@ public class CollectableControl : MonoBehaviour
             highScore = coinCount;
             highScoreAchieved = true;
             SessionData.sessionHighScore = highScore;
-            if (savingPlayerPrefences) { 
-            SessionData.UpdateHighScore(highScore, savingPlayerPrefences);
-            }
+            if (savingPlayerPrefences)
+                SessionData.UpdateHighScore(highScore, savingPlayerPrefences);
             highScoreText = "NOU RÈCORD!";
             Debug.Log("New high score saved: " + highScore);
         }
@@ -101,10 +98,11 @@ public class CollectableControl : MonoBehaviour
     {
         coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
 
-        if (PlayerMove.startedrunning && PlayerMove.isDead == false)
+        if (PlayerMove.startedrunning && !PlayerMove.isDead)
         {
             elapsedTime += Time.deltaTime;
 
+            // Coin achievements
             if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
             {
                 if (coinCount == treballadordelmes_coins[treballadordelmes_coins_index])
@@ -124,7 +122,7 @@ public class CollectableControl : MonoBehaviour
                     }
                 }
         }
-            
+            // Time achievements
                 if (seconds_to_elapse_index < seconds_to_elapse.Count)
                 {
                     if (elapsedTime > seconds_to_elapse[seconds_to_elapse_index])
@@ -151,7 +149,24 @@ public class CollectableControl : MonoBehaviour
                 }
                 }
             }
+
+            // High Score achieved
+            if (!runtimeHighScoreTriggered && coinCount > highScore)
+            {
+                runtimeHighScoreTriggered = true;
+                achievementEndUItext.GetComponent<Text>().text = "NOU RÈCORD!";
+                achievementEndUIsubtext.GetComponent<Text>().text = "No et rendeixis!";
+                achievementUI.SetActive(true);
+                achievementShown = true;
+                highScoreSFX.Play();
+                highSpeedSFX.Play();
+                dimVolumes();
+                lifeUp();
+                StartCoroutine(hideachievement());
+            }
         }
+
+        // Clear High Scores pressing R
         if (Input.GetKeyDown(KeyCode.R))
         {
             SessionData.ClearHighScore();
