@@ -31,7 +31,7 @@ public class MineEntry : MonoBehaviour
                 MineData.endlessFallDisabled = true;
                 Debug.Log("Entering the mine");
                 generateLevel.EnterMine();
-                generateSandstorm.StopTheSandstorm();
+                //generateSandstorm.StopTheSandstorm();
                 //levelControl.GetComponent<GenerateSandstorm>().sandstormActive = false;
             }
             else
