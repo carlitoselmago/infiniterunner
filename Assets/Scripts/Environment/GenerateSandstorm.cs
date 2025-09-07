@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Audio;
 
-public class GenerateSandstorm : MonoBehaviour
+public class GenerateSandstorm : MonoBehaviour, IResettable
 {
 
     public GameObject sandstorm;
@@ -15,9 +15,6 @@ public class GenerateSandstorm : MonoBehaviour
 
     //audio mixer
     public AudioMixer audioMixer;
-    /*private string exposedParameter;
-    private float duration;
-    private float targetVolume;*/
     public AudioSource sandstormFX;
     public AudioSource endStormSFX;
 
@@ -29,7 +26,6 @@ public class GenerateSandstorm : MonoBehaviour
     public float maxParticleAlpha = 1f;
     public float chance = 0.5f;
     public bool generatingSandstorm = false;
-    public bool sandstormActive = true;
 
     private void Awake()
     {
@@ -52,17 +48,14 @@ public class GenerateSandstorm : MonoBehaviour
     public void StartSandstormGeneration()
     {
         StartCoroutine(GenerateTheSandstorm(2f));
-        //Debug.Log("Sandstorm Script Enabled");
+        Debug.Log("Sandstorm Script Enabled");
     }
 
     IEnumerator GenerateTheSandstorm(float prewait)
     {
         if (!MineData.isInTheMine)
-        //if (sandstormActive) // don't generate if underground in the mines
         {
             float randomWait = Random.Range(0f, 40f);
-
-            sandstormActive = true; // test flag
 
             yield return new WaitForSeconds(prewait + randomWait); // delay before attempting to generate sandstorm
             if (Random.value > chance)
@@ -99,9 +92,6 @@ public class GenerateSandstorm : MonoBehaviour
                 Debug.Log("Skipped Sandstrom based on chance");
                 StartCoroutine(GenerateTheSandstorm(10f));
             }
-        } else
-        {
-            sandstormActive = false; //test flag
         }
     }
 
@@ -126,7 +116,7 @@ public class GenerateSandstorm : MonoBehaviour
         while (elapsed < duration)
         {
             sandstormVolume.weight = Mathf.Lerp(from, to, elapsed / duration);
-            float alpha = Mathf.Lerp(from, to, elapsed / (duration/2));
+            float alpha = Mathf.Lerp(from, to, elapsed / (duration / 2));
             sandstormMaterial.SetFloat("_GlobalAlpha", alpha);
 
             elapsed += Time.deltaTime;
@@ -136,15 +126,28 @@ public class GenerateSandstorm : MonoBehaviour
         sandstormVolume.weight = to;
         sandstormMaterial.SetFloat("_GlobalAlpha", to);
         if (to == 0f)
+        {
             sandstormParticles.Stop();
+        }
 
     }
 
     public void StopTheSandstorm()
     {
+        if (!generatingSandstorm) return;   // experimental
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
+    }
+
+    public void ResetState()
+    {
+        generatingSandstorm = false;
+        RenderSettings.fogDensity = 0;
+        sandstormMaterial.SetFloat("_GlobalAlpha", 0f);
+        sandstormVolume.weight = 0;
+        sandstormParticles.Stop();
+        StopCoroutine(GenerateTheSandstorm(0));
     }
 
 }

@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 
-public class PlayerMove : MonoBehaviour
+public class PlayerMove : MonoBehaviour, IResettable
 {
+    private Vector3 startPosition = new Vector3(0f, -0.35f, -48f);
     public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float horizontalSpeed = 20f;
@@ -79,9 +80,6 @@ public class PlayerMove : MonoBehaviour
 
     //audio mixer
     public AudioMixer audioMixer;
-    /*private string exposedParameter;
-    private float duration;
-    private float targetVolume;*/
 
     public GameObject levelControl;
     public CollectableControl collectableControl;
@@ -130,6 +128,7 @@ public class PlayerMove : MonoBehaviour
 
     void Start()
     {
+        //startPosition = transform.position;
         animator = GetComponentInChildren<Animator>();
         camAnimator = mainCam.GetComponent<Animator>();
 
@@ -155,7 +154,6 @@ public class PlayerMove : MonoBehaviour
         startY = transform.position.y;
         originY = startY;
         onMinecart = false;
-        //normalhitbox();
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
         isDead = false;
@@ -327,9 +325,7 @@ public class PlayerMove : MonoBehaviour
             if (tutorialcard == "crouch") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isRolling)
             {
-                //isRolling = true;
                 SetCrouching(true);
-                //crouchhitbox();
                 animator.SetBool("isrolling", true);
                 StartCoroutine(RollSequence());
                 printCodeScript.SetCodePrompt("crouch");
@@ -351,7 +347,7 @@ public class PlayerMove : MonoBehaviour
         // Jump timing fallback (so we don't rely solely on animator transitions)
         if (isJumping)
         {
-            float jumpDuration = 0.7f; // set to your clip length
+            float jumpDuration = 0.6f; // set to your clip length
             if (Time.time - jumpStarted >= jumpDuration)
                 SetJumping(false);
         }
@@ -401,7 +397,6 @@ public class PlayerMove : MonoBehaviour
                 {
                     collectableControl.HandlePlayerDeath();
                     camAnimator.SetBool("dead", true);
-                    //mainCam.GetComponent<Animator>().SetBool("dead", true);
                     isDead = true;
                     animator.SetTrigger("die");
                     crashThud.Play();
@@ -452,7 +447,6 @@ public class PlayerMove : MonoBehaviour
             BGM.pitch += 0.5f;
             animator.SetBool("isflying", true);
             camAnimator.SetBool("flying", true);
-            //mainCam.GetComponent<Animator>().SetBool("flying", true);
             if (!isFlying)
             {
                 // Create array of coins
@@ -507,7 +501,6 @@ public class PlayerMove : MonoBehaviour
                 var cb = other.GetComponent<Collider>();
                 if (cb != null) cb.enabled = false;
                 camAnimator.SetBool("dead", true);
-                //mainCam.GetComponent<Animator>().SetBool("dead", true);
                 animator.SetTrigger("die");
                 carCrashSFX.Play();
                 HideAllTutorialCards();
@@ -521,7 +514,6 @@ public class PlayerMove : MonoBehaviour
             var cb = other.GetComponent<Collider>();
             if (cb != null) cb.enabled = false;
             camAnimator.SetBool("dead", true);
-            //mainCam.GetComponent<Animator>().SetBool("dead", true);
             if (onMinecart)
             {
                 animator.SetTrigger("minecartcollision");
@@ -564,9 +556,9 @@ public class PlayerMove : MonoBehaviour
 
     public void SetConstrainedPositions(bool left, bool center, bool right)
     {
-        blockLeft = left;
-        blockCenter = center;
-        blockRight = right;
+        //blockLeft = left;
+        //blockCenter = center;
+        //blockRight = right;
     }
 
     public void SetJumping (bool jumping)
@@ -709,9 +701,9 @@ public class PlayerMove : MonoBehaviour
         {
             mainTheme.Play();
             mainThemeAlreadyPlaying = true;
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 2, 0f)); //experimental
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 2, 0f));
             yield return new WaitForSeconds(50);
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 3, 1f)); //experimental - turn volume up again
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 3, 1f));
         }
     }
 
@@ -795,5 +787,67 @@ public class PlayerMove : MonoBehaviour
                 isFalling = false;
             }
         }
+    }
+
+    private void StopThemes()
+    {
+        StopCoroutine(PlayMainTheme());
+        if (BGM.isPlaying)
+            BGM.Stop();
+        if (mainTheme.isPlaying)
+            mainTheme.Stop();
+        if (pyramidsTheme.isPlaying)
+            pyramidsTheme.Stop();
+        if (panopticSFX.isPlaying)
+            panopticSFX.Stop();
+    }
+
+    public void ResetState()
+    {
+        Debug.Log("PlayerMove reset");
+        levelControl.GetComponent<EndRunSequence>().enabled = false;
+
+        // set bools
+        boxCollider.enabled = true;
+        godmodevisual.SetActive(false);
+        godmode = false;
+        startedrunning = false;
+        isDead = false;
+        onMinecart = false;
+
+        // set tutorial timers/ text
+        timer = 0f;
+        tutorialcard = "";
+        HideAllTutorialCards();
+
+        // set animator states
+        animator.Rebind();
+        camAnimator.Rebind();
+
+        // set position
+        transform.position = startPosition;
+        startY = transform.position.y;
+        originY = startY;
+        initialmoveSpeed = moveSpeed;
+        SetConstrainedPositions(false, false, false);
+
+        // set hitboxes
+        if (hitLogic != null)
+            hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
+        playerBody.isKinematic = false;
+
+        // set audio parameters
+        BGM.pitch = 1.0f;
+        StopThemes();
+        
+        mainThemeAlreadyPlaying = false;
+        alreadyCrossedPanoptic = false;
+
+        // set health
+        foreach (var h in heartList) Destroy(h);
+        heartList.Clear();
+        remainingHealth = 0;
+        for (int i = 0; i < maxHealth; i++)
+            AddHeart();
     }
 }

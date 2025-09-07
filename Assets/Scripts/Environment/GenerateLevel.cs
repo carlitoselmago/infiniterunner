@@ -2,6 +2,402 @@
 using System.Collections;
 using UnityEngine;
 
+public class GenerateLevel : MonoBehaviour, IResettable
+{
+    public int stepamount = 100;
+    public GameObject templatesparent;
+    private GameObject[] sectionPrefabs;
+    public AudioSource mainTheme;
+
+    private int zPos;
+    public int generatedSections = 0;
+    public bool creatingSection = false;
+
+    public static bool disableMinefall = false;
+    public int mineEntryIndex = 41;
+
+    public GameObject player;
+    public GameObject MAP;
+    private int resumeAhead = 530;
+    public int secNum;
+
+    // --- Active sections in play ---
+    private Queue<GameObject> activeSections = new Queue<GameObject>();
+
+    // --- Pool of reusable sections ---
+    private Dictionary<int, Queue<GameObject>> sectionPools = new Dictionary<int, Queue<GameObject>>();
+
+    void Start()
+    {
+        ResetZPos();
+        CachePrefabs();
+        for (int i = 0; i < 5; i++)
+            InstantiateInitialSection();
+    }
+
+    void Update()
+    {
+        if (MAP.transform.position.z < -zPos + (stepamount * 4) && !creatingSection)
+        {
+            creatingSection = true;
+            GenerateSection();
+            generatedSections++;
+        }
+    }
+
+    public void UpdateZPos(int addedLength)
+    {
+        zPos += addedLength;
+    }
+
+    private void ResetZPos()
+    {
+        zPos = 200; // start point
+    }
+
+    private void CachePrefabs()
+    {
+        sectionPrefabs = new GameObject[templatesparent.transform.childCount];
+        for (int i = 0; i < templatesparent.transform.childCount; i++)
+        {
+            GameObject child = templatesparent.transform.GetChild(i).gameObject;
+            child.transform.localPosition = Vector3.zero;
+            child.SetActive(false);
+            sectionPrefabs[i] = child;
+            sectionPools[i] = new Queue<GameObject>();
+        }
+    }
+
+    private void GenerateSection()
+    {
+        if (MineData.isInTheMine) { creatingSection = false; return; }
+
+        secNum = Random.Range(0, sectionPrefabs.Length);
+        GameObject newSection = GetFromPool(secNum);
+        newSection.transform.position = new Vector3(0, 0, zPos);
+        newSection.transform.SetParent(MAP.transform, false);
+        newSection.SetActive(true);
+
+        activeSections.Enqueue(newSection);
+
+        if (activeSections.Count > 8)
+        {
+            GameObject oldSection = activeSections.Dequeue();
+            ReturnToPool(oldSection);
+        }
+
+        creatingSection = false;
+    }
+
+    private void InstantiateInitialSection()
+    {
+        secNum = Random.Range(0, sectionPrefabs.Length);
+        GameObject newSection = GetFromPool(secNum);
+        newSection.transform.position = new Vector3(0, 0, zPos);
+        newSection.transform.SetParent(MAP.transform, false);
+        newSection.SetActive(true);
+
+        activeSections.Enqueue(newSection);
+    }
+
+    public void EnterMine()
+    {
+        Debug.Log("Generate Level entered mine");
+        Queue<GameObject> newActive = new Queue<GameObject>();
+        GameObject mineEntry = null;
+
+        while (activeSections.Count > 0)
+        {
+            GameObject section = activeSections.Dequeue();
+            Chunk chunkData = section.GetComponent<Chunk>();
+            if (chunkData == null) continue;
+
+            if (chunkData.chunkNum != mineEntryIndex)
+                ReturnToPool(section);
+            else
+                mineEntry = section;
+        }
+
+        if (mineEntry != null)
+            newActive.Enqueue(mineEntry);
+
+        activeSections = newActive;
+    }
+
+    public void ExitMine()
+    {
+        zPos = Mathf.RoundToInt(player.transform.position.z) + resumeAhead;
+        Debug.Log($"ExitMine: player.z = {player.transform.position.z}, zPos set to {zPos}");
+        creatingSection = true;
+        StartCoroutine(ResumeGenerationNextFrame());
+    }
+
+    IEnumerator ResumeGenerationNextFrame()
+    {
+        yield return null;
+        creatingSection = false;
+    }
+
+    // --- Pool management ---
+    private GameObject GetFromPool(int prefabIndex)
+    {
+        if (sectionPools[prefabIndex].Count > 0)
+            return sectionPools[prefabIndex].Dequeue();
+        else
+        {
+            GameObject obj = Instantiate(sectionPrefabs[prefabIndex]);
+            obj.SetActive(false);
+            obj.GetComponent<Chunk>().chunkNum = prefabIndex;
+            return obj;
+        }
+    }
+
+    private void ReturnToPool(GameObject section)
+    {
+        section.SetActive(false);
+        section.transform.SetParent(null);
+        Chunk chunkData = section.GetComponent<Chunk>();
+        if (chunkData != null)
+            sectionPools[chunkData.chunkNum].Enqueue(section);
+        else
+            Destroy(section);
+    }
+
+    public void ResetState()
+    {
+        Debug.Log("GenerateLevel Reset");
+
+        while (activeSections.Count > 0)
+        {
+            GameObject section = activeSections.Dequeue();
+            ReturnToPool(section);
+        }
+
+        ResetZPos();
+        generatedSections = 0;
+        creatingSection = false;
+        disableMinefall = false;
+
+        MAP.transform.position = Vector3.zero;
+
+        for (int i = 0; i < 5; i++)
+            InstantiateInitialSection();
+    }
+}
+
+
+
+
+/*using System.Collections.Generic;
+using System.Collections;
+using UnityEngine;
+
+public class GenerateLevel : MonoBehaviour, IResettable
+{
+    public int stepamount = 100;
+    public GameObject templatesparent;
+    private GameObject[] sectionPrefabs;
+    public AudioSource mainTheme;
+    
+    private int zPos;
+    public int generatedSections = 0;
+    public bool creatingSection = false;
+
+    public static bool disableMinefall = false;
+    public int mineEntryIndex = 41;
+
+    public GameObject player;
+    public GameObject MAP;
+    private int resumeAhead = 530;
+    public int secNum;
+
+    // --- Active sections in play ---
+    private Queue<GameObject> activeSections = new Queue<GameObject>();
+
+    // --- Pool of reusable sections ---
+    private Dictionary<int, Queue<GameObject>> sectionPools = new Dictionary<int, Queue<GameObject>>();
+
+    void Start()
+    {
+    zPos =200;// stepamount*2;
+
+    // Cache section prefabs
+    sectionPrefabs = new GameObject[templatesparent.transform.childCount];
+
+    for (int i = 0; i < templatesparent.transform.childCount; i++)
+        {
+        GameObject child = templatesparent.transform.GetChild(i).gameObject;
+        child.transform.localPosition = Vector3.zero;  // Reset the position of each child
+        child.SetActive(false); // Set to inactive until it is instantiated
+        sectionPrefabs[i] = child;
+            sectionPools[i] = new Queue<GameObject>();//one pool per prefab
+        }
+
+    // Preload 4 sections at the start of the game
+    for (int i = 0; i < 5; i++)
+        InstantiateInitialSection();
+    }
+
+  void Update()
+    {
+        // Check if the map has moved enough to require a new section
+        if (MAP.transform.position.z < -zPos + (stepamount*4) && !creatingSection)
+        {
+            creatingSection = true;
+            GenerateSection();
+            generatedSections ++;
+        }
+    }
+
+    public void UpdateZPos(int addedLength)
+    {
+        zPos += addedLength;
+    }
+
+    void GenerateSection()
+    {
+        if (MineData.isInTheMine) return;
+
+        secNum = Random.Range(0, sectionPrefabs.Length);
+
+        GameObject newSection = GetFromPool(secNum);
+        newSection.transform.position = new Vector3(0, 0, zPos);
+        newSection.transform.SetParent(MAP.transform, false);
+        newSection.SetActive(true);
+
+        activeSections.Enqueue(newSection);
+
+        if (activeSections.Count > 8)
+        {
+            GameObject oldSection = activeSections.Dequeue();
+            ReturnToPool(oldSection);
+        }
+
+        creatingSection = false;
+    }
+
+    void InstantiateInitialSection()
+    {
+        secNum = Random.Range(0, sectionPrefabs.Length);
+        GameObject newSection = GetFromPool(secNum);
+        newSection.transform.position = new Vector3(0, 0, zPos);
+        newSection.transform.SetParent(MAP.transform, false);
+        newSection.SetActive(true);
+
+        activeSections.Enqueue(newSection);
+    }
+
+    public void EnterMine()
+    {
+        Debug.Log("Generate Level entered mine");
+        Queue<GameObject> newActive = new Queue<GameObject>();
+        GameObject mineEntry = null;
+
+        //experimental
+        while (activeSections.Count > 0)
+        {
+            GameObject section = activeSections.Dequeue();
+            Chunk chunkData = section.GetComponent<Chunk>();
+            if (chunkData == null) continue;
+
+            if (chunkData.chunkNum != mineEntryIndex)
+                ReturnToPool(section);
+            else
+                mineEntry = section;
+        }
+        if (mineEntry != null)
+            newActive.Enqueue(mineEntry);
+        activeSections = newActive;
+    
+ 
+    }
+
+    public void ExitMine()
+    {
+        zPos = Mathf.RoundToInt(player.transform.position.z) + resumeAhead;
+        Debug.Log($"ExitMine: player.z = {player.transform.position.z}, zPos set to {zPos}");
+        creatingSection = true;
+        StartCoroutine(ResumeGenerationNextFrame());
+    }
+
+    IEnumerator ResumeGenerationNextFrame()
+    {
+        yield return null; // wait 1 frame
+        creatingSection = false;
+    }
+
+    // --- Pool management ---
+    GameObject GetFromPool(int prefabIndex)
+    {
+        if (sectionPools[prefabIndex].Count > 0)
+            return sectionPools[prefabIndex].Dequeue();
+        else
+        {
+            // Instantiate a new one if pool empty
+            GameObject obj = Instantiate(sectionPrefabs[prefabIndex]);
+            obj.SetActive(false);
+            obj.GetComponent<Chunk>().chunkNum = prefabIndex;
+            return obj;
+        }
+    }
+
+    void ReturnToPool(GameObject section)
+    {
+        section.SetActive(false);
+        section.transform.SetParent(null); // detach from MAP
+        Chunk chunkData = section.GetComponent<Chunk>();
+        if (chunkData != null)
+            sectionPools[chunkData.chunkNum].Enqueue(section);
+        else
+            Destroy(section); // safety fallback
+    }
+
+    public void ResetState()
+    {
+        Debug.Log("GenerateLevel Reset");
+        // Clear active sections
+        while (activeSections.Count > 0)
+        {
+            GameObject section = activeSections.Dequeue();
+            ReturnToPool(section);
+        }
+
+        // 2. Reset counters/flags
+        zPos = 200;  // same as Start()
+        generatedSections = 0;
+        creatingSection = false;
+        disableMinefall = false;
+
+        // 4. Respawn initial sections
+        MAP.transform.position = Vector3.zero;   // reset map root
+
+        for (int i = 0; i < 5; i++)
+            InstantiateInitialSection();
+    }
+
+
+}*/
+
+
+
+
+
+
+
+
+/*
+ * 
+ * 
+ * 
+ * // OLD SCRIPT
+ * 
+ * 
+ * 
+ * 
+ * using System.Collections.Generic;
+using System.Collections;
+using UnityEngine;
+
 public class GenerateLevel : MonoBehaviour
 {
     public int stepamount = 100;
@@ -129,4 +525,4 @@ public class GenerateLevel : MonoBehaviour
         creatingSection = false;
     }
 
-}
+}*/

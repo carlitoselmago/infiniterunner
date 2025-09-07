@@ -66,4 +66,5 @@ public class HitLogic : MonoBehaviour
         // forward the trigger to the parent for processing
         playerMove.ProcessTrigger(other);
     }
-}
+
+    }

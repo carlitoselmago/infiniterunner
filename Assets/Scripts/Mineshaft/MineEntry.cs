@@ -5,6 +5,7 @@ public class MineEntry : MonoBehaviour
 {
     public bool isExit = false; // define entry or exit point
     public GameObject levelControl;
+    public GenerateSandstorm generateSandstorm;
     private GenerateLevel generateLevel;
     private bool triggered = false;
 
@@ -30,6 +31,7 @@ public class MineEntry : MonoBehaviour
                 MineData.endlessFallDisabled = true;
                 Debug.Log("Entering the mine");
                 generateLevel.EnterMine();
+                generateSandstorm.StopTheSandstorm();
                 //levelControl.GetComponent<GenerateSandstorm>().sandstormActive = false;
             }
             else

@@ -15,7 +15,8 @@ public class EndlessFall : MonoBehaviour
 
     private void Start()
     {
-        collectableControl = FindObjectOfType<CollectableControl>();
+        if (collectableControl == null)
+            collectableControl = FindObjectOfType<CollectableControl>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -39,10 +40,7 @@ public class EndlessFall : MonoBehaviour
 
         Debug.Log("Handling endless fall...");
 
-        //TODO experimental !!!
-        // Disable physics on endless fall only
-        // Disable physics collider to prevent collisions with Ground while sinking (check for consistency)
-        // Try: Remove section to ensure it is the problem. Probably returning null on the player.
+        // Disable physics collider to prevent collisions with Ground while sinking
         BoxCollider box = player.GetComponent<BoxCollider>();
         if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
         {

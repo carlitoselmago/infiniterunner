@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 
-public class CollectableControl : MonoBehaviour
+public class CollectableControl : MonoBehaviour, IResettable
 {
     public GameObject player;
     public GameObject levelControl;
@@ -196,6 +196,35 @@ public class CollectableControl : MonoBehaviour
         yield return new WaitForSeconds(3);
         achievementUI.SetActive(false);
         achievementShown = false;
+    }
+
+    public void ResetState()
+    {
+        Debug.Log("CollectableControl reset");
+        coinCount = 0;
+        coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
+        lastAchievementText = "";
+        highScoreText = "";
+
+        // Reset achievements
+        treballadordelmes_coins_index = 0;
+        seconds_to_elapse_index = 0;
+        elapsedTime = 0f;
+        achievementShown = false;
+        runtimeHighScoreTriggered = false;
+        firstAchievementMet = false;
+        highScoreAchieved = false;
+
+        // Reset UI state
+        achievementUI.SetActive(false);
+        achievementEndUItext.GetComponent<Text>().text = "";
+        achievementEndUIsubtext.GetComponent<Text>().text = "";
+
+        // Reload saved high score
+        SessionData.LoadHighScore(savingPlayerPrefences);
+        highScore = SessionData.sessionHighScore;
+
+        //playerMove = player.GetComponent<PlayerMove>();
     }
 
 }

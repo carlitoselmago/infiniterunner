@@ -2,12 +2,13 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections;
 
-public class WaterTrigger : MonoBehaviour
+public class WaterTrigger : MonoBehaviour, IResettable
 {
     public Volume triggeredVolume;
     public float transitionDuration = 0.3f;
     public GameObject splashSound;
     public CollectableControl collectableControl;
+    public GameObject player;
 
     private Coroutine transitionCoroutine;
     private bool triggered = false;
@@ -23,9 +24,23 @@ public class WaterTrigger : MonoBehaviour
         {
             triggered = true;
             Debug.Log("Underwater");
-            collectableControl.HandlePlayerDeath();
             triggeredVolume.gameObject.SetActive(true);
             splashSound.SetActive(true);
+
+            // Disable physics collider to prevent collisions with Ground while sinking
+            
+            BoxCollider box = player.GetComponent<BoxCollider>();
+            if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
+            {
+                if (box.enabled)
+                {
+                    box.enabled = false;
+                    Debug.Log("... Player BoxCollider disabled during water fall.");
+                }
+            }
+
+            collectableControl.HandlePlayerDeath();
+
             if (transitionCoroutine != null)
                 StopCoroutine(transitionCoroutine);
 
@@ -47,5 +62,10 @@ public class WaterTrigger : MonoBehaviour
         }
 
         volume.weight = endWeight;
+    }
+
+    public void ResetState()
+    {
+        triggeredVolume.gameObject.SetActive(false);
     }
 }
