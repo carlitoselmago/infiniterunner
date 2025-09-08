@@ -828,7 +828,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         transform.position = startPosition;
         startY = transform.position.y;
         originY = startY;
-        initialmoveSpeed = moveSpeed;
+        moveSpeed = 12.0f;
         SetConstrainedPositions(false, false, false);
 
         // set hitboxes
