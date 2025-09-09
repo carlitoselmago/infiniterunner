@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7430873009842145181}
   - component: {fileID: 8122148887604455700}
   - component: {fileID: 4856194529034837487}
+  - component: {fileID: 1098083471820386683}
   m_Layer: 0
   m_Name: Barrel RigidBody
   m_TagString: obstacle
@@ -179,3 +180,15 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5888486, y: 1.117219, z: 0.5487175}
   m_Center: {x: 0.006246954, y: 0.5569773, z: -0.004812032}
+--- !u!114 &1098083471820386683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250613773882919493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf045617829644679a6ce3c446d24ace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

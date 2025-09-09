@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 4639727906357200369}
   - component: {fileID: 4049407322244347835}
   - component: {fileID: 2125114502012468978}
-  - component: {fileID: 8968559078252779628}
   - component: {fileID: 7257360917340611046}
+  - component: {fileID: 2942179503425707245}
   m_Layer: 0
   m_Name: Barrier RigidBody
   m_TagString: obstacle
@@ -135,27 +135,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!65 &8968559078252779628
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7750159653028343740}
-  m_Material: {fileID: 13400000, guid: 95a69f50369ff4d768040fa4f51b8af7, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 1
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 1.2693355, y: 0.6997621, z: 0.37932497}
-  m_Center: {x: 0, y: 0.3133844, z: 0.0000019073486}
 --- !u!64 &7257360917340611046
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -178,3 +157,15 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1042801323994665371, guid: 0767df1485b6b3d48a31a0ad8d276df7, type: 3}
+--- !u!114 &2942179503425707245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7750159653028343740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf045617829644679a6ce3c446d24ace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
