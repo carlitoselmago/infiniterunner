@@ -17,6 +17,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public bool holding = false;
     public static bool onMinecart = false;
     private bool mainThemeAlreadyPlaying = false;
+    public static bool idle = true;
 
     [Header("Constrains")]  //(from Constrain.cs)
     public bool blockLeft = false;
@@ -165,9 +166,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         //set hearts based on amount of life
         for (int i = 0; i < maxHealth; i++)
-        {
             AddHeart();
-        }
     }
 
     public void AddHeart()
@@ -184,9 +183,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             remainingHealth += 1;
         }
         else
-        {
             Debug.Log("Cannot add more hearts");
-        }
     }
 
     public void RemoveHeartsInReverseOrder()
@@ -204,7 +201,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             Application.Quit();
 
         // Start sequence (Idle)
-        if (!startedrunning)
+        if (!startedrunning && idle)
         {
             if (!startingText.activeSelf)
             {
@@ -224,18 +221,6 @@ public class PlayerMove : MonoBehaviour, IResettable
             }
         }
 
-        if (!startedrunning && Input.anyKey)
-        {
-            BGM.Play();
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 3, 0.7f));
-            if (!mainThemeAlreadyPlaying) StartCoroutine(PlayMainTheme());
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1.5f, 1));
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 1.5f, 1));
-            tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
-            startingText.SetActive(false);
-            printCodeScript.SetCodePrompt("start");
-        }
-
         if (startedrunning && !animator.GetBool("isrunning"))
             animator.SetBool("isrunning", true);
 
@@ -248,7 +233,9 @@ public class PlayerMove : MonoBehaviour, IResettable
         // Left
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            startedrunning = true;
+            if (!startedrunning)
+                StartPlay();
+
             if (tutorialcard == "left") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
@@ -279,7 +266,9 @@ public class PlayerMove : MonoBehaviour, IResettable
         // Right
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-            startedrunning = true;
+            if (!startedrunning)
+                StartPlay();
+
             if (tutorialcard == "right") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
@@ -321,7 +310,9 @@ public class PlayerMove : MonoBehaviour, IResettable
         // Crouching
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
-            startedrunning = true;
+            if (!startedrunning)
+                StartPlay();
+
             if (tutorialcard == "crouch") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isRolling)
             {
@@ -335,8 +326,10 @@ public class PlayerMove : MonoBehaviour, IResettable
         // Jumping
         if (!isJumping && !isFlying && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)))
             {
-                startedrunning = true;
-                if (tutorialcard == "jump") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+            if (!startedrunning)
+                StartPlay();
+
+            if (tutorialcard == "jump") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
 
             SetJumping(true);
             jumpStarted = Time.time;  // Track start time
@@ -546,6 +539,20 @@ public class PlayerMove : MonoBehaviour, IResettable
                     Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
             }
         }
+    }
+
+    public void StartPlay()
+    {
+            idle = false;
+            startedrunning = true;
+            BGM.Play();
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 3, 0.7f));
+            if (!mainThemeAlreadyPlaying) StartCoroutine(PlayMainTheme());
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1.5f, 1));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 1.5f, 1));
+            tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
+            startingText.SetActive(false);
+            printCodeScript.SetCodePrompt("start");
     }
 
     private void DisplayInstruction(string instruction)
@@ -812,6 +819,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         godmodevisual.SetActive(false);
         godmode = false;
         startedrunning = false;
+        idle = true;
         isDead = false;
         onMinecart = false;
 

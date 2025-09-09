@@ -5,17 +5,8 @@ public class Chunk : MonoBehaviour
     public int chunkNum;
     public int chunkLength;
 
-    private bool initialized = false;
-
-    private void OnEnable()
+    public void RegisterLength(GenerateLevel generator)
     {
-        if (!initialized)
-        {
-            initialized = true; // first time setup
-        }
-
-        // Every time it's activated (from pool or fresh):
-        GenerateLevel generator = FindObjectOfType<GenerateLevel>();
         generator.UpdateZPos(chunkLength);
     }
 }

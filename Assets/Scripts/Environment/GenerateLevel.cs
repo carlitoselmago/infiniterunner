@@ -80,6 +80,11 @@ public class GenerateLevel : MonoBehaviour, IResettable
         newSection.transform.SetParent(MAP.transform, false);
         newSection.SetActive(true);
 
+        // Register section length after placement
+        Chunk chunkData = newSection.GetComponent<Chunk>();
+        if (chunkData != null)
+            chunkData.RegisterLength(this);
+
         activeSections.Enqueue(newSection);
 
         if (activeSections.Count > 8)
@@ -98,6 +103,11 @@ public class GenerateLevel : MonoBehaviour, IResettable
         newSection.transform.position = new Vector3(0, 0, zPos);
         newSection.transform.SetParent(MAP.transform, false);
         newSection.SetActive(true);
+
+        // Register section length after placement
+        Chunk chunkData = newSection.GetComponent<Chunk>();
+        if (chunkData != null)
+            chunkData.RegisterLength(this);
 
         activeSections.Enqueue(newSection);
     }
