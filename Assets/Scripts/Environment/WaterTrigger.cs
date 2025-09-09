@@ -67,5 +67,6 @@ public class WaterTrigger : MonoBehaviour, IResettable
     public void ResetState()
     {
         triggeredVolume.gameObject.SetActive(false);
+        triggered = false;
     }
 }

@@ -29,6 +29,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     void Start()
     {
+        Debug.Log("Started GenerateLevel");
         ResetZPos();
         CachePrefabs();
         for (int i = 0; i < 5; i++)
@@ -52,7 +53,8 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     private void ResetZPos()
     {
-        zPos = 200; // start point
+        zPos = 100; // start point
+        //zPos = 200; // start point
     }
 
     private void CachePrefabs()
@@ -141,6 +143,31 @@ public class GenerateLevel : MonoBehaviour, IResettable
     // --- Pool management ---
     private GameObject GetFromPool(int prefabIndex)
     {
+        GameObject obj;
+        if (sectionPools[prefabIndex].Count > 0)
+            obj = sectionPools[prefabIndex].Dequeue();
+        else
+        {
+            obj = Instantiate(sectionPrefabs[prefabIndex]);
+            // Make sure the prefab knows its index
+            obj.GetComponent<Chunk>().chunkNum = prefabIndex + 1; // added 1 to compensate array's index 0
+        }
+
+        // probably remove?
+        /*var reset = obj.GetComponent<ResettableSection>();
+        if (reset != null)
+            reset.ResetSection();*/
+
+        // Reset everything that supports IResettable
+        foreach (var reset in obj.GetComponentsInChildren<IResettableChild>(true))
+        {
+            reset.ResetState();
+        }
+
+        obj.SetActive(true); // ensures OnEnable runs
+        return obj;
+
+        /*
         if (sectionPools[prefabIndex].Count > 0)
             return sectionPools[prefabIndex].Dequeue();
         else
@@ -149,13 +176,14 @@ public class GenerateLevel : MonoBehaviour, IResettable
             obj.SetActive(false);
             obj.GetComponent<Chunk>().chunkNum = prefabIndex;
             return obj;
-        }
+        }*/
     }
 
     private void ReturnToPool(GameObject section)
     {
         section.SetActive(false);
         section.transform.SetParent(null);
+
         Chunk chunkData = section.GetComponent<Chunk>();
         if (chunkData != null)
             sectionPools[chunkData.chunkNum].Enqueue(section);

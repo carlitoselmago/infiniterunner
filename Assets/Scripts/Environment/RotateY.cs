@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RotateY : MonoBehaviour
+public class RotateY : MonoBehaviour, IResettableChild
 {
     public GameObject rotatedObject;         // The object to rotate
     public Transform player;                 // The player (dynamic Z/Y, fixed X)
@@ -39,9 +39,21 @@ public class RotateY : MonoBehaviour
             // Stop once desired rotation is reached
             if (totalRotated >= rotationDegree)
             {
-                Debug.Log("Stop Rotation");
+                Debug.Log($"{name}: Stop Rotation");
                 this.enabled = false;
             }
+        } else
+        {
+            Debug.Log($"{name}: Rotation stopped after player's death");
+            this.enabled = false;
         }
+    }
+
+    // --- Reset hook for pooling ---
+    public void ResetState()
+    {
+        totalRotated = 0f;
+        this.enabled = true;
+        rotatedObject.transform.localRotation = Quaternion.identity;
     }
 }

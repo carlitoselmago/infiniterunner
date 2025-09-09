@@ -143,6 +143,7 @@ public class CollectableControl : MonoBehaviour, IResettable
                         if (seconds_to_elapse_index == 1)
                         {
                             firstAchievementMet = true;
+                            levelControl.GetComponent<GenerateSandstorm>().enabled = true;
                             levelControl.GetComponent<GenerateSandstorm>().StartSandstormGeneration();
                         }
                         StartCoroutine(hideachievement());

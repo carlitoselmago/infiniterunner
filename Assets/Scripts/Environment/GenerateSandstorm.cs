@@ -148,6 +148,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         sandstormVolume.weight = 0;
         sandstormParticles.Stop();
         StopCoroutine(GenerateTheSandstorm(0));
+        this.enabled = false;   // disable script until called again
     }
 
 }

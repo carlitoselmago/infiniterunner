@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Minecart : MonoBehaviour
+public class Minecart : MonoBehaviour, IResettable
 {
     public PlayerMove player;
     public Animator playerAnimator;
@@ -81,5 +81,10 @@ public class Minecart : MonoBehaviour
             yield return new WaitForSeconds(4);
             Destroy(rideCart);
         }
+    }
+
+    public void ResetState()
+    {
+        triggered = false;
     }
 }

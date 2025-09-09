@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HitLogic : MonoBehaviour
+public class HitLogic : MonoBehaviour, IResettable
 {
     public enum HitboxType { Normal, Jump, Crouch, None }
 
@@ -67,4 +67,9 @@ public class HitLogic : MonoBehaviour
         playerMove.ProcessTrigger(other);
     }
 
+    public void ResetState()
+    {
+        EnableHitbox(HitboxType.Normal); // default
     }
+
+}

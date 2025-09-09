@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class TriggerWall : MonoBehaviour
+public class TriggerWall : MonoBehaviour, IResettable
 {
     public GameObject triggeredObject;
     public bool triggered = false;
@@ -13,5 +13,11 @@ public class TriggerWall : MonoBehaviour
             triggeredObject.SetActive(true);
             triggered = true;
         }
+    }
+
+    public void ResetState()
+    {
+        triggeredObject.SetActive(false);
+        triggered = false;
     }
 }

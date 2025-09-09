@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class EndlessFall : MonoBehaviour
+public class EndlessFall : MonoBehaviour, IResettable
 {
     private float decelerationRate = 1000f;
     public PlayerMove player;
@@ -60,5 +60,11 @@ public class EndlessFall : MonoBehaviour
             yield return null;
         }
         player.moveSpeed = 0;
+    }
+
+    public void ResetState()
+    {
+        triggered = false;
+        isFalling = false;
     }
 }
