@@ -1,0 +1,36 @@
+using UnityEngine;
+
+public class ResettableObject : MonoBehaviour, IResettableChild, IResettable
+{
+    public bool wokeOnEnable = false; // define if the object waits for player to be moved, or it should move already before
+    private Vector3 startPos;
+    private Quaternion startRot;
+    private Rigidbody rb;
+
+    void Awake()
+    {
+        // Save the default local transform
+        startPos = transform.localPosition;
+        startRot = transform.localRotation;
+
+        rb = GetComponent<Rigidbody>();
+    }
+
+    public void ResetState()
+    {
+        // Reset physics
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            if (wokeOnEnable)
+                rb.WakeUp();
+            else
+                rb.Sleep();
+        }
+
+        // Reset transform to original local position/rotation
+        transform.localPosition = startPos;
+        transform.localRotation = startRot;
+    }
+}
