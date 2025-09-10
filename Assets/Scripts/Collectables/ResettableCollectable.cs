@@ -1,6 +1,6 @@
 /*using UnityEngine;
 
-public class ResettableCollectable : MonoBehaviour, IResettableChild
+public class ResettableCollectable : MonoBehaviour, IResettable
 {
     private Vector3 initialPos;
     private Quaternion initialRot;

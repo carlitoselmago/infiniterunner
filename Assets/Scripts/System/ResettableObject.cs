@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ResettableObject : MonoBehaviour, IResettableChild, IResettable
+public class ResettableObject : MonoBehaviour, IResettable
 {
     public bool wokeOnEnable = false; // define if the object waits for player to be moved, or it should move already before
     private Vector3 startPos;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ResettableAnimator : MonoBehaviour, IResettableChild
+public class ResettableAnimator : MonoBehaviour, IResettable
 {
     private Animator animator;
 
