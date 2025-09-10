@@ -12,16 +12,25 @@ public class Chunk : MonoBehaviour
 }
 
 
-/*using UnityEngine;
+/*
+ * TRY OUT!
+ * 
+ * using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
     public int chunkNum;
-    public int chunkLength;
+    public int baseLength = 25;          // default section length
+    public int overrideLength = -1;      // -1 means no override
 
-    private void OnEnable()
+    public int GetLength()
     {
-        GenerateLevel generator = FindObjectOfType<GenerateLevel>();
-        generator.UpdateZPos(chunkLength);
+        return (overrideLength > 0) ? overrideLength : baseLength;
     }
-}*/
+
+    public void RegisterLength(GenerateLevel generator)
+    {
+        generator.UpdateZPos(GetLength());
+    }
+}
+*/

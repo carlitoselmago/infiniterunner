@@ -14,7 +14,8 @@ public class GenerateLevel : MonoBehaviour, IResettable
     public bool creatingSection = false;
 
     public static bool disableMinefall = false;
-    public int mineEntryIndex = 41;
+    public int mineEntryIndex = 40;
+    private bool protectMineSection = false;
 
     public GameObject player;
     public GameObject MAP;
@@ -53,8 +54,8 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     private void ResetZPos()
     {
-        zPos = 100; // start point
-        //zPos = 200; // start point
+        //zPos = 100; // start point
+        zPos = 200; // start point
     }
 
     private void CachePrefabs()
@@ -67,6 +68,12 @@ public class GenerateLevel : MonoBehaviour, IResettable
             child.SetActive(false);
             sectionPrefabs[i] = child;
             sectionPools[i] = new Queue<GameObject>();
+
+            if (child.GetComponent<MineTemplateMarker>() != null)
+            {
+                mineEntryIndex = i;
+                Debug.Log($"Detected mine template at index {i} (name '{child.name}')");
+            }
         }
     }
 
@@ -89,9 +96,43 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
         if (activeSections.Count > 8)
         {
+            GameObject oldest = activeSections.Peek(); // look at first in queue
+            Chunk oldestChunk = oldest.GetComponent<Chunk>();
+
+            if (protectMineSection && oldestChunk != null && oldestChunk.chunkNum == mineEntryIndex)
+            {
+                // Keep the mine section until more are ahead
+                Debug.Log("Keeping mine section in queue for now.");
+            }
+            else
+            {
+                oldest = activeSections.Dequeue();
+                ReturnToPool(oldest);
+                protectMineSection = false; // after this, allow normal cleanup
+            }
+        }
+
+        /*
+        if (activeSections.Count > 8)
+        {
+            //experimental fix
+            GameObject oldest = activeSections.Peek(); // just check, don’t dequeue yet
+            Chunk chunkData = oldest.GetComponent<Chunk>();
+            if (protectMineSection && chunkData != null && chunkData.chunkNum == mineEntryIndex)
+            {
+                // Keep it until more sections are ahead
+                Debug.Log("Keeping mine section in queue for now.");
+            }
+            else
+            {
+                oldest = activeSections.Dequeue();
+                ReturnToPool(oldest);
+                protectMineSection = false; // once something else is removed, we can allow normal cleanup
+            }
+
             GameObject oldSection = activeSections.Dequeue();
             ReturnToPool(oldSection);
-        }
+        }*/
 
         creatingSection = false;
     }
@@ -115,24 +156,44 @@ public class GenerateLevel : MonoBehaviour, IResettable
     public void EnterMine()
     {
         Debug.Log("Generate Level entered mine");
+        Debug.Log($"EnterMine() — activeSections count before: {activeSections.Count}");
         Queue<GameObject> newActive = new Queue<GameObject>();
         GameObject mineEntry = null;
+
+        if (mineEntry != null)
+        {
+            newActive.Enqueue(mineEntry);
+            protectMineSection = true; // start protection
+        }
 
         while (activeSections.Count > 0)
         {
             GameObject section = activeSections.Dequeue();
             Chunk chunkData = section.GetComponent<Chunk>();
-            if (chunkData == null) continue;
+            int num = (chunkData != null) ? chunkData.chunkNum : -999;
+            Debug.Log($" Checking section '{section.name}' chunkNum={num}");
+
+
+            if (chunkData == null)
+            {
+                Debug.LogWarning($"  Section {section.name} has no Chunk component — returning to pool.");
+                ReturnToPool(section);
+                continue;
+            }
 
             if (chunkData.chunkNum != mineEntryIndex)
                 ReturnToPool(section);
             else
+            {
                 mineEntry = section;
+                Debug.Log(" --> Found mine entry here!");
+            }
         }
 
         if (mineEntry != null)
             newActive.Enqueue(mineEntry);
 
+        Debug.Log($"EnterMine() — newActive count after: {newActive.Count}");
         activeSections = newActive;
     }
 
@@ -160,33 +221,15 @@ public class GenerateLevel : MonoBehaviour, IResettable
         {
             obj = Instantiate(sectionPrefabs[prefabIndex]);
             // Make sure the prefab knows its index
-            obj.GetComponent<Chunk>().chunkNum = prefabIndex + 1; // added 1 to compensate array's index 0
+            obj.GetComponent<Chunk>().chunkNum = prefabIndex;
         }
-
-        // probably remove?
-        /*var reset = obj.GetComponent<ResettableSection>();
-        if (reset != null)
-            reset.ResetSection();*/
 
         // Reset everything that supports IResettable
-        foreach (var reset in obj.GetComponentsInChildren<IResettableChild>(true))
-        {
+        foreach (var reset in obj.GetComponentsInChildren<IResettable>(true))
             reset.ResetState();
-        }
 
         obj.SetActive(true); // ensures OnEnable runs
         return obj;
-
-        /*
-        if (sectionPools[prefabIndex].Count > 0)
-            return sectionPools[prefabIndex].Dequeue();
-        else
-        {
-            GameObject obj = Instantiate(sectionPrefabs[prefabIndex]);
-            obj.SetActive(false);
-            obj.GetComponent<Chunk>().chunkNum = prefabIndex;
-            return obj;
-        }*/
     }
 
     private void ReturnToPool(GameObject section)
