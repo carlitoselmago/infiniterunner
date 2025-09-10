@@ -1,15 +1,9 @@
-/*
- * 
- * 
- * 
- REMOVE
-
-
 using UnityEngine;
 
-public class GenerateTunnel : MonoBehaviour
+public class GenerateTunnel : MonoBehaviour, IResettable
 {
-    public GameObject minecartTunnel;
+    public GameObject object1;
+    public GameObject object2;
 
     private bool triggered = false; // ensures it only runs once
 
@@ -18,26 +12,27 @@ public class GenerateTunnel : MonoBehaviour
         if (other.CompareTag("Player") && !triggered)
         {
             triggered = true;
-            minecartTunnel.SetActive(true);
-/*
- *Removed section for splitting tunnels
- *
- *
+
             float activatedSection = Random.Range(0f, 1f);
 
             if (activatedSection >= 0.5f)
             {
-                walkTunnel.SetActive(true);
-                minecartTunnel.SetActive(false);
-                Debug.Log("Walk tunnel activated");
+                object1.SetActive(true);
+                object2.SetActive(false);
+                Debug.Log("Object 1 activated");
             }
             else
             {
-                minecartTunnel.SetActive(true);
-                walkTunnel.SetActive(false);
-                Debug.Log("Minecart tunnel activated");
+                object2.SetActive(true);
+                object1.SetActive(false);
+                Debug.Log("Object 2 activated");
             }
         }
     }
 
-}*/
+    public void ResetState()
+    {
+        triggered = false;
+    }
+
+}
