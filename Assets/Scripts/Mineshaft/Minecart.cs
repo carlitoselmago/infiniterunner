@@ -29,6 +29,12 @@ public class Minecart : MonoBehaviour, IResettable
             Debug.LogError("Minecart holder not found under player! Please create a child named 'minecart'.");
     }
 
+   void OnEnable()
+    {
+        if (!nonAnimatedMinecart.activeSelf)
+            nonAnimatedMinecart.SetActive(true);
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player") && !triggered)
@@ -85,6 +91,17 @@ public class Minecart : MonoBehaviour, IResettable
 
     public void ResetState()
     {
+        nonAnimatedMinecart.SetActive(true);
         triggered = false;
+
+        // --- Cleanup spawned carts in the holder ---
+        if (minecartHolder != null)
+        {
+            for (int i = minecartHolder.childCount - 1; i >= 0; i--)
+            {
+                Transform child = minecartHolder.GetChild(i);
+                child.gameObject.SetActive(false);
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ public class ResettableObject : MonoBehaviour, IResettable
     private Quaternion startRot;
     private Rigidbody rb;
 
-    void Awake()
+    void Start()
     {
         // Save the default local transform
         startPos = transform.localPosition;

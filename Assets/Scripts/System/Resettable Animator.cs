@@ -4,7 +4,7 @@ public class ResettableAnimator : MonoBehaviour, IResettable
 {
     private Animator animator;
 
-    void Awake()
+    void Start()
     {
         animator = GetComponent<Animator>();
     }

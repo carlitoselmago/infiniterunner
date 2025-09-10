@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RotateY : MonoBehaviour, IResettableChild
+public class RotateY : MonoBehaviour, IResettable
 {
     public GameObject rotatedObject;         // The object to rotate
     public Transform player;                 // The player (dynamic Z/Y, fixed X)

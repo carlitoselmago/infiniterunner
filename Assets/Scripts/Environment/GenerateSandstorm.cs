@@ -27,6 +27,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     public float chance = 0.5f;
     public bool generatingSandstorm = false;
     private bool sandstormGeneratorEnabled = false;
+    private bool triggered = false;
 
     private void Awake()
     {
@@ -44,6 +45,32 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         //RenderSettings.fogColor = fogColor;
         //RenderSettings.fogMode = FogMode.ExponentialSquared;
         //RenderSettings.fogDensity = minFogDensity;
+    }
+
+    void Update()
+    {
+        if (!generatingSandstorm) return;
+
+        if (MineData.isInTheMine)
+        {
+            StopTheSandstorm();
+            generatingSandstorm = false;
+        }
+
+        if (PlayerMove.isUnderwater && !triggered)
+        {
+            triggered = true;
+            StopAllCoroutines();
+            StartCoroutine(FadeFog(maxFogDensity, minFogDensity, 0.3f));
+            StartCoroutine(FadeVolumeAndParticles(1f, 0f, 0.3f));
+        }
+
+        if (PlayerMove.isDead)
+        {
+            StopAllCoroutines();
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
+            sandstormFX.Stop();
+        }
     }
 
     public void StartSandstormGeneration()
@@ -131,9 +158,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         sandstormVolume.weight = to;
         sandstormMaterial.SetFloat("_GlobalAlpha", to);
         if (to == 0f)
-        {
             sandstormParticles.Stop();
-        }
 
     }
 
@@ -153,6 +178,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         sandstormMaterial.SetFloat("_GlobalAlpha", 0f);
         sandstormVolume.weight = 0;
         sandstormParticles.Stop();
+        triggered = false;
         StopCoroutine(GenerateTheSandstorm(0));
         sandstormGeneratorEnabled = false;   // disable script until called again
     }

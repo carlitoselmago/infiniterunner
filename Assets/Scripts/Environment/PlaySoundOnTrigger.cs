@@ -5,7 +5,7 @@ public class PlaySoundOnTrigger : MonoBehaviour
     public GameObject targetWithAudio;
     private AudioSource audioSource;
 
-    void Start()
+    void Awake()
     {
     audioSource = targetWithAudio.GetComponent<AudioSource>();
     }

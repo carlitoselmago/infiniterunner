@@ -35,9 +35,7 @@ public class AchievementAnimations : MonoBehaviour
     void OnEnable()
     {
         if (!isAnimating)
-        {
             StartCoroutine(AnimateIn());
-        }
     }
 
     IEnumerator AnimateIn()

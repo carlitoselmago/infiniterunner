@@ -4,7 +4,7 @@ public class Spawner : MonoBehaviour
 {
     public float activationProbability = 0.5f; // (0.0 to 1.0)
 
-    void Start()
+    void Awake()
     {
         bool activateObject = Random.value < activationProbability;
         gameObject.SetActive(activateObject);

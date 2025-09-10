@@ -5,7 +5,7 @@ public class RotateObjectcoin : MonoBehaviour
     public float rotateSpeed = 1;
     private float startingPos = 0;
 
-    private void Start()
+    private void Awake()
     {
         startingPos = transform.position.z*8f;
         transform.Rotate(0,startingPos, 0, Space.Self);

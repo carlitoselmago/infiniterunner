@@ -7,7 +7,7 @@ public class WindBlow : MonoBehaviour
 
     private Vector3 startPos; // Starting local position of the cube
 
-    void Start()
+    void Awake()
     {
         startPos = transform.localPosition;
     }

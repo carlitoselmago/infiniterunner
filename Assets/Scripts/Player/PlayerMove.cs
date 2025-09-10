@@ -18,6 +18,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public static bool onMinecart = false;
     private bool mainThemeAlreadyPlaying = false;
     public static bool idle = true;
+    public static bool isUnderwater = false;
 
     [Header("Constrains")]  //(from Constrain.cs)
     public bool blockLeft = false;
@@ -39,8 +40,10 @@ public class PlayerMove : MonoBehaviour, IResettable
     public static bool isDead = false;
     public bool godmode = false;
 
+    [Header("Fly coins")]
     public GameObject flycoin;
     public int flycoinsamount = 30;
+    public Transform coinContainer;
     private List<GameObject> instantiatedCoins = new List<GameObject>();
 
     public GameObject godmodevisual;
@@ -52,6 +55,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     private Animator camAnimator;
 
     public GameObject mainCam;
+    public GameObject rocks;
 
     //sfx
     [Header("SFX")]
@@ -102,7 +106,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     private bool alreadyCrossedPanoptic = false;
     public AudioSource coinFX;
     public HurtMask hurtMaskScript;
-    public Minecart minecartObject;
+    public AudioSource minecartObject;
+    private bool triggered = false;
 
     public GameObject MAP;
 
@@ -449,7 +454,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 {
                     GameObject newcoin = Instantiate(flycoin, Vector3.zero, Quaternion.identity);
                     newcoin.transform.localPosition = new Vector3(this.transform.position.x, targetHeight, currentZ + (i * 3));
-                    newcoin.transform.SetParent(MAP.transform, false);
+                    newcoin.transform.SetParent(coinContainer, false);
                     instantiatedCoins.Add(newcoin);
                 }
                 StartCoroutine(FlyTimeout());
@@ -489,8 +494,8 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("car") && !godmode)
         {
-                var cb = other.GetComponent<Collider>();
-                if (cb != null) cb.enabled = false;
+                //var cb = other.GetComponent<Collider>();
+                //if (cb != null) cb.enabled = false;
                 camAnimator.SetBool("dead", true);
                 animator.SetTrigger("die");
                 carCrashSFX.Play();
@@ -500,22 +505,27 @@ public class PlayerMove : MonoBehaviour, IResettable
                 this.enabled = false; // Disable this script
         }
 
-        if (other.gameObject.CompareTag("minewall"))
+        if (other.gameObject.CompareTag("minewall") && !triggered)
         {
-            var cb = other.GetComponent<Collider>();
-            if (cb != null) cb.enabled = false;
+            //var cb = other.GetComponent<Collider>();
+            //if (cb != null) cb.enabled = false;
             camAnimator.SetBool("dead", true);
             if (onMinecart)
             {
                 animator.SetTrigger("minecartcollision");
                 minecartCrashSFX.Play();
-                minecartObject.minecartSFX.Stop();
+                carCrashSFX.Play();
+                minecartObject.Stop();
+                onMinecart = false;
+                triggered = true;
             }
             else
+            {
                 animator.SetTrigger("die");
-            carCrashSFX.Play();
-            Transform child = playerObject.transform.Find("rocks");
-            child.gameObject.SetActive(true);
+                carCrashSFX.Play();
+                triggered = true;
+            }
+            rocks.SetActive(true);
             Debug.Log("Entered in minewall collision with " + other);
             HideAllTutorialCards();
             collectableControl.HandlePlayerDeath();
@@ -831,6 +841,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         camAnimator.Rebind();
 
         // set position
+        rocks.SetActive(false);
         transform.position = startPosition;
         startY = transform.position.y;
         originY = startY;

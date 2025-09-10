@@ -35,8 +35,6 @@ public class MineEntry : MonoBehaviour, IResettable
                 Debug.Log("Entering the mine");
                 generateLevel.EnterMine();
                 StartCoroutine(FadeVolume(0f, 1f, 3f));
-                //generateSandstorm.StopTheSandstorm();
-                //levelControl.GetComponent<GenerateSandstorm>().sandstormActive = false;
             }
             else
             {
@@ -46,7 +44,6 @@ public class MineEntry : MonoBehaviour, IResettable
                 generateLevel.ExitMine();
                 StartCoroutine(FadeVolume(1f, 0f, 1.5f));
                 StartCoroutine(ReenableEndlessFall());
-                //levelControl.GetComponent<GenerateSandstorm>().sandstormActive = true;
             }
         }
     }

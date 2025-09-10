@@ -11,7 +11,7 @@ public class HitLogic : MonoBehaviour, IResettable
 
     private PlayerMove playerMove;
 
-    void Awake()
+    void Start()
     {
         playerMove = GetComponentInParent<PlayerMove>();
         // Ensure we have a kinematic Rigidbody so triggers reliably fire:
@@ -20,10 +20,7 @@ public class HitLogic : MonoBehaviour, IResettable
             rb = gameObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         rb.useGravity = false;
-    }
 
-    void Start()
-    {
         // Auto-find trigger colliders if not assigned
         Collider[] cols = GetComponents<Collider>();
         foreach (var c in cols)
@@ -38,6 +35,7 @@ public class HitLogic : MonoBehaviour, IResettable
 
         EnableHitbox(HitboxType.Normal); // default
     }
+
 
     /// <summary>
     /// Enables exactly one hitbox (Normal, Jump, Crouch), or disables all (None).

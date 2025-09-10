@@ -6,12 +6,12 @@ public class CarBehaviour : MonoBehaviour
     private float interval;
     public Animator animator;
 
-    void Start()
+    void Awake()
     {
         animator.enabled = false;
         interval = Random.Range(0f, 4f);
         StartCoroutine(Activate());
-    }
+    } 
 
     IEnumerator Activate()
     {

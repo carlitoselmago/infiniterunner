@@ -122,7 +122,6 @@ public class PrintCode : MonoBehaviour
         if (childTextComponents.Length != 10)
             Debug.LogError("canvasText should have exactly 10 child objects with Text components.");
 
-        // Ensure all children are initially inactive and setup their timeout
         foreach (Text text in childTextComponents)
         {
             text.gameObject.SetActive(false);

@@ -1,19 +1,13 @@
 using UnityEngine;
 
-public class GenerateTunnel : MonoBehaviour, IResettable
+public class GenerateTunnel : MonoBehaviour
 {
     public GameObject object1;
     public GameObject object2;
 
-    private bool triggered = false; // ensures it only runs once
-
-    void OnTriggerEnter(Collider other)
+    void Awake()
     {
-        if (other.CompareTag("Player") && !triggered)
-        {
-            triggered = true;
-
-            float activatedSection = Random.Range(0f, 1f);
+        float activatedSection = Random.Range(0f, 1f);
 
             if (activatedSection >= 0.5f)
             {
@@ -27,12 +21,5 @@ public class GenerateTunnel : MonoBehaviour, IResettable
                 object1.SetActive(false);
                 Debug.Log("Object 2 activated");
             }
-        }
     }
-
-    public void ResetState()
-    {
-        triggered = false;
-    }
-
 }

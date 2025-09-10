@@ -15,7 +15,7 @@ public class Flickering : MonoBehaviour
 
     private Coroutine flickerCoroutine;
 
-    private void Start()
+    private void Awake()
     {
         if (energyShield)
             shield = GetComponent<Renderer>();

@@ -23,12 +23,12 @@ public class WaterTrigger : MonoBehaviour, IResettable
         if (other.gameObject.CompareTag("Player") && !triggered)
         {
             triggered = true;
+            PlayerMove.isUnderwater = true;
             Debug.Log("Underwater");
             triggeredVolume.gameObject.SetActive(true);
             splashSound.SetActive(true);
 
             // Disable physics collider to prevent collisions with Ground while sinking
-            
             BoxCollider box = player.GetComponent<BoxCollider>();
             if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
             {
