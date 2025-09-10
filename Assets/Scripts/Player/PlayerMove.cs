@@ -477,10 +477,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 StartCoroutine(ApplyGlissando());
                 alreadyCrossedPanoptic = true;
             }
-            else if (alreadyCrossedPanoptic)
-            {
+            else
                 if (Random.value >= 0.5f) StartCoroutine(ApplyGlissando());
-            }
 
             if (!mainTheme.isPlaying && !panopticSFX.isPlaying && !canyonSFX.isPlaying && !pyramidsTheme.isPlaying) panopticSFX.Play();
         }
@@ -704,7 +702,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     IEnumerator PlayMainTheme()
     {
         yield return new WaitForSeconds(18);
-        if (!mainTheme.isPlaying && !pyramidsTheme.isPlaying && !flyFX.isPlaying)
+        if (!idle && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !flyFX.isPlaying)
         {
             mainTheme.Play();
             mainThemeAlreadyPlaying = true;
