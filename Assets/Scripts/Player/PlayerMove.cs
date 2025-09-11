@@ -351,10 +351,11 @@ public class PlayerMove : MonoBehaviour, IResettable
         }
 
         // Flying
-        if (floating)
+        if (floating) // removable bool altogether
             jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
         else
         {
+            // only interpolate while rising
             if (isFlying)
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
         }
@@ -635,6 +636,40 @@ public class PlayerMove : MonoBehaviour, IResettable
         while (holding) yield return new WaitForSeconds(1);
 
         camAnimator.SetBool("flying", false);
+        StartCoroutine(delayedGodmodeOff());
+        StartCoroutine(ChangePitchOverTime());
+        animator.SetBool("isflying", false);
+
+        // End flying immediately and let physics take over
+        isFlying = false;
+
+        // Re-enable physics (previously set to kinematic during flying)
+        playerBody.isKinematic = false;
+
+        // give a small downward velocity to ensure gravity immediately affects the player
+        // preserve horizontal components, override only y
+        Vector3 v = playerBody.velocity;
+        playerBody.velocity = new Vector3(v.x, -2f, v.z);
+
+        // optional small delay removed here — physics will do the rest
+        moveSpeed = initialmoveSpeed;
+
+        foreach (GameObject coin in instantiatedCoins) coin.SetActive(false);
+        instantiatedCoins.Clear();
+    }
+
+    /*
+    IEnumerator FlyTimeout()
+    {
+        yield return new WaitForSeconds(3);
+        tutorial2d.transform.Find("fly").gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(5);
+        tutorial2d.transform.Find("fly").gameObject.SetActive(false);
+
+        while (holding) yield return new WaitForSeconds(1);
+
+        camAnimator.SetBool("flying", false);
         //mainCam.GetComponent<Animator>().SetBool("flying", false);
         StartCoroutine(delayedGodmodeOff());
         StartCoroutine(ChangePitchOverTime());
@@ -651,7 +686,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         foreach (GameObject coin in instantiatedCoins) coin.SetActive(false);
         instantiatedCoins.Clear();
-    }
+    }*/
 
     IEnumerator PitchShiftTimeout()
     {
