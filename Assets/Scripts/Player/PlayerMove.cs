@@ -13,7 +13,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public bool isJumping = false;
     public bool isRolling = false;
     public bool isFlying = false;
-    public bool floating = false;
+    //public bool floating = false;
     public bool holding = false;
     public static bool onMinecart = false;
     private bool mainThemeAlreadyPlaying = false;
@@ -351,14 +351,14 @@ public class PlayerMove : MonoBehaviour, IResettable
         }
 
         // Flying
-        if (floating) // removable bool altogether
-            jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
-        else
-        {
+        //if (floating) // removable bool altogether
+        //    jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
+        //else
+        //{
             // only interpolate while rising
             if (isFlying)
                 startY = interpolateValueY(true, startY, targetHeight, 1f);
-        }
+        //}
 
         // Holding
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
@@ -371,7 +371,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // Raycast ground detection
         UpdateGroundTracking();
-        if (!isJumping && !isFlying && !floating)
+        if (!isJumping && !isFlying /*&& !floating*/)
             ApplyVerticalMovement();
     }
 
