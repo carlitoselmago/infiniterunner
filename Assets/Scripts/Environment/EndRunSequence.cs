@@ -15,6 +15,7 @@ public class EndRunSequence : MonoBehaviour
     public GameObject gameOverText;
     public GameObject highScoreDisplay;
     public GameObject levelControl;
+    public GameObject highScoreCelebration;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
 
@@ -42,6 +43,8 @@ public class EndRunSequence : MonoBehaviour
         endCoinCount.SetActive(true);
         highScoreDisplay.SetActive(true);
         fadeOut.SetActive(true);
+        if (CollectableControl.highScoreAchieved && highScoreCelebration != null)
+            highScoreCelebration.SetActive(true);   // assign and check for timing
 
         // Animate UI
         yield return new WaitForSeconds(2);
