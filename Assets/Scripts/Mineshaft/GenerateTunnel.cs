@@ -5,7 +5,7 @@ public class GenerateTunnel : MonoBehaviour
     public GameObject object1;
     public GameObject object2;
 
-    void Awake()
+    void OnEnable()
     {
         float activatedSection = Random.Range(0f, 1f);
 

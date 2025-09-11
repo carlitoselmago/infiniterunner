@@ -6,7 +6,7 @@ public class DestroyObject : MonoBehaviour
     [Tooltip("The object that will be destroyed if overlapped")]
     public GameObject destroyedObject;
 
-    void Awake()
+    void OnEnable()
     {
         StartCoroutine(CheckAndDestroy());
     }

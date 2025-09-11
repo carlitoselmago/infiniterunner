@@ -25,9 +25,7 @@ public class HighestScore : MonoBehaviour, IResettable
         // Cache initial state of cogs and all child rigidbodies
         cogStartStates = new Dictionary<Rigidbody, (Vector3, Quaternion)>();
         foreach (var rb in cogs.GetComponentsInChildren<Rigidbody>())
-        {
             cogStartStates[rb] = (rb.transform.position, rb.transform.rotation);
-        }
 
         gameObject.SetActive(false);
         cogs.SetActive(false);

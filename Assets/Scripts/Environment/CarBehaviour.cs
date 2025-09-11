@@ -6,7 +6,7 @@ public class CarBehaviour : MonoBehaviour
     private float interval;
     public Animator animator;
 
-    void Awake()
+    void OnEnable()
     {
         animator.enabled = false;
         interval = Random.Range(0f, 4f);

@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class Constrain : MonoBehaviour
 {
@@ -29,4 +29,4 @@ public class Constrain : MonoBehaviour
             triggered = true;
             player.SetConstrainedPositions(constrainLeft, constrainCenter, constrainRight);
     }
-}
+}*/
