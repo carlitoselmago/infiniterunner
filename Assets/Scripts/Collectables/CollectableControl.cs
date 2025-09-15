@@ -167,8 +167,8 @@ public class CollectableControl : MonoBehaviour, IResettable
             }
         }
 
-        // Clear High Scores pressing R
-        if (Input.GetKeyDown(KeyCode.R))
+        // Clear High Scores pressing C
+        if (Input.GetKeyDown(KeyCode.C))
         {
             SessionData.ClearHighScore();
             highScore = 0;
