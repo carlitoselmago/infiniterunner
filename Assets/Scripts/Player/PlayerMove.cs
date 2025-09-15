@@ -22,12 +22,12 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     [Header("Constrains")]  //(from Constrain.cs)
     public bool blockLeft = false;
-    public bool blockCenter = false;
     public bool blockRight = false;
 
     // raycast
     [Header("Raycast")]
     public LayerMask groundLayer;
+    public LayerMask wallLayer;
     public float rayLength = 0.7f;
     public float raycastHeightOffset = 0.5f;
     public bool isGrounded = false;
@@ -244,9 +244,10 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (tutorialcard == "left") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
+                if (blockLeft) return;
+
                 if (pos == "center") // Pressing left from center goes to left
                 {
-                    if (blockLeft) return;
                     pos = "left";
                     if (onMinecart)
                     {
@@ -256,7 +257,6 @@ public class PlayerMove : MonoBehaviour, IResettable
                 }
                 else if (pos == "right") // Pressing left when at right goes to center
                 {
-                    if (blockCenter) return;
                     pos = "center";
                     if (onMinecart)
                     {
@@ -277,9 +277,10 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (tutorialcard == "right") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
+                if (blockRight) return;
+
                 if (pos == "center") // Pressing right from center goes to right
                 {
-                    if (blockRight) return;
                     pos = "right";
                     if (onMinecart)
                     {
@@ -289,7 +290,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 }
                 else if (pos == "left") // Pressing right when at left goes to center
                 {
-                    if (blockCenter) return;
+                    if (blockRight) return;
                     pos = "center";
                     if (onMinecart)
                     {
@@ -810,14 +811,35 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (boxCollider == null) return;
         float feetOffset = transform.position.y + boxCollider.center.y - (boxCollider.size.y / 2f);
         Vector3 rayOrigin = new Vector3(transform.position.x, feetOffset + raycastHeightOffset, transform.position.z);
+
+        // Ground detection
         Ray ray = new Ray(rayOrigin, Vector3.down);
         Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
-
         // Optional test: remove Ray definition and replace if statement by this:
         //if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
 
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer)) isGrounded = true;
         else isGrounded = false;
+
+        // Wall detection
+        Ray leftRay = new Ray(rayOrigin, Vector3.left); // experimental: to be used in wall detection
+        Ray rightRay = new Ray(rayOrigin, Vector3.right);
+        Debug.DrawRay(rayOrigin, Vector3.left * rayLength*2, Color.green);
+        Debug.DrawRay(rayOrigin, Vector3.right * rayLength*2, Color.green);
+
+        if (Physics.Raycast(leftRay, out RaycastHit leftHit, rayLength * 2, wallLayer))
+        {
+            blockLeft = true;
+            Debug.Log("Left Ray hit: " + leftHit.collider.name);
+        }
+        else blockLeft = false;
+
+        if (Physics.Raycast(rightRay, out RaycastHit rightHit, rayLength * 2, wallLayer))
+        {
+            blockRight = true;
+            Debug.Log("Right Ray hit: " + rightHit.collider.name);
+        }
+        else blockRight = false;
     }
 
     // review so falling stops or eases out playerMove (falling without the map scrolling)
