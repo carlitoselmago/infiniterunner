@@ -20,6 +20,18 @@ public class EndRunSequence : MonoBehaviour
 
     void OnEnable()
     {
+        // Show end screen
+        Text txt = gameOverText.GetComponent<Text>();
+        if (CollectableControl.highScoreAchieved)
+        {
+            txt.text = "NOU RÈCORD!";
+            StartCoroutine(PopTextAnimation(txt));
+            CollectableControl.achievementShown = true;
+        }
+        else txt.text = "GAME OVER";
+        endScreen.SetActive(true);
+        gameOverText.SetActive(true);
+
         StartCoroutine(EndSequence());
     }
 
@@ -33,15 +45,6 @@ public class EndRunSequence : MonoBehaviour
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 1.5f, 0f));
         levelControl.GetComponent<GenerateSandstorm>().enabled = false;
 
-        // Show end screen
-        Text txt = gameOverText.GetComponent<Text>();
-
-        if (CollectableControl.highScoreAchieved)
-            txt.text = "NOU RÈCORD!";
-        else
-            txt.text = "GAME OVER";
-
-        endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
 
         // Show normal Game Over or High Score celebration
@@ -76,6 +79,26 @@ public class EndRunSequence : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         ResetGame();
+    }
+
+    IEnumerator PopTextAnimation(Text txt)
+    {
+        float duration = 1.5f;
+        float elapsed = 0f;
+        Vector3 startScale = Vector3.zero;
+        Vector3 endScale = Vector3.one;
+
+        gameOverText.transform.localScale = startScale;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            t = Mathf.Sin(t * Mathf.PI * 0.5f);
+            gameOverText.transform.localScale = Vector3.Lerp(startScale, endScale, t);
+            yield return null;
+        }
+        gameOverText.transform.localScale = endScale;
     }
 
     private void ResetGame()

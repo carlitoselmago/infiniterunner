@@ -82,9 +82,7 @@ public class HighestScore : MonoBehaviour, IResettable
     {
         Rigidbody rb = other.attachedRigidbody;
         if (rb != null)
-        {
             rb.AddExplosionForce(explosionForce, transform.position, maxRadius, explosionUpward, ForceMode.Impulse);
-        }
     }
 
     public void ResetState()
@@ -107,7 +105,7 @@ public class HighestScore : MonoBehaviour, IResettable
         }
 
         animator.Rebind();
-        animator.Update(0f);
+        //animator.Update(0f);
     }
 }
 

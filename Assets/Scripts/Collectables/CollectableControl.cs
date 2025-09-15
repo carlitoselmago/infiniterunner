@@ -44,7 +44,7 @@ public class CollectableControl : MonoBehaviour, IResettable
     //list of time compliments
     private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL", "MORIRÀS TREBALLANT", "NO HI HA FUTUR" };
 
-    public bool achievementShown = false; //used to prevent collisions between score and time achievements
+    public static bool achievementShown = false; //used to prevent collisions between score and time achievements
     public bool runtimeHighScoreTriggered = false;
 
     //audio
@@ -79,7 +79,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             SessionData.sessionHighScore = highScore;
             if (savingPlayerPrefences)
                 SessionData.UpdateHighScore(highScore, savingPlayerPrefences);
-            highScoreText = "NOU RÈCORD!";
+            highScoreText = "";
             Debug.Log("New high score saved: " + highScore);
         }
         else if (coinCount <= highScore)
