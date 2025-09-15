@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Flickering : MonoBehaviour
 {
-    public Light pointLight;
+    private Light componentLight;
     public float minIntensity = 0.5f;
     public float maxIntensity = 1.5f;
     public float minWaitTime = 0.1f;
@@ -17,17 +17,16 @@ public class Flickering : MonoBehaviour
 
     private void Awake()
     {
+        componentLight = GetComponent<Light>();
+
         if (energyShield)
             shield = GetComponent<Renderer>();
-
-        // If the GameObject is enabled at the start, start the flickering coroutine
-        if (gameObject.activeInHierarchy)
-            flickerCoroutine = StartCoroutine(Flicker());
     }
 
     private void OnEnable()
     {
-        flickerCoroutine = StartCoroutine(Flicker());
+        if (componentLight != null)
+            flickerCoroutine = StartCoroutine(Flicker());
     }
 
     private void OnDisable()
@@ -49,7 +48,7 @@ public class Flickering : MonoBehaviour
             if (isFlickering)
             {
                 // Set random intensity
-                pointLight.intensity = Random.Range(minIntensity, maxIntensity);
+                componentLight.intensity = Random.Range(minIntensity, maxIntensity);
 
                 if (energyShield)
                     shield.enabled = !shield.enabled;
@@ -58,7 +57,7 @@ public class Flickering : MonoBehaviour
                 yield return new WaitForSeconds(Random.Range(0.05f, 0.1f));
 
                 // Reset intensity to its original value
-                pointLight.intensity = maxIntensity;
+                componentLight.intensity = maxIntensity;
             }
         }
     }

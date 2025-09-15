@@ -16,6 +16,8 @@ public class RotateY : MonoBehaviour, IResettable
         // Store rotation center using fixed X (e.g., the initial X of player or scene-defined)
         // Lock X to a specific value. Example: 0
         rotationCenter = new Vector3(0f, player.position.y, player.position.z);
+        // reset rotation (experimental, confirm working)
+        rotatedObject.transform.localRotation = Quaternion.identity;
     }
 
     void Update()
@@ -49,7 +51,6 @@ public class RotateY : MonoBehaviour, IResettable
         }
     }
 
-    // --- Reset hook for pooling ---
     public void ResetState()
     {
         totalRotated = 0f;

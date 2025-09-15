@@ -20,7 +20,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     public GameObject player;
     public GameObject MAP;
-    private int resumeAhead = 300;
+    private int resumeAhead = 450;
     public int secNum;
 
     // --- Active sections in play ---
@@ -29,7 +29,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
     // --- Pool of reusable sections ---
     private Dictionary<int, Queue<GameObject>> sectionPools = new Dictionary<int, Queue<GameObject>>();
 
-    void Awake() // or STart???
+    void Awake()
     {
         Debug.Log("Started GenerateLevel");
         ResetZPos();
@@ -49,14 +49,6 @@ public class GenerateLevel : MonoBehaviour, IResettable
             GenerateSection();
             generatedSections++;
         }
-
-        /*
-        if (MAP.transform.position.z < -zPos + (stepamount * 4) && !creatingSection)
-        {
-            creatingSection = true;
-            GenerateSection();
-            generatedSections++;
-        }*/
     }
 
     public void UpdateZPos(int addedLength)
