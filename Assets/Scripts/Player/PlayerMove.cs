@@ -246,7 +246,11 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (tutorialcard == "left") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
-                if (blockLeft) return;
+                if (blockLeft)
+                {
+                    animator.SetTrigger("blockleft");
+                    return;
+                }
 
                 if (pos == "center") // Pressing left from center goes to left
                 {
@@ -279,7 +283,11 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (tutorialcard == "right") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
             if (!isFlying)
             {
-                if (blockRight) return;
+                if (blockRight)
+                {
+                    animator.SetTrigger("blockright");
+                    return;
+                }
 
                 if (pos == "center") // Pressing right from center goes to right
                 {
@@ -292,7 +300,6 @@ public class PlayerMove : MonoBehaviour, IResettable
                 }
                 else if (pos == "left") // Pressing right when at left goes to center
                 {
-                    if (blockRight) return;
                     pos = "center";
                     if (onMinecart)
                     {
@@ -354,14 +361,8 @@ public class PlayerMove : MonoBehaviour, IResettable
         }
 
         // Flying
-        //if (floating) // removable bool altogether
-        //    jumpedHeight = interpolateValueY(false, jumpedHeight, originY, 2.8f);
-        //else
-        //{
-            // only interpolate while rising
-            if (isFlying)
-                startY = interpolateValueY(true, startY, targetHeight, 1f);
-        //}
+        if (isFlying)
+            startY = interpolateValueY(true, startY, targetHeight, 1f);
 
         // Holding
         if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow))
@@ -374,7 +375,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // Raycast ground detection
         UpdateGroundTracking();
-        if (!isJumping && !isFlying /*&& !floating*/)
+        if (!isJumping && !isFlying)
             ApplyVerticalMovement();
     }
 
@@ -392,7 +393,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
-                var bc = other.GetComponent<BoxCollider>();
+                var bc = other.GetComponent<Collider>();
                 if (bc != null) bc.enabled = false;
 
                 if (remainingHealth <= 0)
@@ -573,13 +574,6 @@ public class PlayerMove : MonoBehaviour, IResettable
         tutorialText.SetActive(true);
     }
 
-    public void SetConstrainedPositions(bool left, bool center, bool right)
-    {
-        //blockLeft = left;
-        //blockCenter = center;
-        //blockRight = right;
-    }
-
     public void SetJumping (bool jumping)
     {
         isJumping = jumping;
@@ -645,51 +639,17 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // End flying immediately and let physics take over
         isFlying = false;
-
-        // Re-enable physics (previously set to kinematic during flying)
         playerBody.isKinematic = false;
 
         // give a small downward velocity to ensure gravity immediately affects the player
-        // preserve horizontal components, override only y
         Vector3 v = playerBody.velocity;
         playerBody.velocity = new Vector3(v.x, -2f, v.z);
 
-        // optional small delay removed here — physics will do the rest
         moveSpeed = initialmoveSpeed;
 
         foreach (GameObject coin in instantiatedCoins) coin.SetActive(false);
         instantiatedCoins.Clear();
     }
-
-    /*
-    IEnumerator FlyTimeout()
-    {
-        yield return new WaitForSeconds(3);
-        tutorial2d.transform.Find("fly").gameObject.SetActive(true);
-
-        yield return new WaitForSeconds(5);
-        tutorial2d.transform.Find("fly").gameObject.SetActive(false);
-
-        while (holding) yield return new WaitForSeconds(1);
-
-        camAnimator.SetBool("flying", false);
-        //mainCam.GetComponent<Animator>().SetBool("flying", false);
-        StartCoroutine(delayedGodmodeOff());
-        StartCoroutine(ChangePitchOverTime());
-        floating = true;
-        animator.SetBool("isflying", false);
-        jumpedHeight = this.transform.position.y;
-        yield return new WaitForSeconds(1);
-
-        isFlying = false;
-        yield return new WaitForSeconds(1);
-        floating = false;
-        moveSpeed = initialmoveSpeed;
-        playerBody.isKinematic = false;
-
-        foreach (GameObject coin in instantiatedCoins) coin.SetActive(false);
-        instantiatedCoins.Clear();
-    }*/
 
     IEnumerator PitchShiftTimeout()
     {
@@ -819,7 +779,6 @@ public class PlayerMove : MonoBehaviour, IResettable
         Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
         // Optional test: remove Ray definition and replace if statement by this:
         //if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
-
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer)) isGrounded = true;
         else isGrounded = false;
 
@@ -844,7 +803,6 @@ public class PlayerMove : MonoBehaviour, IResettable
         else blockRight = false;
     }
 
-    // review so falling stops or eases out playerMove (falling without the map scrolling)
     void ApplyVerticalMovement()
     {
         if (!isGrounded)
