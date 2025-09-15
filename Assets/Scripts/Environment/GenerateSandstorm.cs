@@ -68,7 +68,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         if (PlayerMove.isDead)
         {
             StopAllCoroutines();
-            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 2f, 0f));
             sandstormFX.Stop();
         }
     }
@@ -173,6 +173,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     public void ResetState()
     {
         StopTheSandstorm();
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 2f, 0f));
         generatingSandstorm = false;
         RenderSettings.fogDensity = 0;
         sandstormMaterial.SetFloat("_GlobalAlpha", 0f);
