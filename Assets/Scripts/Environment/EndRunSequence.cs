@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
 using UnityEngine;
-//using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
@@ -35,19 +34,38 @@ public class EndRunSequence : MonoBehaviour
         levelControl.GetComponent<GenerateSandstorm>().enabled = false;
 
         // Show end screen
+        Text txt = gameOverText.GetComponent<Text>();
+
+        if (CollectableControl.highScoreAchieved)
+            txt.text = "NOU RÈCORD!";
+        else
+            txt.text = "GAME OVER";
+
         endScreen.SetActive(true);
         yield return new WaitForSeconds(1);
-        gameOverFX.Play();
+
+        // Show normal Game Over or High Score celebration
+        if (CollectableControl.highScoreAchieved && highScoreCelebration != null)
+                highScoreCelebration.SetActive(true);
+        else
+            gameOverFX.Play();
+
         endCoinCount.GetComponent<Text>().text = "Has recollit " + CollectableControl.coinCount + " monedes. \n" + CollectableControl.lastAchievementText;
         highScoreDisplay.GetComponent<Text>().text = CollectableControl.highScoreText;
         endCoinCount.SetActive(true);
         highScoreDisplay.SetActive(true);
+        //fadeOut.SetActive(true);
+
+        if (CollectableControl.highScoreAchieved)
+            yield return new WaitForSeconds(5f);
         fadeOut.SetActive(true);
-        if (CollectableControl.highScoreAchieved && highScoreCelebration != null)
-            highScoreCelebration.SetActive(true);   // assign and check for timing
 
         // Animate UI
-        yield return new WaitForSeconds(2);
+        if (CollectableControl.highScoreAchieved)
+            yield return new WaitForSeconds(2f);
+        else
+            yield return new WaitForSeconds(2f);
+
         gameOverText.GetComponent<Animator>().enabled = true;
         gameOverText.GetComponent<Animator>().Play("FadeOutText");
         endCoinCount.GetComponent<Animator>().enabled = true;
@@ -55,10 +73,9 @@ public class EndRunSequence : MonoBehaviour
         highScoreDisplay.GetComponent<Animator>().enabled = true;
         highScoreDisplay.GetComponent<Animator>().Play("FadeOutText");
 
-        //yield return new WaitForSeconds(2.5f);
         yield return new WaitForSeconds(2f);
+
         ResetGame();
-        //SceneManager.LoadScene(0);
     }
 
     private void ResetGame()
@@ -71,7 +88,6 @@ public class EndRunSequence : MonoBehaviour
         // Re-enable gameplay systems
         player.enabled = true;
         //levelControl.GetComponent<GenerateSandstorm>().enabled = true;
-
 
         // Hide end screen UI
         endScreen.SetActive(false);
