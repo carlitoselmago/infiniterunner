@@ -21,10 +21,7 @@ public class FloatingObject : MonoBehaviour
             enabled = false;
             return;
         }
-    }
 
-    private void OnEnable()
-    {
         // Calculate Z offset from map's position at start
         initialZOffset = transform.position.z - mapTransform.position.z;
         startRot = transform.rotation;
