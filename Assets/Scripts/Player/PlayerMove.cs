@@ -222,6 +222,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                     tutorial2d.transform.Find("touch-cards").gameObject.SetActive(false);
                     //startingText.SetActive(false);
                     timer = 0f;
+                    bool stretchArmsAnimation = Random.value > 0.65f;
+                    if (stretchArmsAnimation) animator.SetTrigger("stretch");
                 }
             }
         }
