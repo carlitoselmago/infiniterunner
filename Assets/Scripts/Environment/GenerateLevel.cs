@@ -203,7 +203,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
     public void ExitMine()
     {
         int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
-        zPos = mapFront + 50; // just a safety buffer, not 530
+        zPos = mapFront + 150; // just a safety buffer (resume ahead)
 
         Debug.Log($"ExitMine: MAP.z = {MAP.transform.position.z}, mapFront = {mapFront}, zPos set to {zPos}");
 
