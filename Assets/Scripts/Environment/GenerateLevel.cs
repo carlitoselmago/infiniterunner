@@ -157,9 +157,9 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     public void EnterMine()
     {
-        Debug.Log("Generate Level entered mine");
+        //Debug.Log("Generate Level entered mine");
         minePresent = false;
-        Debug.Log($"EnterMine() — activeSections count before: {activeSections.Count}");
+        //Debug.Log($"EnterMine() — activeSections count before: {activeSections.Count}");
         Queue<GameObject> newActive = new Queue<GameObject>();
         GameObject mineEntry = null;
 
@@ -189,23 +189,23 @@ public class GenerateLevel : MonoBehaviour, IResettable
             else
             {
                 mineEntry = section;
-                Debug.Log(" --> Found mine entry here!");
+                //Debug.Log(" --> Found mine entry here!");
             }
         }
 
         if (mineEntry != null)
             newActive.Enqueue(mineEntry);
 
-        Debug.Log($"EnterMine() — newActive count after: {newActive.Count}");
+        //Debug.Log($"EnterMine() — newActive count after: {newActive.Count}");
         activeSections = newActive;
     }
 
     public void ExitMine()
     {
         int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
-        zPos = mapFront + 150; // just a safety buffer (resume ahead)
+        zPos = mapFront + 100; // just a safety buffer (resume ahead)
 
-        Debug.Log($"ExitMine: MAP.z = {MAP.transform.position.z}, mapFront = {mapFront}, zPos set to {zPos}");
+        //Debug.Log($"ExitMine: MAP.z = {MAP.transform.position.z}, mapFront = {mapFront}, zPos set to {zPos}");
 
         //creatingSection = true;
         //StartCoroutine(ResumeGenerationNextFrame());

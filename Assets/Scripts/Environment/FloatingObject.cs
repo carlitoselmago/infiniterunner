@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FloatingObject : MonoBehaviour
+public class FloatingObject : MonoBehaviour, IResettable
 {
     public Transform mapTransform;           // Assign your scrolling map here
 
@@ -10,8 +10,16 @@ public class FloatingObject : MonoBehaviour
     public float bobAmount = 0.05f;          // Amount of bobbing
     public float tiltAmount = 2f;            // Max rocking tilt in degrees
 
-    private float initialZOffset;
     private Quaternion startRot;
+
+    private Vector3 initialLocalPos;
+    private Quaternion initialLocalRot;
+
+    void Awake()
+    {
+        initialLocalPos = transform.localPosition;
+        initialLocalRot = transform.localRotation;
+    }
 
     void Start()
     {
@@ -22,16 +30,13 @@ public class FloatingObject : MonoBehaviour
             return;
         }
 
-        // Calculate Z offset from map's position at start
-        initialZOffset = transform.position.z - mapTransform.position.z;
         startRot = transform.rotation;
     }
 
     void Update()
     {
-        // Maintain Z offset from scrolling map
-        Vector3 pos = transform.position;
-        pos.z = mapTransform.position.z + initialZOffset;
+        // Keep base local position relative to map
+        Vector3 pos = mapTransform.TransformPoint(initialLocalPos);
 
         // Bobbing motion on Y axis
         float bobOffset = Mathf.Sin(Time.time * bobSpeed + transform.position.x) * bobAmount;
@@ -45,5 +50,12 @@ public class FloatingObject : MonoBehaviour
         float tiltZ = Mathf.Cos(Time.time * bobSpeed * 0.9f) * tiltAmount;
         Quaternion targetRot = Quaternion.Euler(tiltX, startRot.eulerAngles.y, tiltZ);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 0.5f);
+    }
+
+    public void ResetState()
+    {
+        transform.localPosition = initialLocalPos;
+        transform.localRotation = initialLocalRot;
+        startRot = transform.rotation;
     }
 }

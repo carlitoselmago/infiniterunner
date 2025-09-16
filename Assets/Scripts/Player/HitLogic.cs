@@ -36,10 +36,7 @@ public class HitLogic : MonoBehaviour, IResettable
         EnableHitbox(HitboxType.Normal); // default
     }
 
-
-    /// <summary>
     /// Enables exactly one hitbox (Normal, Jump, Crouch), or disables all (None).
-    /// </summary>
     public void EnableHitbox(HitboxType type)
     {
         if (normalHitbox != null) normalHitbox.enabled = (type == HitboxType.Normal);

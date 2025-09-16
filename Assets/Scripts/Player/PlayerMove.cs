@@ -392,7 +392,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 printCodeScript.SetCodePrompt("dead");
                 StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
-                Debug.Log("Entered in collision with " + other);
+                Debug.Log("Entered in collision with" + other);
                 var bc = other.GetComponent<Collider>();
                 if (bc != null) bc.enabled = false;
 
@@ -791,14 +791,14 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (Physics.Raycast(leftRay, out RaycastHit leftHit, rayLength * 2, wallLayer))
         {
             blockLeft = true;
-            Debug.Log("Left Ray hit: " + leftHit.collider.name);
+            //Debug.Log("Left Ray hit: " + leftHit.collider.name);
         }
         else blockLeft = false;
 
         if (Physics.Raycast(rightRay, out RaycastHit rightHit, rayLength * 2, wallLayer))
         {
             blockRight = true;
-            Debug.Log("Right Ray hit: " + rightHit.collider.name);
+            //Debug.Log("Right Ray hit: " + rightHit.collider.name);
         }
         else blockRight = false;
     }

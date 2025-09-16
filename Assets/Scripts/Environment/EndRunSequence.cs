@@ -24,11 +24,16 @@ public class EndRunSequence : MonoBehaviour
         Text txt = gameOverText.GetComponent<Text>();
         if (CollectableControl.highScoreAchieved)
         {
-            txt.text = "NOU RÈCORD!";
-            StartCoroutine(PopTextAnimation(txt));
             CollectableControl.achievementShown = true;
+            txt.text = "NOU RÈCORD!";
+            StartCoroutine(PopTextAnimation(txt, 0.65f));
         }
-        else txt.text = "GAME OVER";
+        else
+        {
+            txt.text = "GAME OVER";
+            StartCoroutine(PopTextAnimation(txt, 2f));
+        }
+
         endScreen.SetActive(true);
         gameOverText.SetActive(true);
 
@@ -81,9 +86,8 @@ public class EndRunSequence : MonoBehaviour
         ResetGame();
     }
 
-    IEnumerator PopTextAnimation(Text txt)
+    IEnumerator PopTextAnimation(Text txt, float duration)
     {
-        float duration = 1.5f;
         float elapsed = 0f;
         Vector3 startScale = Vector3.zero;
         Vector3 endScale = Vector3.one;

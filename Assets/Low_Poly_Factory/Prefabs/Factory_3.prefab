@@ -239,6 +239,7 @@ GameObject:
   - component: {fileID: 6994883838394120963}
   - component: {fileID: 3910211074519613712}
   - component: {fileID: 4242766787656164246}
+  - component: {fileID: 7194750424125907533}
   m_Layer: 0
   m_Name: Smoke (3)
   m_TagString: Untagged
@@ -832,7 +833,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 10000
+    maxNumParticles: 18000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -1098,7 +1099,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4000
+      scalar: 3500
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -1151,7 +1152,7 @@ ParticleSystem:
     rateOverDistance:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 30
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -5056,6 +5057,18 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &7194750424125907533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2373058583941065136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4c022c42a9b4952af7d02e7a4fb137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3120162805135352772
 GameObject:
   m_ObjectHideFlags: 0
@@ -5067,6 +5080,7 @@ GameObject:
   - component: {fileID: 518385765334913108}
   - component: {fileID: 2610493942058366376}
   - component: {fileID: 4819274710949610088}
+  - component: {fileID: 6299246441107433653}
   m_Layer: 0
   m_Name: Smoke (2)
   m_TagString: Untagged
@@ -5660,7 +5674,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 10000
+    maxNumParticles: 18000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -5926,7 +5940,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4000
+      scalar: 3500
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -5979,7 +5993,7 @@ ParticleSystem:
     rateOverDistance:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 30
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -9884,6 +9898,18 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &6299246441107433653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3120162805135352772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4c022c42a9b4952af7d02e7a4fb137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5483984428301950673
 GameObject:
   m_ObjectHideFlags: 0
@@ -9931,7 +9957,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989ffbbaa58ae4aefa05d69a98ee5c3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activationProbability: 0.6
+  activationProbability: 0.5
 --- !u!1 &8883665470035030410
 GameObject:
   m_ObjectHideFlags: 0
@@ -9943,6 +9969,7 @@ GameObject:
   - component: {fileID: 5581750173191943667}
   - component: {fileID: 4151032884810941426}
   - component: {fileID: 1871083949156202768}
+  - component: {fileID: 2387160475868917471}
   m_Layer: 0
   m_Name: Smoke (4)
   m_TagString: Untagged
@@ -10536,7 +10563,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 10000
+    maxNumParticles: 18000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -10802,7 +10829,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4000
+      scalar: 3500
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -10855,7 +10882,7 @@ ParticleSystem:
     rateOverDistance:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 30
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -14760,3 +14787,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &2387160475868917471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8883665470035030410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4c022c42a9b4952af7d02e7a4fb137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
