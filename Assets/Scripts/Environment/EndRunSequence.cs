@@ -20,23 +20,9 @@ public class EndRunSequence : MonoBehaviour
 
     void OnEnable()
     {
-        // Show end screen
-        Text txt = gameOverText.GetComponent<Text>();
-        if (CollectableControl.highScoreAchieved)
-        {
-            CollectableControl.achievementShown = true;
-            txt.text = "NOU RÈCORD!";
-            StartCoroutine(PopTextAnimation(txt, 0.65f));
-        }
-        else
-        {
-            txt.text = "GAME OVER";
-            StartCoroutine(PopTextAnimation(txt, 2f));
-        }
-
+        ShowGameOverText();
         endScreen.SetActive(true);
         gameOverText.SetActive(true);
-
         StartCoroutine(EndSequence());
     }
 
@@ -74,12 +60,12 @@ public class EndRunSequence : MonoBehaviour
         else
             yield return new WaitForSeconds(2f);
 
-        gameOverText.GetComponent<Animator>().enabled = true;
-        gameOverText.GetComponent<Animator>().Play("FadeOutText");
-        endCoinCount.GetComponent<Animator>().enabled = true;
-        endCoinCount.GetComponent<Animator>().Play("FadeOutText");
-        highScoreDisplay.GetComponent<Animator>().enabled = true;
-        highScoreDisplay.GetComponent<Animator>().Play("FadeOutText");
+        //gameOverText.GetComponent<Animator>().enabled = true;
+        //gameOverText.GetComponent<Animator>().Play("FadeOutText");
+        //endCoinCount.GetComponent<Animator>().enabled = true;
+        //endCoinCount.GetComponent<Animator>().Play("FadeOutText");
+        //highScoreDisplay.GetComponent<Animator>().enabled = true;
+        //highScoreDisplay.GetComponent<Animator>().Play("FadeOutText");
 
         yield return new WaitForSeconds(2f);
 
@@ -105,6 +91,24 @@ public class EndRunSequence : MonoBehaviour
         gameOverText.transform.localScale = endScale;
     }
 
+    public void ShowGameOverText()
+    {
+        Text txt = gameOverText.GetComponent<Text>();
+        gameOverText.transform.localScale = Vector3.zero;
+        gameOverText.SetActive(true);
+
+        if (CollectableControl.highScoreAchieved)
+        {
+            txt.text = "NOU RÈCORD!";
+            StartCoroutine(PopTextAnimation(txt, 0.65f));
+        }
+        else
+        {
+            txt.text = "GAME OVER";
+            StartCoroutine(PopTextAnimation(txt, 2f));
+        }
+    }
+
     private void ResetGame()
     {
         Debug.Log("Requesting Reset");
@@ -122,15 +126,27 @@ public class EndRunSequence : MonoBehaviour
         highScoreDisplay.SetActive(false);
         StartCoroutine(ReloadSequence());
         fadeOut.SetActive(false);
-        gameOverText.GetComponent<Animator>().enabled = false;
-        endCoinCount.GetComponent<Animator>().enabled = false;
-        highScoreDisplay.GetComponent<Animator>().enabled = false;
+        ResetAnimators(gameOverText, endCoinCount, highScoreDisplay);
 
         // Restore audio volumes
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 1f, 0.75f));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1f, 1f));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 1f, 1f));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 1f, 1f));
+    }
+
+    private void ResetAnimators(params GameObject[] objects)
+    {
+        foreach (var obj in objects)
+        {
+            var animator = obj.GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.Rebind();
+                animator.Update(0f);
+                animator.enabled = false;
+            }
+        }
     }
 
     IEnumerator ReloadSequence()

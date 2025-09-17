@@ -35,8 +35,8 @@ public class FloatingObject : MonoBehaviour, IResettable
 
     void Update()
     {
-        // Keep base local position relative to map
-        Vector3 pos = mapTransform.TransformPoint(initialLocalPos);
+        // Start from current position (section design handles base placement)
+        Vector3 pos = transform.position;
 
         // Bobbing motion on Y axis
         float bobOffset = Mathf.Sin(Time.time * bobSpeed + transform.position.x) * bobAmount;

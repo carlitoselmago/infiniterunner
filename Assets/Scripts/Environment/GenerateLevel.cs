@@ -203,20 +203,46 @@ public class GenerateLevel : MonoBehaviour, IResettable
     public void ExitMine()
     {
         int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
+        zPos = mapFront + 100; // just a safety buffer
+
+        creatingSection = false;
+
+        // Start staged resume
+        StartCoroutine(ResumeGenerationStaggered(4, 0.2f));
+    }
+
+    //experimental: this is the olf version
+    /*
+    public void ExitMine()
+    {
+        int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
         zPos = mapFront + 100; // just a safety buffer (resume ahead)
 
         //Debug.Log($"ExitMine: MAP.z = {MAP.transform.position.z}, mapFront = {mapFront}, zPos set to {zPos}");
 
-        //creatingSection = true;
-        //StartCoroutine(ResumeGenerationNextFrame());
+        creatingSection = false;
+    }*/
+
+    /// <summary>
+    /// Staggers the generation of initial sections after exiting the mine.
+    /// </summary>
+    /// <param name="count">How many sections to spawn</param>
+    /// <param name="delay">Delay between each spawn (seconds)</param>
+
+    IEnumerator ResumeGenerationStaggered(int count, float delay)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            GenerateSection();
+            generatedSections++;
+            yield return new WaitForSeconds(delay);
+        }
+
+        // After stagged resume, normal Update() spawning will take over
         creatingSection = false;
     }
 
-    IEnumerator ResumeGenerationNextFrame()
-    {
-        yield return null;
-        creatingSection = false;
-    }
+
 
     // --- Pool management ---
     private GameObject GetFromPool(int prefabIndex)

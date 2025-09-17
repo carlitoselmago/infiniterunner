@@ -13,13 +13,13 @@ public class GenerateTunnel : MonoBehaviour
             {
                 object1.SetActive(true);
                 object2.SetActive(false);
-                Debug.Log("Object 1 activated");
+                //Debug.Log("Object 1 activated");
             }
             else
             {
                 object2.SetActive(true);
                 object1.SetActive(false);
-                Debug.Log("Object 2 activated");
+                //Debug.Log("Object 2 activated");
             }
     }
 }

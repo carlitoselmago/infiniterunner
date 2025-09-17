@@ -53,6 +53,7 @@ public class Minecart : MonoBehaviour, IResettable
             StartCoroutine(ChangeSpeed(true, rideCart));
             nonAnimatedMinecart.SetActive(false);
             PlayerMove.onMinecart = true;
+            PlayerMove.rayLength = 0.15f;
         }
     }
 
@@ -82,10 +83,12 @@ public class Minecart : MonoBehaviour, IResettable
             playerAnimator.SetBool("isdrivingminecart", false);
             playerAnimator.SetTrigger("jumpoffminecart");
             PlayerMove.onMinecart = false;
+            PlayerMove.rayLength = 0.7f;
             playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
             rideCart.transform.SetParent(MAP.transform, true); //leave cart behind
             yield return new WaitForSeconds(4);
-            Destroy(rideCart);
+            rideCart.SetActive(false); // pool instead of destroy
+            //Destroy(rideCart);
         }
     }
 

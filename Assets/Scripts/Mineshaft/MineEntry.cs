@@ -34,7 +34,7 @@ public class MineEntry : MonoBehaviour, IResettable
                 MineData.endlessFallDisabled = true;
                 //Debug.Log("Entering the mine");
                 generateLevel.EnterMine();
-                StartCoroutine(FadeVolume(0f, 1f, 3f));
+                //StartCoroutine(FadeVolume(0f, 1f, 3f));
             }
             else
             {
@@ -42,7 +42,7 @@ public class MineEntry : MonoBehaviour, IResettable
                 MineData.isInTheMine = false;
                 //Debug.Log("Exiting the mine");
                 generateLevel.ExitMine();
-                StartCoroutine(FadeVolume(1f, 0f, 1.5f));
+                //StartCoroutine(FadeVolume(1f, 0f, 1.5f));
                 StartCoroutine(ReenableEndlessFall());
             }
         }
@@ -53,7 +53,7 @@ public class MineEntry : MonoBehaviour, IResettable
         yield return new WaitForSeconds(5);
         MineData.endlessFallDisabled = false;
     }
-
+/*
     IEnumerator FadeVolume(float from, float to, float duration)
     {
         float elapsed = 0f;
@@ -65,7 +65,7 @@ public class MineEntry : MonoBehaviour, IResettable
             yield return null;
         }
         mineVolume.weight = to;
-    }
+    }*/
 
     public void ResetState()
     {

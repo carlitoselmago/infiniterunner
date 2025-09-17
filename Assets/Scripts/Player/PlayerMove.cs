@@ -28,7 +28,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     [Header("Raycast")]
     public LayerMask groundLayer;
     public LayerMask wallLayer;
-    public float rayLength = 0.7f;
+    public static float rayLength = 0.7f;
     public float raycastHeightOffset = 0.5f;
     public bool isGrounded = false;
     public bool isFalling = false;
