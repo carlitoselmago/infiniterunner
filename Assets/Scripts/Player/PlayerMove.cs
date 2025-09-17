@@ -28,7 +28,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     [Header("Raycast")]
     public LayerMask groundLayer;
     public LayerMask wallLayer;
-    public static float rayLength = 0.7f;
+    public static float rayLength = 1.2f;
+    public float exposedRayLength = 1.2f;
     public float raycastHeightOffset = 0.5f;
     public bool isGrounded = false;
     public bool isFalling = false;
@@ -201,6 +202,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     void Update()
 
     {
+        exposedRayLength = rayLength;
+
         // Quit the game (Escape)
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
@@ -393,8 +396,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
                 Debug.Log("Entered in collision with" + other);
-                var bc = other.GetComponent<Collider>();
-                if (bc != null) bc.enabled = false;
+                //var bc = other.GetComponent<Collider>();
+                //if (bc != null) bc.enabled = false;
 
                 if (remainingHealth <= 0)
                 {
@@ -499,8 +502,6 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("car") && !godmode)
         {
-                //var cb = other.GetComponent<Collider>();
-                //if (cb != null) cb.enabled = false;
                 camAnimator.SetBool("dead", true);
                 animator.SetTrigger("die");
                 carCrashSFX.Play();
@@ -512,8 +513,6 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("minewall") && !triggered)
         {
-            //var cb = other.GetComponent<Collider>();
-            //if (cb != null) cb.enabled = false;
             camAnimator.SetBool("dead", true);
             if (onMinecart)
             {
@@ -847,7 +846,8 @@ public class PlayerMove : MonoBehaviour, IResettable
         idle = true;
         isDead = false;
         onMinecart = false;
-        rayLength = 0.7f;
+        triggered = false;
+        rayLength = 1.2f;
 
         // set tutorial timers/ text
         timer = 0f;

@@ -4,6 +4,7 @@ public static class SessionData
 {
     private const string HighScoreKey = "HighScore";
     public static int sessionHighScore = 0;
+    public static bool minePresent = false;
 
     public static void LoadHighScore(bool usePrefs)
     {

@@ -1,4 +1,5 @@
-using UnityEngine;
+/*
+ using UnityEngine;
 
 public class FloatingObject : MonoBehaviour, IResettable
 {
@@ -58,4 +59,4 @@ public class FloatingObject : MonoBehaviour, IResettable
         transform.localRotation = initialLocalRot;
         startRot = transform.rotation;
     }
-}
+}*/

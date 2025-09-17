@@ -51,8 +51,9 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     {
         if (!generatingSandstorm) return;
 
-        if (MineData.isInTheMine)
+        if (MineData.isInTheMine && generatingSandstorm)
         {
+            Debug.Log("MEEE");
             StopTheSandstorm();
             generatingSandstorm = false;
         }
@@ -164,7 +165,6 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
 
     public void StopTheSandstorm()
     {
-        if (!generatingSandstorm) return;   // experimental
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));

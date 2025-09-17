@@ -7,7 +7,6 @@ public class MineEntry : MonoBehaviour, IResettable
 {
     public bool isExit = false; // define entry or exit point
     public GameObject levelControl;
-    public GenerateSandstorm generateSandstorm;
     public Volume mineVolume;
     private GenerateLevel generateLevel;
     private bool triggered = false;
@@ -34,6 +33,7 @@ public class MineEntry : MonoBehaviour, IResettable
                 MineData.endlessFallDisabled = true;
                 //Debug.Log("Entering the mine");
                 generateLevel.EnterMine();
+                PlayerMove.rayLength = 2f;
                 //StartCoroutine(FadeVolume(0f, 1f, 3f));
             }
             else
@@ -70,7 +70,7 @@ public class MineEntry : MonoBehaviour, IResettable
     public void ResetState()
     {
         triggered = false;
-        mineVolume.weight = 0f;
+        //mineVolume.weight = 0f;
     }
 
 }

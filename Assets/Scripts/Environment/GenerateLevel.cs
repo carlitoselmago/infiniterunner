@@ -87,6 +87,19 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
         secNum = Random.Range(0, sectionPrefabs.Length);
 
+        // Prevent more than one active mine section at a time
+        if (secNum == mineEntryIndex && minePresent)
+        {
+            // Force reroll until it's not the mine
+            int tries = 0;
+            while (secNum == mineEntryIndex && tries < 10)
+            {
+                secNum = Random.Range(0, sectionPrefabs.Length);
+                tries++;
+            }
+        }
+
+        /*
         // Only block mines if there are alternatives
         if (sectionPrefabs.Length > 1 && secNum == mineEntryIndex && minePresent)
         {
@@ -97,7 +110,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
                 secNum = Random.Range(0, sectionPrefabs.Length);
                 tries++;
             }
-        }
+        }*/
 
         GameObject newSection = GetFromPool(secNum);
         newSection.transform.position = new Vector3(0, 0, zPos);
@@ -109,13 +122,21 @@ public class GenerateLevel : MonoBehaviour, IResettable
         if (chunkData != null)
             chunkData.RegisterLength(this);
 
-            if (chunkData.chunkNum == mineEntryIndex)
+        // Track mine presence
+        if (chunkData != null && chunkData.chunkNum == mineEntryIndex)
+        {
+            minePresent = true;
+            protectMineSection = true;
+        }
+
+        /*
+        if (chunkData.chunkNum == mineEntryIndex)
             {
                 minePresent = true;          // mine is now active
                 protectMineSection = true;  // enable protection
-            }
+            }*/
 
-            activeSections.Enqueue(newSection);
+        activeSections.Enqueue(newSection);
 
         if (activeSections.Count > 8)
         {
@@ -131,8 +152,16 @@ public class GenerateLevel : MonoBehaviour, IResettable
             {
                 oldest = activeSections.Dequeue();
                 ReturnToPool(oldest);
-                protectMineSection = false; // after this, allow normal cleanup
-                minePresent = false;
+
+                if (oldestChunk != null && oldestChunk.chunkNum == mineEntryIndex)
+                {
+                    // Mine just got removed
+                    minePresent = false;
+                    protectMineSection = false;
+                }
+
+                //protectMineSection = false; // after this, allow normal cleanup
+                //minePresent = false;
             }
         }
 
@@ -211,24 +240,8 @@ public class GenerateLevel : MonoBehaviour, IResettable
         StartCoroutine(ResumeGenerationStaggered(4, 0.2f));
     }
 
-    //experimental: this is the olf version
-    /*
-    public void ExitMine()
-    {
-        int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
-        zPos = mapFront + 100; // just a safety buffer (resume ahead)
-
-        //Debug.Log($"ExitMine: MAP.z = {MAP.transform.position.z}, mapFront = {mapFront}, zPos set to {zPos}");
-
-        creatingSection = false;
-    }*/
-
-    /// <summary>
-    /// Staggers the generation of initial sections after exiting the mine.
-    /// </summary>
     /// <param name="count">How many sections to spawn</param>
     /// <param name="delay">Delay between each spawn (seconds)</param>
-
     IEnumerator ResumeGenerationStaggered(int count, float delay)
     {
         for (int i = 0; i < count; i++)
@@ -247,6 +260,12 @@ public class GenerateLevel : MonoBehaviour, IResettable
     // --- Pool management ---
     private GameObject GetFromPool(int prefabIndex)
     {
+        if (!sectionPools.ContainsKey(prefabIndex))
+        {
+            Debug.LogError($"No pool found for prefab index {prefabIndex}! templatesparent has {sectionPrefabs.Length} prefabs.");
+            prefabIndex = 0; // fallback to first prefab to avoid crash
+        }
+
         GameObject obj;
         if (sectionPools[prefabIndex].Count > 0)
             obj = sectionPools[prefabIndex].Dequeue();

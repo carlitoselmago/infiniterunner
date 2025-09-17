@@ -83,7 +83,7 @@ public class Minecart : MonoBehaviour, IResettable
             playerAnimator.SetBool("isdrivingminecart", false);
             playerAnimator.SetTrigger("jumpoffminecart");
             PlayerMove.onMinecart = false;
-            PlayerMove.rayLength = 0.7f;
+            PlayerMove.rayLength = 1.2f;
             //playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
             rideCart.transform.SetParent(MAP.transform, true); //leave cart behind
             yield return new WaitForSeconds(4);
