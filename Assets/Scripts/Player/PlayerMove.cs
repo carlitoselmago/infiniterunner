@@ -847,6 +847,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         idle = true;
         isDead = false;
         onMinecart = false;
+        rayLength = 0.7f;
 
         // set tutorial timers/ text
         timer = 0f;

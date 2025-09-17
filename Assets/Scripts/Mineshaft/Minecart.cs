@@ -49,11 +49,10 @@ public class Minecart : MonoBehaviour, IResettable
             rideCart.transform.localRotation = rotationOffset;
             rideCart.SetActive(true);
 
-            playerRb.constraints = RigidbodyConstraints.FreezeRotationX /*| RigidbodyConstraints.FreezeRotationZ*/; //or RigidbodyConstraints.None;
+            //playerRb.constraints = RigidbodyConstraints.FreezeRotationX /*| RigidbodyConstraints.FreezeRotationZ*/; //or RigidbodyConstraints.None;
             StartCoroutine(ChangeSpeed(true, rideCart));
             nonAnimatedMinecart.SetActive(false);
             PlayerMove.onMinecart = true;
-            PlayerMove.rayLength = 0.15f;
         }
     }
 
@@ -72,6 +71,7 @@ public class Minecart : MonoBehaviour, IResettable
             yield return null;
         }
         player.moveSpeed = targetSpeed;
+        PlayerMove.rayLength = 0.25f;
 
         if (accelerate)
         {
@@ -84,7 +84,7 @@ public class Minecart : MonoBehaviour, IResettable
             playerAnimator.SetTrigger("jumpoffminecart");
             PlayerMove.onMinecart = false;
             PlayerMove.rayLength = 0.7f;
-            playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
+            //playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
             rideCart.transform.SetParent(MAP.transform, true); //leave cart behind
             yield return new WaitForSeconds(4);
             rideCart.SetActive(false); // pool instead of destroy
