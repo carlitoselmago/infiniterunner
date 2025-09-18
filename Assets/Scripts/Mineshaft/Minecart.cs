@@ -12,6 +12,7 @@ public class Minecart : MonoBehaviour, IResettable
     public GameObject animatedMinecartPrefab;
     public GameObject MAP;
     public AudioSource minecartSFX;
+    private GameObject rideCart;
     private Transform minecartHolder;
     // Define offsets
     Vector3 positionOffset = new Vector3(-0.012f, -0.129f, -0.58f);
@@ -44,19 +45,19 @@ public class Minecart : MonoBehaviour, IResettable
             playerAnimator.SetBool("isdrivingminecart", true);
 
             // --- Spawn a working copy ---
-            GameObject rideCart = Instantiate(animatedMinecartPrefab, minecartHolder);
+            /*GameObject */rideCart = Instantiate(animatedMinecartPrefab, minecartHolder);
             rideCart.transform.localPosition = positionOffset;
             rideCart.transform.localRotation = rotationOffset;
             rideCart.SetActive(true);
 
             //playerRb.constraints = RigidbodyConstraints.FreezeRotationX /*| RigidbodyConstraints.FreezeRotationZ*/; //or RigidbodyConstraints.None;
-            StartCoroutine(ChangeSpeed(true, rideCart));
+            StartCoroutine(ChangeSpeed(true));
             nonAnimatedMinecart.SetActive(false);
             PlayerMove.onMinecart = true;
         }
     }
 
-    IEnumerator ChangeSpeed(bool accelerate, GameObject rideCart)
+    IEnumerator ChangeSpeed(bool accelerate)
     {
         float targetSpeed = accelerate ? 40f : 12f;   // where we want to go
         float duration = 1.2f;                        // time to reach target
@@ -79,7 +80,7 @@ public class Minecart : MonoBehaviour, IResettable
             yield return new WaitForSeconds(8.4f);
 
             // --- Phase 3: Decelerate back ---
-            yield return StartCoroutine(ChangeSpeed(false, rideCart));
+            yield return StartCoroutine(ChangeSpeed(false));
             playerAnimator.SetBool("isdrivingminecart", false);
             playerAnimator.SetTrigger("jumpoffminecart");
             PlayerMove.onMinecart = false;
@@ -87,16 +88,24 @@ public class Minecart : MonoBehaviour, IResettable
             //playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
             rideCart.transform.SetParent(MAP.transform, true); //leave cart behind
             yield return new WaitForSeconds(4);
-            rideCart.SetActive(false); // pool instead of destroy
-            //Destroy(rideCart);
+            rideCart.SetActive(false);
         }
+    }
+
+    public void CartCrash()
+    {
+        rideCart.transform.SetParent(MAP.transform, true);
+        Rigidbody cartRb = rideCart.GetComponent<Rigidbody>();
+        BoxCollider cartCollider = rideCart.GetComponent<BoxCollider>();
+        cartCollider.enabled = true;
+        cartRb.isKinematic = false;
     }
 
     public void ResetState()
     {
         nonAnimatedMinecart.SetActive(true);
         triggered = false;
-
+        
         // --- Cleanup spawned carts in the holder ---
         if (minecartHolder != null)
         {

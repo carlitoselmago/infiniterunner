@@ -54,9 +54,10 @@ public class PlayerMove : MonoBehaviour, IResettable
     public GameObject tutorialText;
     private Animator animator;
     private Animator camAnimator;
-
     public GameObject mainCam;
     public GameObject rocks;
+    public Minecart minecart;
+
 
     //sfx
     [Header("SFX")]
@@ -395,9 +396,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 printCodeScript.SetCodePrompt("dead");
                 StartCoroutine(hurtMaskScript.Mask());
                 remainingHealth--;
-                Debug.Log("Entered in collision with" + other);
-                //var bc = other.GetComponent<Collider>();
-                //if (bc != null) bc.enabled = false;
+                Debug.Log("Entered in collision with " + other);
 
                 if (remainingHealth <= 0)
                 {
@@ -519,6 +518,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 animator.SetTrigger("minecartcollision");
                 minecartCrashSFX.Play();
                 carCrashSFX.Play();
+                minecart.CartCrash();
                 minecartObject.Stop();
                 onMinecart = false;
                 triggered = true;
