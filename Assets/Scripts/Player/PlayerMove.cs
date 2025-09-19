@@ -859,12 +859,12 @@ public class PlayerMove : MonoBehaviour, IResettable
         camAnimator.Rebind();
 
         // set position
-        rocks.SetActive(false);
+        if (rocks.activeSelf)
+            rocks.SetActive(false);
         transform.position = startPosition;
         startY = transform.position.y;
         originY = startY;
-        moveSpeed = 12.0f;
-        //SetConstrainedPositions(false, false, false);
+        moveSpeed = 12f;
 
         // set hitboxes
         if (hitLogic != null)

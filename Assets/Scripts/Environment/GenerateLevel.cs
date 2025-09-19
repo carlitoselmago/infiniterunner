@@ -298,8 +298,6 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     public void ResetState()
     {
-        Debug.Log("GenerateLevel Reset");
-
         while (activeSections.Count > 0)
         {
             GameObject section = activeSections.Dequeue();

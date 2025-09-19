@@ -34,8 +34,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         sandstormVolume = sandstorm.GetComponent<Volume>();
         sandstormParticles = particles.GetComponent<ParticleSystem>();
         sandstormMaterial = particles.GetComponent<ParticleSystemRenderer>().material;
-
-        //sandstormVolume.weight = 0f;
+        sandstormVolume.weight = 0f;
         //sandstormMaterial.SetFloat("_GlobalAlpha", 0f); // Start transparent
     }
 
@@ -165,6 +164,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
 
     public void StopTheSandstorm()
     {
+        if (!generatingSandstorm) return;
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
@@ -173,8 +173,8 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     public void ResetState()
     {
         StopTheSandstorm();
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 2f, 0f));
         generatingSandstorm = false;
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 2f, 0f));
         RenderSettings.fogDensity = 0;
         sandstormMaterial.SetFloat("_GlobalAlpha", 0f);
         sandstormVolume.weight = 0;
