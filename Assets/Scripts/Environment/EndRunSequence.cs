@@ -17,6 +17,7 @@ public class EndRunSequence : MonoBehaviour
     public GameObject highScoreCelebration;
     public AudioMixer audioMixer;
     public AudioSource gameOverFX;
+    public GameObject startSection;
 
     void OnEnable()
     {
@@ -68,7 +69,7 @@ public class EndRunSequence : MonoBehaviour
         //highScoreDisplay.GetComponent<Animator>().Play("FadeOutText");
 
         yield return new WaitForSeconds(2f);
-
+        startSection.SetActive(true);
         ResetGame();
     }
 

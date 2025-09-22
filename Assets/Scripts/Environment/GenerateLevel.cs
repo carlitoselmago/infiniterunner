@@ -99,19 +99,6 @@ public class GenerateLevel : MonoBehaviour, IResettable
             }
         }
 
-        /*
-        // Only block mines if there are alternatives
-        if (sectionPrefabs.Length > 1 && secNum == mineEntryIndex && minePresent)
-        {
-            // Force a non-mine prefab
-            int tries = 0;
-            while (secNum == mineEntryIndex && tries < 5) // max 5 tries to avoid infinite loop
-            {
-                secNum = Random.Range(0, sectionPrefabs.Length);
-                tries++;
-            }
-        }*/
-
         GameObject newSection = GetFromPool(secNum);
         newSection.transform.position = new Vector3(0, 0, zPos);
         newSection.transform.SetParent(MAP.transform, false);
@@ -128,13 +115,6 @@ public class GenerateLevel : MonoBehaviour, IResettable
             minePresent = true;
             protectMineSection = true;
         }
-
-        /*
-        if (chunkData.chunkNum == mineEntryIndex)
-            {
-                minePresent = true;          // mine is now active
-                protectMineSection = true;  // enable protection
-            }*/
 
         activeSections.Enqueue(newSection);
 
@@ -159,9 +139,6 @@ public class GenerateLevel : MonoBehaviour, IResettable
                     minePresent = false;
                     protectMineSection = false;
                 }
-
-                //protectMineSection = false; // after this, allow normal cleanup
-                //minePresent = false;
             }
         }
 
