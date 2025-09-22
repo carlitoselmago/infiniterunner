@@ -478,7 +478,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("photos") && !mainTheme.isPlaying && !photosSFX.isPlaying) photosSFX.Play();
 
-        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying) backDoorSFX.Play();
+        if (other.gameObject.CompareTag("backdoor") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !photosSFX.isPlaying) backDoorSFX.Play();
 
         if (other.gameObject.CompareTag("cardboard")) (Random.value < 0.5f ? cardboard1 : cardboard2).Play();
 
@@ -503,6 +503,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         {
                 camAnimator.SetBool("dead", true);
                 animator.SetTrigger("die");
+                animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
                 HideAllTutorialCards();
                 collectableControl.HandlePlayerDeath();
@@ -526,6 +527,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             else
             {
                 animator.SetTrigger("die");
+                animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
                 triggered = true;
             }
