@@ -100,6 +100,31 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &-8423906832879651434
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: isflying
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -662016764920322695}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9537037
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-7677350446919593679
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -165,7 +190,7 @@ AnimatorStateTransition:
     m_ConditionEvent: isdrivingminecart
     m_EventTreshold: 0
   - m_ConditionMode: 1
-    m_ConditionEvent: minecartcollision
+    m_ConditionEvent: die
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -7591412572013190781}
@@ -327,6 +352,9 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 1
     m_ConditionEvent: endlessfall
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: die
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2816397031060684824}
@@ -610,7 +638,7 @@ AnimatorStateTransition:
     m_ConditionEvent: isdrivingminecart
     m_EventTreshold: 0
   - m_ConditionMode: 1
-    m_ConditionEvent: minecartcollision
+    m_ConditionEvent: die
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -7591412572013190781}
@@ -1114,6 +1142,7 @@ AnimatorState:
   - {fileID: -3618467427818648664}
   - {fileID: -3692154865021187765}
   - {fileID: -5611732752782289232}
+  - {fileID: -8423906832879651434}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0

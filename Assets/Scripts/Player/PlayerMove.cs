@@ -10,12 +10,14 @@ public class PlayerMove : MonoBehaviour, IResettable
     public float moveSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float horizontalSpeed = 20f;
+    private Quaternion startRotation;
     public bool isJumping = false;
     public bool isRolling = false;
     public bool isFlying = false;
     //public bool floating = false;
     public bool holding = false;
     public static bool onMinecart = false;
+    public static bool onForklift = false;
     private bool mainThemeAlreadyPlaying = false;
     public static bool idle = true;
     public static bool isUnderwater = false;
@@ -58,6 +60,12 @@ public class PlayerMove : MonoBehaviour, IResettable
     public GameObject rocks;
     public Minecart minecart;
 
+    //forklift
+    private float forkliftOffsetX = 0f; // current lateral offset
+    // --- define lanes ---
+    float leftLane = -10f;
+    float rightLane = 10f;
+    public Forklift forkliftManager;
 
     //sfx
     [Header("SFX")]
@@ -93,10 +101,11 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     // IMPORTANT: main physics collider (non-trigger). Keep this always enabled to avoid sinking.
     public BoxCollider boxCollider;
+    public BoxCollider forkliftCollider;
 
     public HitLogic hitLogic; // assign the child HitLogic in inspector or it will auto-find
 
-    private float targetHeight = 17.0f;
+    private float targetHeight = 22.0f; // previously 17.0f
     private float startY;
     private float originY;
     private float jumpedHeight;
@@ -161,6 +170,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         startY = transform.position.y;
         originY = startY;
+        startRotation = transform.rotation;
         onMinecart = false;
         BGM.pitch = 1.0f;
         HideAllTutorialCards();
@@ -204,6 +214,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     {
         exposedRayLength = rayLength;
+        UpdateActiveCollider();
 
         // Quit the game (Escape)
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -241,79 +252,121 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (playerBody.IsSleeping())
             playerBody.WakeUp();
 
-        // Left
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        if (!onForklift)
         {
-            if (!startedrunning)
-                StartPlay();
-
-            if (tutorialcard == "left") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
-            if (!isFlying)
+            // Left
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                if (blockLeft)
-                {
-                    animator.SetTrigger("blockleft");
-                    return;
-                }
+                if (!startedrunning)
+                    StartPlay();
 
-                if (pos == "center") // Pressing left from center goes to left
+                if (tutorialcard == "left") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+                if (!isFlying)
                 {
-                    pos = "left";
-                    if (onMinecart)
+                    if (blockLeft)
                     {
-                        minecartShiftLaneSFX.panStereo = -0.7f;
-                        minecartShiftLaneSFX.Play();
+                        animator.SetTrigger("blockleft");
+                        return;
                     }
+
+                    if (pos == "center") // Pressing left from center goes to left
+                    {
+                        pos = "left";
+                        if (onMinecart)
+                        {
+                            minecartShiftLaneSFX.panStereo = -0.7f;
+                            minecartShiftLaneSFX.Play();
+                        }
+                    }
+                    else if (pos == "right") // Pressing left when at right goes to center
+                    {
+                        pos = "center";
+                        if (onMinecart)
+                        {
+                            minecartShiftLaneSFX.panStereo = 0f;
+                            minecartShiftLaneSFX.Play();
+                        }
+                    }
+                    printCodeScript.SetCodePrompt("left");
                 }
-                else if (pos == "right") // Pressing left when at right goes to center
+            }
+
+            // Right
+            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                if (!startedrunning)
+                    StartPlay();
+
+                if (tutorialcard == "right") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
+                if (!isFlying)
                 {
-                    pos = "center";
-                    if (onMinecart)
+                    if (blockRight)
                     {
-                        minecartShiftLaneSFX.panStereo = 0f;
-                        minecartShiftLaneSFX.Play();
+                        animator.SetTrigger("blockright");
+                        return;
                     }
+
+                    if (pos == "center") // Pressing right from center goes to right
+                    {
+                        pos = "right";
+                        if (onMinecart)
+                        {
+                            minecartShiftLaneSFX.panStereo = 0.7f;
+                            minecartShiftLaneSFX.Play();
+                        }
+                    }
+                    else if (pos == "left") // Pressing right when at left goes to center
+                    {
+                        pos = "center";
+                        if (onMinecart)
+                        {
+                            minecartShiftLaneSFX.panStereo = 0f;
+                            minecartShiftLaneSFX.Play();
+                        }
+                    }
+                    printCodeScript.SetCodePrompt("right");
                 }
-                printCodeScript.SetCodePrompt("left");
             }
         }
-
-        // Right
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        else if (onForklift)
         {
-            if (!startedrunning)
-                StartPlay();
+            UpdateActiveCollider();
+            float steerSpeed = 8f;       // sideways drift speed
+            float rotationSmooth = 5f;   // how fast rotation catches up
+            float tiltAngle = 20f;       // tilt amount
 
-            if (tutorialcard == "right") tutorial2d.transform.Find(tutorialcard).gameObject.SetActive(false);
-            if (!isFlying)
+            float moveInput = 0f;
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+                moveInput = -1f;
+            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+                moveInput = 1f;
+
+            // --- Position ---
+            if (moveInput != 0f)
             {
-                if (blockRight)
-                {
-                    animator.SetTrigger("blockright");
-                    return;
-                }
-
-                if (pos == "center") // Pressing right from center goes to right
-                {
-                    pos = "right";
-                    if (onMinecart)
-                    {
-                        minecartShiftLaneSFX.panStereo = 0.7f;
-                        minecartShiftLaneSFX.Play();
-                    }
-                }
-                else if (pos == "left") // Pressing right when at left goes to center
-                {
-                    pos = "center";
-                    if (onMinecart)
-                    {
-                        minecartShiftLaneSFX.panStereo = 0f;
-                        minecartShiftLaneSFX.Play();
-                    }
-                }
-                printCodeScript.SetCodePrompt("right");
+                forkliftOffsetX += moveInput * steerSpeed * Time.deltaTime;
+                forkliftOffsetX = Mathf.Clamp(forkliftOffsetX, leftLane, rightLane);
             }
+
+            transform.position = new Vector3(forkliftOffsetX, transform.position.y, transform.position.z);
+
+            // --- Rotation ---
+            float desiredTilt = tiltAngle * moveInput;  // tilt only if moving
+            Quaternion targetRot = Quaternion.Euler(0f, desiredTilt, 0f);
+
+            // If no input → reset rotation to forward (0°)
+            if (moveInput == 0f)
+                targetRot = Quaternion.identity;
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSmooth * Time.deltaTime);
         }
+
+
+
+
+
+
+
 
         // pos interpolator
         switch (pos)
@@ -403,6 +456,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                     collectableControl.HandlePlayerDeath();
                     camAnimator.SetBool("dead", true);
                     isDead = true;
+                    if (onForklift)
+                        StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
                     animator.SetTrigger("die");
                     crashThud.Play();
                     levelControl.GetComponent<GenerateSandstorm>().enabled = false;
@@ -447,6 +502,13 @@ public class PlayerMove : MonoBehaviour, IResettable
         {
             printCodeScript.SetCodePrompt("fly");
             godmode = true;
+            if (onForklift)
+            {
+                forkliftManager.ExitForklift();
+                UpdateActiveCollider();
+                forkliftManager = null;
+                Debug.Log("Powerup - Exited Forklift");
+            }
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 2, 0));
             flyFX.Play();
             BGM.pitch += 0.5f;
@@ -502,6 +564,8 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (other.gameObject.CompareTag("car") && !godmode)
         {
                 camAnimator.SetBool("dead", true);
+                if (onForklift)
+                    StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
                 animator.SetTrigger("die");
                 animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
@@ -514,9 +578,12 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (other.gameObject.CompareTag("minewall") && !triggered)
         {
             camAnimator.SetBool("dead", true);
+            if (onForklift)
+                StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
+            animator.SetTrigger("die");
             if (onMinecart)
             {
-                animator.SetTrigger("minecartcollision");
+                //animator.SetTrigger("minecartcollision");
                 minecartCrashSFX.Play();
                 carCrashSFX.Play();
                 minecart.CartCrash();
@@ -526,7 +593,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             }
             else
             {
-                animator.SetTrigger("die");
+                //animator.SetTrigger("die");
                 animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
                 triggered = true;
@@ -734,6 +801,27 @@ public class PlayerMove : MonoBehaviour, IResettable
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
     }
 
+    public IEnumerator RaisePlayerBody(float targetY, float duration)
+    {
+        Debug.Log("Raise");
+        Transform body = transform.Find("Ch46_nonPBR@Standard Run");
+
+        Vector3 startPos = body.localPosition;
+        Vector3 endPos = new Vector3(startPos.x, targetY, startPos.z);
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            body.localPosition = Vector3.Lerp(startPos, endPos, elapsed / duration);
+            yield return null;
+        }
+
+        body.localPosition = endPos;
+        Debug.Log("Raised");
+    }
+
     private IEnumerator EnableEndSequenceSafely()
     {
         yield return null; // wait one frame
@@ -767,8 +855,23 @@ public class PlayerMove : MonoBehaviour, IResettable
         foreach (Transform child in tutorial2d.transform) child.gameObject.SetActive(false);
     }
 
+    private void UpdateActiveCollider()
+    {
+        if (onForklift)
+        {
+            if (forkliftCollider != null) forkliftCollider.enabled = true;
+            if (boxCollider != null) boxCollider.enabled = false;
+        }
+        else
+        {
+            if (forkliftCollider != null) forkliftCollider.enabled = false;
+            if (boxCollider != null) boxCollider.enabled = true;
+        }
+    }
+
+
     // RAYCAST
-    
+
     void UpdateGroundTracking()
     {
         if (boxCollider == null) return;
@@ -842,12 +945,14 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // set bools
         boxCollider.enabled = true;
+        forkliftCollider.enabled = false;
         godmodevisual.SetActive(false);
         godmode = false;
         startedrunning = false;
         idle = true;
         isDead = false;
         onMinecart = false;
+        onForklift = false;
         triggered = false;
         rayLength = 1.2f;
 
@@ -866,7 +971,10 @@ public class PlayerMove : MonoBehaviour, IResettable
         transform.position = startPosition;
         startY = transform.position.y;
         originY = startY;
+        transform.rotation = startRotation;
         moveSpeed = 12f;
+        StartCoroutine(RaisePlayerBody(-0.35f, 0f));
+        // add rotation reset
 
         // set hitboxes
         if (hitLogic != null)
