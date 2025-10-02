@@ -65,7 +65,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     // --- define lanes ---
     float leftLane = -10f;
     float rightLane = 10f;
-    public Forklift forkliftManager;
+    public RideForklift forkliftManager;
 
     //sfx
     [Header("SFX")]
@@ -85,6 +85,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public AudioSource canyonSFX;
     public AudioSource claxonSFX;
     public AudioSource carCrashSFX;
+    public AudioSource rumbleSFX;
     public AudioSource cardboard1;
     public AudioSource cardboard2;
 
@@ -359,6 +360,30 @@ public class PlayerMove : MonoBehaviour, IResettable
                 targetRot = Quaternion.identity;
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSmooth * Time.deltaTime);
+
+            if (RideForklift.lowHealth)
+            {
+                tutorial2d.transform.Find("exit-forklift").gameObject.SetActive(true);
+                if (timer >= 3f)
+                {
+                    tutorial2d.transform.Find("exit-forklift").gameObject.SetActive(false);
+                    timer = 0f;
+                }
+            } else if (RideForklift.forkliftDestroyed)
+            {
+                tutorial2d.transform.Find("exit-forklift").gameObject.SetActive(false);
+            }
+
+            // Leave forklift
+            if (Input.GetKeyDown(KeyCode.UpArrow) || forkliftManager == null)
+            {
+                forkliftManager.ExitForklift();
+                transform.rotation = startRotation;
+                animator.SetTrigger("jumpoffminecart");
+                UpdateActiveCollider();
+                forkliftManager = null;
+                Debug.Log("Left Forklift");
+            }
         }
 
 
@@ -441,7 +466,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     {
         HideAllTutorialCards();
 
-        if (other.gameObject.CompareTag("obstacle"))
+        if (other.gameObject.CompareTag("obstacle") && !onForklift)
         {
             if (!godmode)
             {
@@ -620,6 +645,35 @@ public class PlayerMove : MonoBehaviour, IResettable
                     Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
             }
         }
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (!onForklift) return;
+
+        if (other.CompareTag("obstacle"))
+        {
+            if (playerBody.velocity.magnitude < 0.5f)
+            {
+                //Debug.Log("Playing Rumble");
+                forkliftManager.ApplyCollisionDamage(Time.deltaTime);
+                //rumbleSFX.Play();
+            } else
+            {
+                Debug.Log("Stopping Rumble");
+                //rumbleSFX.Stop();
+            }
+        }
+    }
+
+    public void DieOnForklift()
+    {
+        Debug.Log("Player Dead on Forklift");
+        StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
+        animator.SetTrigger("die");
+        collectableControl.HandlePlayerDeath();
+        StartCoroutine(EnableEndSequenceSafely());
+        this.enabled = false;
     }
 
     public void StartPlay()

@@ -68,7 +68,9 @@ public class Explodable : MonoBehaviour, IResettable
             part.localPosition = originalPositions[i];
             part.localRotation = originalRotations[i];
 
+            // Reset physics state
             Rigidbody rb = partRigidbodies[i];
+            rb.isKinematic = false;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;

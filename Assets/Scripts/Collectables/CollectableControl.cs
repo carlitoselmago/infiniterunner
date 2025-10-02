@@ -20,6 +20,8 @@ public class CollectableControl : MonoBehaviour, IResettable
     private int treballadordelmes_coins_index = 0;
     public int highScore;
     public static bool highScoreAchieved = false;
+    public static bool firstForklift = false;
+    private bool firstForkliftAchieved = false;
     public bool firstAchievementMet = false;
 
     //time vars
@@ -165,6 +167,19 @@ public class CollectableControl : MonoBehaviour, IResettable
                 lifeUp();
                 StartCoroutine(hideachievement());
             }
+
+            if (firstForklift && !firstForkliftAchieved)
+            {
+                firstForkliftAchieved = true;
+                achievementEndUItext.GetComponent<Text>().text = "AL TORO!";
+                achievementEndUIsubtext.GetComponent<Text>().text = "El món és teu";
+                achievementUI.SetActive(true);
+                achievementShown = true;
+                highSpeedSFX.Play();
+                dimVolumes();
+                lifeUp();
+                StartCoroutine(hideachievement());
+            }
         }
 
         // Clear High Scores pressing C
@@ -215,6 +230,8 @@ public class CollectableControl : MonoBehaviour, IResettable
         runtimeHighScoreTriggered = false;
         firstAchievementMet = false;
         highScoreAchieved = false;
+        firstForklift = false;
+        firstForkliftAchieved = false;
 
         // Reset UI state
         achievementUI.SetActive(false);
