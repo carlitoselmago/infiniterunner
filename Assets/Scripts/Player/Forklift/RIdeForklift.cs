@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System.Linq;
+using DG.Tweening;
 
 public class RideForklift : MonoBehaviour, IResettable
 {
@@ -23,9 +24,15 @@ public class RideForklift : MonoBehaviour, IResettable
     public GameObject explosionPrefab;
 
     [Header("Forklift Endurance")]
-    public float maxHealth = 150f;
+    public float maxHealth = 100f;
     public float currentHealth;
     public float damagePerSecond = 10f;
+    public Image fillImage;
+    public Image background;
+    public CanvasGroup sliderCanvasGroup;
+    private RectTransform healthBarRect;
+    private Tweener shakeTween;
+    private bool isShaking = false;
     public static bool lowHealth = false;
     public static bool forkliftDestroyed = false;
     public GameObject canvas;
@@ -65,6 +72,9 @@ public class RideForklift : MonoBehaviour, IResettable
 
         currentHealth = maxHealth;
         if (healthBar != null) healthBar.maxValue = maxHealth;
+
+        if (sliderCanvasGroup != null)
+            sliderCanvasGroup.alpha = 0.5f;
     }
 
     void Update()
@@ -80,6 +90,7 @@ public class RideForklift : MonoBehaviour, IResettable
         if (PlayerMove.isDead && !triggered)
         {
             triggered = true;
+            canvas.SetActive(false);
             Debug.Log("Explosion");
 
             if (explosionPrefab != null)
@@ -87,7 +98,6 @@ public class RideForklift : MonoBehaviour, IResettable
                 // spawn explosion at forklift position
                 GameObject expl = Instantiate(explosionPrefab, transform.position, transform.rotation);
 
-                canvas.SetActive(false);
                 // enable Explodable script if it’s not already enabled
                 var explScript = GetComponent<Explodable>();
                 if (explScript != null)
@@ -140,24 +150,108 @@ public class RideForklift : MonoBehaviour, IResettable
 
     public void ApplyCollisionDamage(float dt)
     {
-        if (!canvas.activeSelf)
-            canvas.SetActive(true);     // reset to false if no damage is taken?
-        currentHealth -= damagePerSecond * dt;
-        if (healthBar != null) healthBar.value = currentHealth;
+        if (!canvas.activeSelf && !PlayerMove.isDead)
+            canvas.SetActive(true);
 
-        if (!lowHealth && currentHealth <= 50)
+        currentHealth -= damagePerSecond * dt;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+        if (healthBar != null)
+            healthBar.value = currentHealth;
+
+        // Fill color (white -> red)
+        if (fillImage != null)
         {
-            lowHealth = true;
-            smoke.SetActive(true);
+            float tFill = 1f - (currentHealth / maxHealth); // 0 at full, 1 at zero
+            fillImage.color = Color.Lerp(Color.white, Color.red, tFill);
         }
 
-        if (!forkliftDestroyed && currentHealth <= 0 && !PlayerMove.isDead)
+        // Canvas alpha
+        if (sliderCanvasGroup != null)
+        {
+            sliderCanvasGroup.alpha = Mathf.Lerp(0.5f, 1f, 1f - (currentHealth / maxHealth));
+        }
+
+        // LOW HEALTH logic (<= 50). Update background color every tick while low.
+        if (currentHealth <= 50f)
+        {
+            if (!lowHealth)
+            {
+                lowHealth = true;
+                if (smoke != null) smoke.SetActive(true);
+
+                // start a continuous shake
+                StartHealthShake();
+            }
+
+            if (background != null)
+            {
+                // Map currentHealth 50 -> 0 into t 0 -> 1
+                float tBg = Mathf.Clamp01(1f - (currentHealth / 50f));
+                background.color = Color.Lerp(Color.white, Color.red, tBg);
+            }
+        }
+        else
+        {
+            // If you recover above 50, stop shake and reset background
+            if (lowHealth)
+            {
+                lowHealth = false;
+                if (smoke != null) smoke.SetActive(false);
+                StopHealthShake();
+
+                if (background != null) background.color = Color.white;
+            }
+        }
+
+        // Death
+        if (!forkliftDestroyed && currentHealth <= 0f && !PlayerMove.isDead)
         {
             PlayerMove.isDead = true;
             forkliftDestroyed = true;
+            canvas.SetActive(false);
+            StopHealthShake();
             player.DieOnForklift();
         }
     }
+
+    private void StartHealthShake()
+    {
+        if (isShaking) return;
+
+        // Prefer shaking the healthBar RectTransform, not the whole Canvas
+        if (healthBarRect == null && healthBar != null)
+            healthBarRect = healthBar.GetComponent<RectTransform>();
+
+        if (healthBarRect == null) return;
+
+        // Kill any previous tween, then start a looping anchor-pos shake
+        healthBarRect.DOKill();
+        shakeTween = healthBarRect.DOShakeAnchorPos(
+            duration: 1.0f,                     // how long one cycle is (we will loop)
+            strength: new Vector2(12f, 0f),     // shake strength (x, y)
+            vibrato: 20,                        // how many strikes
+            randomness: 90f,                    // randomness
+            snapping: false,
+            fadeOut: true
+        )
+        .SetLoops(-1, LoopType.Restart);
+
+        isShaking = true;
+    }
+
+    private void StopHealthShake()
+    {
+        if (!isShaking) return;
+
+        if (shakeTween != null) shakeTween.Kill();
+        if (healthBarRect != null)
+        {
+            healthBarRect.anchoredPosition = Vector2.zero; // reset pos cleanly
+        }
+        isShaking = false;
+    }
+
 
     private IEnumerator LeaveAndDestroy()
     {

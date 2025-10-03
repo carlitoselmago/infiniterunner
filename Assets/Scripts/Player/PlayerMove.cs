@@ -85,9 +85,13 @@ public class PlayerMove : MonoBehaviour, IResettable
     public AudioSource canyonSFX;
     public AudioSource claxonSFX;
     public AudioSource carCrashSFX;
-    public AudioSource rumbleSFX;
     public AudioSource cardboard1;
     public AudioSource cardboard2;
+    [Header("Collision Sounds")]
+    public AudioSource rumbleSFX;
+    public AudioClip[] hitClips;
+    private float soundInterval = 0.8f;
+    private float soundTimer = 0f;
 
     //pitch shifter for flying timeout
     private float startingPitch = 1.5f;
@@ -653,17 +657,33 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.CompareTag("obstacle"))
         {
-            if (playerBody.velocity.magnitude < 0.5f)
+            forkliftManager.ApplyCollisionDamage(Time.deltaTime);
+            soundTimer -= Time.deltaTime;   // no està clar
+            if (soundTimer <= 0f && !isDead)
             {
-                //Debug.Log("Playing Rumble");
-                forkliftManager.ApplyCollisionDamage(Time.deltaTime);
-                //rumbleSFX.Play();
-            } else
-            {
-                Debug.Log("Stopping Rumble");
-                //rumbleSFX.Stop();
+                PlayRandomHitSound();
+                soundTimer = soundInterval;
             }
         }
+    }
+    // forklift's pushing force
+    private void OnCollisionStay(Collision collision)
+    {
+        if (!onForklift) return;
+        Rigidbody objrb = collision.rigidbody;
+        if (objrb != null && objrb.mass <= 100f && !objrb.isKinematic)
+        {
+            Vector3 pushDir = transform.forward;
+            objrb.AddForce(pushDir * 10f, ForceMode.Impulse);  // 8.5f --> push force
+        }
+    }
+
+    private void PlayRandomHitSound()
+    {
+        if (hitClips.Length == 0 || rumbleSFX == null) return;
+        int index = Random.Range(0, hitClips.Length);
+        rumbleSFX.pitch = Random.Range(0.8f, 1.1f);
+        rumbleSFX.PlayOneShot(hitClips[index]);
     }
 
     public void DieOnForklift()

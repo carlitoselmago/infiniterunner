@@ -172,7 +172,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             {
                 firstForkliftAchieved = true;
                 achievementEndUItext.GetComponent<Text>().text = "AL TORO!";
-                achievementEndUIsubtext.GetComponent<Text>().text = "El món és teu";
+                achievementEndUIsubtext.GetComponent<Text>().text = "Has après a conduir!";
                 achievementUI.SetActive(true);
                 achievementShown = true;
                 highSpeedSFX.Play();
