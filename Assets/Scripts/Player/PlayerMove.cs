@@ -599,6 +599,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
                 HideAllTutorialCards();
+                hitLogic.EnableHitbox(HitLogic.HitboxType.None);
                 collectableControl.HandlePlayerDeath();
                 StartCoroutine(EnableEndSequenceSafely());
                 this.enabled = false; // Disable this script
@@ -877,9 +878,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     public IEnumerator RaisePlayerBody(float targetY, float duration)
     {
-        Debug.Log("Raise");
         Transform body = transform.Find("Ch46_nonPBR@Standard Run");
-
         Vector3 startPos = body.localPosition;
         Vector3 endPos = new Vector3(startPos.x, targetY, startPos.z);
 
@@ -891,9 +890,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             body.localPosition = Vector3.Lerp(startPos, endPos, elapsed / duration);
             yield return null;
         }
-
         body.localPosition = endPos;
-        Debug.Log("Raised");
     }
 
     private IEnumerator EnableEndSequenceSafely()
