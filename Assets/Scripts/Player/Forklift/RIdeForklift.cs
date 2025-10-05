@@ -64,17 +64,34 @@ public class RideForklift : MonoBehaviour, IResettable
         initialized = true;
     }
 
+    void OnEnable()
+    {
+        ResetState();
+        InitHealthUI();
+    }
+
+    private void InitHealthUI()
+    {
+        currentHealth = maxHealth;
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+        }
+
+        if (fillImage != null) fillImage.color = Color.white;
+        if (background != null) background.color = Color.white;
+        if (sliderCanvasGroup != null) sliderCanvasGroup.alpha = 0.5f;
+
+        if (smoke != null) smoke.SetActive(false);
+        StopHealthShake();
+    }
+
     private void Start()
     {
         forkliftHolder = player.transform.Find("forklift");
         if (forkliftHolder == null)
             Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
-
-        currentHealth = maxHealth;
-        if (healthBar != null) healthBar.maxValue = maxHealth;
-
-        if (sliderCanvasGroup != null)
-            sliderCanvasGroup.alpha = 0.5f;
     }
 
     void Update()
