@@ -127,7 +127,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
             {
                 float sectionEndZ = oldest.transform.position.z + oldestChunk.chunkLength + oldestChunk.cullBuffer;
                 int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
-                if(mapFront > sectionEndZ)
+                if(mapFront > sectionEndZ && activeSections.Count > 8)
                 {
                     oldest = activeSections.Dequeue();
                     ReturnToPool(oldest);
@@ -139,32 +139,6 @@ public class GenerateLevel : MonoBehaviour, IResettable
                 }
             }
         }
-
-
-
-        /*
-        if (activeSections.Count > 8)
-        {
-            GameObject oldest = activeSections.Peek(); // look at first in queue
-            Chunk oldestChunk = oldest.GetComponent<Chunk>();
-
-            if (protectMineSection && oldestChunk != null && oldestChunk.chunkNum == mineEntryIndex)
-            {
-                Debug.Log("Keeping mine section in queue for now.");
-            }
-            else
-            {
-                oldest = activeSections.Dequeue();
-                ReturnToPool(oldest);
-
-                if (oldestChunk != null && oldestChunk.chunkNum == mineEntryIndex)
-                {
-                    // Mine just got removed
-                    minePresent = false;
-                    protectMineSection = false;
-                }
-            }
-        }*/
 
         creatingSection = false;
     }
