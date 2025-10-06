@@ -5,7 +5,6 @@ public class Minecart : MonoBehaviour, IResettable
 {
     public PlayerMove player;
     public Animator playerAnimator;
-    private Rigidbody playerRb;
     public float rideLength = 500f;
 
     public GameObject nonAnimatedMinecart;
@@ -22,8 +21,6 @@ public class Minecart : MonoBehaviour, IResettable
 
     private void Start()
     {
-        playerRb = player.GetComponent<Rigidbody>();
-
         // Find the "minecart" holder object under the player
         minecartHolder = player.transform.Find("minecart");
         if (minecartHolder == null)
@@ -50,7 +47,6 @@ public class Minecart : MonoBehaviour, IResettable
             rideCart.transform.localRotation = rotationOffset;
             rideCart.SetActive(true);
 
-            //playerRb.constraints = RigidbodyConstraints.FreezeRotationX /*| RigidbodyConstraints.FreezeRotationZ*/; //or RigidbodyConstraints.None;
             StartCoroutine(ChangeSpeed(true));
             nonAnimatedMinecart.SetActive(false);
             PlayerMove.onMinecart = true;
@@ -80,12 +76,12 @@ public class Minecart : MonoBehaviour, IResettable
             yield return new WaitForSeconds(8.4f);
 
             // --- Phase 3: Decelerate back ---
+            PlayerMove.rayLength = 0.6f;
             yield return StartCoroutine(ChangeSpeed(false));
             playerAnimator.SetBool("isdrivingminecart", false);
             playerAnimator.SetTrigger("jumpoffminecart");
             PlayerMove.onMinecart = false;
             PlayerMove.rayLength = 1.2f;
-            //playerRb.constraints = RigidbodyConstraints.FreezeRotation; //freeze again rigidbody rotation
             rideCart.transform.SetParent(MAP.transform, true); //leave cart behind
             yield return new WaitForSeconds(4);
             rideCart.SetActive(false);
@@ -99,6 +95,8 @@ public class Minecart : MonoBehaviour, IResettable
         BoxCollider cartCollider = rideCart.GetComponent<BoxCollider>();
         cartCollider.enabled = true;
         cartRb.isKinematic = false;
+        Vector3 pushDir = transform.up;
+        cartRb.AddForce(pushDir * 12f, ForceMode.Impulse);
     }
 
     public void ResetState()
