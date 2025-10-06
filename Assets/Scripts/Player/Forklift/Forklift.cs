@@ -1,7 +1,6 @@
 // Forklift.cs (trigger / spawner)
 using UnityEngine;
 using System.Collections;
-using System.Linq;
 
 public class Forklift : MonoBehaviour, IResettable
 {
@@ -36,11 +35,8 @@ public class Forklift : MonoBehaviour, IResettable
         if (!other.CompareTag("Player") || triggered) return;
 
         // Prevent double spawn if a ride exists
-        if (rideForklift != null)
-        {
-            Debug.LogWarning("Forklift spawn skipped: rideForklift already exists.");
-            return;
-        }
+        if (rideForklift != null) return;
+
 
         triggered = true;
         CollectableControl.firstForklift = true;
@@ -49,8 +45,7 @@ public class Forklift : MonoBehaviour, IResettable
             playerAnimator.SetBool("isdrivingminecart", true);
 
         // Raise the player body visually
-        if (player != null)
-            player.StartCoroutine(player.RaisePlayerBody(0.511f, 0.6f));
+        player.StartCoroutine(player.RaisePlayerBody(0.511f, 0.6f));
 
         // Spawn the prefab (parented to forkliftHolder initially so it matches position/rotation)
         Vector3 spawnPos = forkliftHolder != null ? forkliftHolder.position : transform.position;
@@ -108,10 +103,8 @@ public class Forklift : MonoBehaviour, IResettable
 
     public void ResetState()
     {
-        // Clean up any leftover spawned forklift regardless of its parent
         if (rideForklift != null)
         {
-            // Destroying the ride will call its OnDestroy/OnDisable which will call NotifyRideDestroyed
             Destroy(rideForklift);
             rideForklift = null;
         }
@@ -120,16 +113,5 @@ public class Forklift : MonoBehaviour, IResettable
             nonAnimatedForklift.SetActive(true);
 
         triggered = false;
-
-        // If something else was left under forkliftHolder, make sure it's not active
-        if (forkliftHolder != null)
-        {
-            for (int i = forkliftHolder.childCount - 1; i >= 0; i--)
-            {
-                var child = forkliftHolder.GetChild(i);
-                if (child != null)
-                    child.gameObject.SetActive(false);
-            }
-        }
     }
 }

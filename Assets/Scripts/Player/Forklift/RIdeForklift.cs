@@ -33,7 +33,8 @@ public class RideForklift : MonoBehaviour, IResettable
     private RectTransform healthBarRect;
     private Tweener shakeTween;
     private bool isShaking = false;
-    public static bool lowHealth = false;
+    public bool lowHealth = false;
+    public static bool criticalHealth = false;
     public static bool forkliftDestroyed = false;
     public GameObject canvas;
     public GameObject smoke;
@@ -108,19 +109,7 @@ public class RideForklift : MonoBehaviour, IResettable
         {
             triggered = true;
             canvas.SetActive(false);
-            Debug.Log("Explosion");
-
-            if (explosionPrefab != null)
-            {
-                // spawn explosion at forklift position
-                GameObject expl = Instantiate(explosionPrefab, transform.position, transform.rotation);
-
-                // enable Explodable script if it’s not already enabled
-                var explScript = GetComponent<Explodable>();
-                if (explScript != null)
-                    explScript.enabled = true;
-                forkliftDestroyed = true;
-            }
+            Explode();
             return;
         }
 
@@ -207,8 +196,12 @@ public class RideForklift : MonoBehaviour, IResettable
                 float tBg = Mathf.Clamp01(1f - (currentHealth / 50f));
                 background.color = Color.Lerp(Color.white, Color.red, tBg);
             }
+
+            if (currentHealth <= 20f)
+                criticalHealth = true;
         }
-        else
+
+        else // no needed, since you can't recover health for the forklift
         {
             // If you recover above 50, stop shake and reset background
             if (lowHealth)
@@ -222,13 +215,30 @@ public class RideForklift : MonoBehaviour, IResettable
         }
 
         // Death
-        if (!forkliftDestroyed && currentHealth <= 0f && !PlayerMove.isDead)
+        if (!forkliftDestroyed && currentHealth <= 0f)
         {
-            PlayerMove.isDead = true;
             forkliftDestroyed = true;
             canvas.SetActive(false);
             StopHealthShake();
+            Explode();
             player.DieOnForklift();
+            return;
+        }
+    }
+
+    private void Explode()
+    {
+        if (explosionPrefab != null)
+        {
+            // spawn explosion at forklift position
+            GameObject expl = Instantiate(explosionPrefab, transform.position, transform.rotation);
+
+            // enable Explodable script if it’s not already enabled
+            var explScript = GetComponent<Explodable>();
+            if (explScript != null)
+                explScript.enabled = true;
+            forkliftDestroyed = true;
+            Debug.Log("Forklift exploded!");
         }
     }
 
@@ -298,9 +308,13 @@ public class RideForklift : MonoBehaviour, IResettable
 
     void OnDisable()
     {
-        // If the ride is disabled (manual disable flow), inform the trigger manager
+        // Notify trigger if possible
         if (triggerManager != null)
             triggerManager.NotifyRideDestroyed(gameObject);
+
+        // Extra cleanup safeguard: remove from holder if still attached
+        if (transform.parent != null && transform.parent.name == "forklift")
+            transform.SetParent(null);
     }
 
     void OnDestroy()
@@ -313,6 +327,9 @@ public class RideForklift : MonoBehaviour, IResettable
     {
         triggered = false;
         lowHealth = false;
+        criticalHealth = false;
         forkliftDestroyed = false;
     }
+
+
 }

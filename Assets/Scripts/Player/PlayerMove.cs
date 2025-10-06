@@ -365,18 +365,10 @@ public class PlayerMove : MonoBehaviour, IResettable
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSmooth * Time.deltaTime);
 
-            if (RideForklift.lowHealth)
-            {
-                tutorial2d.transform.Find("exit-forklift").gameObject.SetActive(true);
-                if (timer >= 3f)
-                {
-                    tutorial2d.transform.Find("exit-forklift").gameObject.SetActive(false);
-                    timer = 0f;
-                }
-            } else if (RideForklift.forkliftDestroyed)
-            {
-                tutorial2d.transform.Find("exit-forklift").gameObject.SetActive(false);
-            }
+            if (RideForklift.criticalHealth)
+                DisplayInstruction("SALTA!");
+            else if (RideForklift.forkliftDestroyed)
+                HideAllTutorialCards();
 
             // Leave forklift
             if (Input.GetKeyDown(KeyCode.UpArrow) || forkliftManager == null)
@@ -690,10 +682,12 @@ public class PlayerMove : MonoBehaviour, IResettable
     public void DieOnForklift()
     {
         Debug.Log("Player Dead on Forklift");
+        isDead = true;
         StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
         animator.SetTrigger("die");
         collectableControl.HandlePlayerDeath();
         StartCoroutine(EnableEndSequenceSafely());
+        onForklift = false;
         this.enabled = false;
     }
 
@@ -1015,6 +1009,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         levelControl.GetComponent<EndRunSequence>().enabled = false;
 
         // set bools
+        onForklift = false;
         boxCollider.enabled = true;
         forkliftCollider.enabled = false;
         godmodevisual.SetActive(false);
@@ -1023,9 +1018,22 @@ public class PlayerMove : MonoBehaviour, IResettable
         idle = true;
         isDead = false;
         onMinecart = false;
-        onForklift = false;
         triggered = false;
         rayLength = 1.2f;
+
+        // destroy vehicles
+        Transform forkliftHolder = transform.Find("forklift");
+        if (forkliftHolder != null)
+        {
+            for (int i = forkliftHolder.childCount -1; i>= 0; i--)
+                forkliftHolder.GetChild(i).gameObject.SetActive(false);
+        }
+        Transform minecartHolder = transform.Find("minecart");
+        if (minecartHolder != null)
+        {
+            for (int i = minecartHolder.childCount - 1; i >= 0; i--)
+                minecartHolder.GetChild(i).gameObject.SetActive(false);
+        }
 
         // set tutorial timers/ text
         timer = 0f;
