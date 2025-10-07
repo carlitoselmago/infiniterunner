@@ -462,6 +462,12 @@ public class PlayerMove : MonoBehaviour, IResettable
         UpdateGroundTracking();
         if (!isJumping && !isFlying)
             ApplyVerticalMovement();
+
+        if (isUnderwater)
+        {
+            animator.SetTrigger("endlessfall");
+            animator.SetBool("isrunning", false);
+        }
     }
 
     // Trigger processing forwarded from HitLogic (child)
@@ -701,6 +707,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     {
         Debug.Log("Player Dead on Forklift");
         isDead = true;
+        hitLogic.EnableHitbox(HitLogic.HitboxType.None);
         if (playerObject != null)
             playerObject.transform.SetParent(null); // unparent from Player
         StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
