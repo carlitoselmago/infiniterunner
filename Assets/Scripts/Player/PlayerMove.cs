@@ -112,8 +112,9 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     private float targetHeight = 22.0f; // previously 17.0f
     private float startY;
-    private float originY;
-    private float jumpedHeight;
+    private Transform playerStartParent; // To remember original parent
+    private Vector3 playerLocalPos;      // Local position relative to parent
+    private Quaternion playerLocalRot;   // Local rotation relative to parent
 
     private float jumpStarted;
 
@@ -174,7 +175,6 @@ public class PlayerMove : MonoBehaviour, IResettable
             hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
 
         startY = transform.position.y;
-        originY = startY;
         startRotation = transform.rotation;
         onMinecart = false;
         BGM.pitch = 1.0f;
@@ -185,6 +185,13 @@ public class PlayerMove : MonoBehaviour, IResettable
         godmodevisual.SetActive(false);
         initialmoveSpeed = moveSpeed;
         collectableControl = FindObjectOfType<CollectableControl>();
+
+        if (playerObject != null)
+        {
+            playerStartParent = playerObject.transform.parent;
+            playerLocalPos = playerObject.transform.localPosition;
+            playerLocalRot = playerObject.transform.localRotation;
+        }
 
         //set hearts based on amount of life
         for (int i = 0; i < maxHealth; i++)
@@ -468,7 +475,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             {
                 hit = true;
                 printCodeScript.SetCodePrompt("dead");
-                StartCoroutine(hurtMaskScript.Mask());
+                hurtMaskScript.Mask();
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
 
@@ -477,6 +484,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                     collectableControl.HandlePlayerDeath();
                     camAnimator.SetBool("dead", true);
                     isDead = true;
+                    if (playerObject != null)
+                        playerObject.transform.SetParent(null); // unparent from Player
                     if (onForklift)
                         StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
                     animator.SetTrigger("die");
@@ -493,6 +502,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                     printCodeScript.SetCodePrompt("hurt");
                     animator.SetBool("ishurt", true);
                     StartCoroutine(HurtSequence());
+                    //if (other.gameObject.layer != LayerMask.NameToLayer("HasSound")) // uncomment to not play the hurt sfx
                     HurtSFX.Play();
                     RemoveHeartsInReverseOrder();
                 }
@@ -588,6 +598,9 @@ public class PlayerMove : MonoBehaviour, IResettable
                 if (onForklift)
                     StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
                 animator.SetTrigger("die");
+                isDead = true;
+                if (playerObject != null)
+                    playerObject.transform.SetParent(null); // unparent from Player
                 animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
                 HideAllTutorialCards();
@@ -603,6 +616,9 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (onForklift)
                 StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
             animator.SetTrigger("die");
+            isDead = true;
+            if (playerObject != null)
+                playerObject.transform.SetParent(null); // unparent from Player
             if (onMinecart)
             {
                 //animator.SetTrigger("minecartcollision");
@@ -650,6 +666,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.CompareTag("obstacle"))
         {
+            hurtMaskScript.Mask();
             forkliftManager.ApplyCollisionDamage(Time.deltaTime);
             soundTimer -= Time.deltaTime;   // no està clar
             if (soundTimer <= 0f && !isDead)
@@ -657,7 +674,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 PlayRandomHitSound();
                 soundTimer = soundInterval;
             }
-        }
+        } else if (other.CompareTag("fall"))
+            DieOnForklift();
     }
     // forklift's pushing force
     private void OnCollisionStay(Collision collision)
@@ -667,7 +685,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (objrb != null && objrb.mass <= 100f && !objrb.isKinematic)
         {
             Vector3 pushDir = transform.forward;
-            objrb.AddForce(pushDir * 10f, ForceMode.Impulse);  // 8.5f --> push force
+            objrb.AddForce(pushDir * 20f, ForceMode.Impulse);
         }
     }
 
@@ -683,6 +701,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     {
         Debug.Log("Player Dead on Forklift");
         isDead = true;
+        if (playerObject != null)
+            playerObject.transform.SetParent(null); // unparent from Player
         StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
         animator.SetTrigger("die");
         collectableControl.HandlePlayerDeath();
@@ -1049,11 +1069,15 @@ public class PlayerMove : MonoBehaviour, IResettable
             rocks.SetActive(false);
         transform.position = startPosition;
         startY = transform.position.y;
-        originY = startY;
         transform.rotation = startRotation;
         moveSpeed = 12f;
         StartCoroutine(RaisePlayerBody(-0.35f, 0f));
-        // add rotation reset
+        if (playerObject != null && playerStartParent != null)
+        {
+            playerObject.transform.SetParent(playerStartParent); // reparent
+            playerObject.transform.localPosition = playerLocalPos;
+            playerObject.transform.localRotation = playerLocalRot;
+        }
 
         // set hitboxes
         if (hitLogic != null)
@@ -1062,6 +1086,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // set audio parameters
         BGM.pitch = 1.0f;
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 0, 0));
         StopThemes();
         
         mainThemeAlreadyPlaying = false;
