@@ -76,7 +76,7 @@ public class Minecart : MonoBehaviour, IResettable
             yield return new WaitForSeconds(8.4f);
 
             // --- Phase 3: Decelerate back ---
-            PlayerMove.rayLength = 0.6f;
+            PlayerMove.rayLength = 1.5f;
             yield return StartCoroutine(ChangeSpeed(false));
             playerAnimator.SetBool("isdrivingminecart", false);
             playerAnimator.SetTrigger("jumpoffminecart");
