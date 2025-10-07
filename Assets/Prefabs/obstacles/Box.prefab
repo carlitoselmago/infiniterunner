@@ -40,6 +40,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 65034867545946468}
     m_Modifications:
+    - target: {fileID: -585885203532798036, guid: b41b38d048f374b038b6412611d4b756,
+        type: 3}
+      propertyPath: wokeOnEnable
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2591906224090668133, guid: b41b38d048f374b038b6412611d4b756,
         type: 3}
       propertyPath: m_LocalPosition.x

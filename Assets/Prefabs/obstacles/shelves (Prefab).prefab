@@ -157,7 +157,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 882426624406734529}
   serializedVersion: 4
-  m_Mass: 120
+  m_Mass: 80
   m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf045617829644679a6ce3c446d24ace, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wokeOnEnable: 0
+  wokeOnEnable: 1
 --- !u!1 &5037406393312208575 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8930853752465368501, guid: 8f61ec00a9063421db3876b75c544e5a,

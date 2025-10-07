@@ -238,8 +238,12 @@ public class RideForklift : MonoBehaviour, IResettable
             if (explScript != null)
                 explScript.enabled = true;
             forkliftDestroyed = true;
-            AudioSource engineSound = GetComponent<AudioSource>();
-            engineSound.Stop();
+            var audioSources = GetComponents<AudioSource>();
+            foreach (var source in audioSources)
+            {
+                if (source.loop)
+                    source.Stop();
+            }
             Debug.Log("Forklift exploded!");
         }
     }

@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf045617829644679a6ce3c446d24ace, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wokeOnEnable: 0
+  wokeOnEnable: 1
 --- !u!82 &6177990438991848672
 AudioSource:
   m_ObjectHideFlags: 0

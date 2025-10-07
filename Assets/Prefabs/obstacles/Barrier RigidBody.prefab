@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 4049407322244347835}
   - component: {fileID: 7618079840792253697}
   - component: {fileID: 2125114502012468978}
-  - component: {fileID: 7257360917340611046}
   - component: {fileID: 2942179503425707245}
   - component: {fileID: 1328951090615465273}
+  - component: {fileID: 4967609463739945016}
   m_Layer: 12
   m_Name: Barrier RigidBody
   m_TagString: obstacle
@@ -234,28 +234,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!64 &7257360917340611046
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7750159653028343740}
-  m_Material: {fileID: 13400000, guid: 95a69f50369ff4d768040fa4f51b8af7, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 1042801323994665371, guid: 0767df1485b6b3d48a31a0ad8d276df7, type: 3}
 --- !u!114 &2942179503425707245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf045617829644679a6ce3c446d24ace, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wokeOnEnable: 0
+  wokeOnEnable: 1
 --- !u!114 &1328951090615465273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289,3 +267,25 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 20ad0f53f8deb4e76b740bfbc8770f21, type: 3}
   - {fileID: 8300000, guid: 8ec419f4f368e4b038b4521042691ca0, type: 3}
   - {fileID: 8300000, guid: d1bcdc22591d948c785955d27d93fcdf, type: 3}
+--- !u!64 &4967609463739945016
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7750159653028343740}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 4150
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1042801323994665371, guid: 0767df1485b6b3d48a31a0ad8d276df7, type: 3}

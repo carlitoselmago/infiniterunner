@@ -879,6 +879,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     IEnumerator delayedGodmodeOff()
     {
+        godmode = true;
         godmodevisual.SetActive(true);
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = true;
         yield return new WaitForSeconds(5);
