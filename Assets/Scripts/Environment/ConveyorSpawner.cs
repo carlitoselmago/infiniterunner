@@ -16,6 +16,7 @@ public class ConveyorSpawner : MonoBehaviour
 
     [Header("Culling")]
     public float maxDistance = 300f;       // Cull when behind or too far ahead
+    public float stopDistance = 30f;        // Distance at which spawner stops
 
     private List<GameObject> pool = new List<GameObject>();
     private float nextSpawnTime = 1f;
@@ -35,6 +36,11 @@ public class ConveyorSpawner : MonoBehaviour
 
     void Update()
     {
+        // Stop spawning if camera/player is close to the start of the conveyor
+        float distanceToCam = Vector3.Distance(cam.position, transform.position);
+        if (distanceToCam < stopDistance)
+            return;
+
         if (Time.time >= nextSpawnTime)
         {
             SpawnRandomObject();
