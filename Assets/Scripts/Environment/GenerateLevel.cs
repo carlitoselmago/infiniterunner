@@ -159,48 +159,27 @@ public class GenerateLevel : MonoBehaviour, IResettable
         activeSections.Enqueue(newSection);
     }
 
-    public void EnterMine()
+    public void EnterMine(GameObject mineSection)
     {
         minePresent = false;
-        //Debug.Log($"EnterMine() — activeSections count before: {activeSections.Count}");
-        Queue<GameObject> newActive = new Queue<GameObject>();
-        GameObject mineEntry = null;
+        protectMineSection = true;
 
-        if (mineEntry != null)
-        {
-            newActive.Enqueue(mineEntry);
-            protectMineSection = true; // start protection
-        }
+        // Remove all other sections, keep the mine one
+        Queue<GameObject> newActive = new Queue<GameObject>();
 
         while (activeSections.Count > 0)
         {
             GameObject section = activeSections.Dequeue();
-            Chunk chunkData = section.GetComponent<Chunk>();
-            //int num = (chunkData != null) ? chunkData.chunkNum : -999;
-            //Debug.Log($" Checking section '{section.name}' chunkNum={num}");
-
-            if (chunkData == null)
-            {
-                Debug.LogWarning($"  Section {section.name} has no Chunk component — returning to pool.");
-                ReturnToPool(section);
-                continue;
-            }
-
-            if (chunkData.chunkNum != mineEntryIndex)
+            if (section != mineSection)
                 ReturnToPool(section);
             else
-            {
-                mineEntry = section;
-                //Debug.Log(" --> Found mine entry here!");
-            }
+                newActive.Enqueue(section);
         }
 
-        if (mineEntry != null)
-            newActive.Enqueue(mineEntry);
-
-        //Debug.Log($"EnterMine() — newActive count after: {newActive.Count}");
         activeSections = newActive;
+        Debug.Log($"EnterMine() — keeping mine section {mineSection.name}, cleared others");
     }
+
 
     public void ExitMine()
     {
