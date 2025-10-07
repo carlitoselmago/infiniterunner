@@ -300,14 +300,13 @@ public class RideForklift : MonoBehaviour, IResettable
         }
 
         // small visual delay so the object remains visible for a moment
-        yield return null;/*
         yield return new WaitForSeconds(3f);
 
         // Before destroying, notify trigger manager so it doesn't keep a stale reference
         if (triggerManager != null)
             triggerManager.NotifyRideDestroyed(gameObject);
 
-        Destroy(gameObject);*/
+        Destroy(gameObject);
     }
 
     void OnDisable()
