@@ -51,7 +51,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     {
         if (!generatingSandstorm) return;
 
-        if (MineData.isInTheMine && generatingSandstorm)
+        if (MineData.isInTheMine && sandstormGeneratorEnabled)
         {
             StopTheSandstorm();
             generatingSandstorm = false;
@@ -163,17 +163,36 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     public void StopTheSandstorm()
     {
         if (!generatingSandstorm) return;
+        sandstormText.SetActive(false);
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
     }
 
+    private IEnumerator FadeOutAndStopAudio()
+    {
+        // Fade the mixer group volume down to 0 smoothly
+        yield return StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 2f, 0f));
+
+        // Stop both audio sources cleanly
+        sandstormFX.Stop();
+        endStormSFX.Stop();
+    }
+
     private void OnDisable()
     {
-        StopAllCoroutines();
-        stormCoroutine = null;
+        if (stormCoroutine != null)
+        {
+            StopCoroutine(stormCoroutine);
+            stormCoroutine = null;
+        }
+
         generatingSandstorm = false;
+        sandstormGeneratorEnabled = false;
+
+        StartCoroutine(FadeOutAndStopAudio());
     }
+
 
     public void ResetState()
     {
@@ -183,16 +202,17 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
             stormCoroutine = null;
         }
 
-        StopTheSandstorm();
+        sandstormGeneratorEnabled = false;   // disable script until called again
         generatingSandstorm = false;
-        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 2f, 0f));
+        triggered = false;
+        StopTheSandstorm();
+        StartCoroutine(FadeOutAndStopAudio());
+
         RenderSettings.fogDensity = 0;
         sandstormMaterial.SetFloat("_GlobalAlpha", 0f);
         sandstormVolume.weight = 0;
         sandstormParticles.Stop();
-        triggered = false;
         StopCoroutine(GenerateTheSandstorm(0));
-        sandstormGeneratorEnabled = false;   // disable script until called again
     }
 
 }
