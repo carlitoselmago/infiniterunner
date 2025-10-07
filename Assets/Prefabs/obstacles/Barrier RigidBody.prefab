@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7257360917340611046}
   - component: {fileID: 2942179503425707245}
   - component: {fileID: 1328951090615465273}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Barrier RigidBody
   m_TagString: obstacle
   m_Icon: {fileID: 0}
@@ -250,7 +250,7 @@ MeshCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
   m_Convex: 1
