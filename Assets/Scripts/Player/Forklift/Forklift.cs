@@ -37,9 +37,9 @@ public class Forklift : MonoBehaviour, IResettable
         // Prevent double spawn if a ride exists
         if (rideForklift != null) return;
 
-
         triggered = true;
-        CollectableControl.firstForklift = true;
+        if (!CollectableControl.firstForklift)
+            CollectableControl.firstForklift = true;
 
         if (playerAnimator != null)
             playerAnimator.SetBool("isdrivingminecart", true);

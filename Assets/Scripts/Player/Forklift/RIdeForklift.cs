@@ -238,6 +238,8 @@ public class RideForklift : MonoBehaviour, IResettable
             if (explScript != null)
                 explScript.enabled = true;
             forkliftDestroyed = true;
+            AudioSource engineSound = GetComponent<AudioSource>();
+            engineSound.Stop();
             Debug.Log("Forklift exploded!");
         }
     }
@@ -273,9 +275,7 @@ public class RideForklift : MonoBehaviour, IResettable
 
         if (shakeTween != null) shakeTween.Kill();
         if (healthBarRect != null)
-        {
             healthBarRect.anchoredPosition = Vector2.zero; // reset pos cleanly
-        }
         isShaking = false;
     }
 
