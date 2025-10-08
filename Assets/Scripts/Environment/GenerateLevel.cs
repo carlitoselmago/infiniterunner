@@ -127,7 +127,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
             {
                 float sectionEndZ = oldest.transform.position.z + oldestChunk.chunkLength + oldestChunk.cullBuffer;
                 int mapFront = -Mathf.RoundToInt(MAP.transform.position.z);
-                if(mapFront > sectionEndZ && activeSections.Count > 8)
+                if(mapFront > sectionEndZ && activeSections.Count > 9)
                 {
                     oldest = activeSections.Dequeue();
                     ReturnToPool(oldest);
