@@ -13,6 +13,8 @@ public class Minecart : MonoBehaviour, IResettable
     public AudioSource minecartSFX;
     private GameObject rideCart;
     private Transform minecartHolder;
+    private Coroutine speedCoroutine;
+
     // Define offsets
     Vector3 positionOffset = new Vector3(-0.012f, -0.129f, -0.58f);
     Quaternion rotationOffset = Quaternion.Euler(0, 270, 0);
@@ -42,12 +44,12 @@ public class Minecart : MonoBehaviour, IResettable
             playerAnimator.SetBool("isdrivingminecart", true);
 
             // --- Spawn a working copy ---
-            /*GameObject */rideCart = Instantiate(animatedMinecartPrefab, minecartHolder);
+            rideCart = Instantiate(animatedMinecartPrefab, minecartHolder);
             rideCart.transform.localPosition = positionOffset;
             rideCart.transform.localRotation = rotationOffset;
             rideCart.SetActive(true);
 
-            StartCoroutine(ChangeSpeed(true));
+            speedCoroutine = StartCoroutine(ChangeSpeed(true));
             nonAnimatedMinecart.SetActive(false);
             PlayerMove.onMinecart = true;
         }
@@ -84,20 +86,45 @@ public class Minecart : MonoBehaviour, IResettable
             PlayerMove.rayLength = 1.2f;
             rideCart.transform.SetParent(MAP.transform, true); //leave cart behind
             yield return new WaitForSeconds(4);
-            rideCart.SetActive(false);
+            //rideCart.SetActive(false);
+            Destroy(rideCart);
+        }
+    }
+
+    private void StopSpeedCoroutine()
+    {
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            speedCoroutine = null;
         }
     }
 
     public void CartCrash()
     {
+        StopSpeedCoroutine(); // stop the minecart ride
+
+        if (rideCart == null)
+            return;
+
         rideCart.transform.SetParent(MAP.transform, true);
+
         Rigidbody cartRb = rideCart.GetComponent<Rigidbody>();
         BoxCollider cartCollider = rideCart.GetComponent<BoxCollider>();
-        cartCollider.enabled = true;
-        cartRb.isKinematic = false;
-        Vector3 pushDir = transform.up;
-        cartRb.AddForce(pushDir * 12f, ForceMode.Impulse);
+
+        if (cartCollider != null) cartCollider.enabled = true;
+        if (cartRb != null)
+        {
+            cartRb.isKinematic = false;
+            Vector3 pushDir = transform.up;
+            cartRb.AddForce(pushDir * 12f, ForceMode.Impulse);
+        }
+
+        // Optionally stop cart SFX if it loops
+        if (minecartSFX.isPlaying)
+            minecartSFX.Stop();
     }
+
 
     public void ResetState()
     {
