@@ -374,11 +374,6 @@ public class PlayerMove : MonoBehaviour, IResettable
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSmooth * Time.deltaTime);
 
-            if (RideForklift.criticalHealth)
-                DisplayInstruction("SALTA!");
-            else if (RideForklift.forkliftDestroyed)
-                HideAllTutorialCards();
-
             // Leave forklift
             if (Input.GetKeyDown(KeyCode.UpArrow) || forkliftManager == null)
             {

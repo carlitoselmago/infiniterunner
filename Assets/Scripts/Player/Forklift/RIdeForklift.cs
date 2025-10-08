@@ -42,8 +42,12 @@ public class RideForklift : MonoBehaviour, IResettable
     public static bool forkliftDestroyed = false;
     public static bool isRepairing = false;
     public GameObject canvas;
+    public GameObject instructionCanvas;
     public GameObject smoke;
     public Slider healthBar;
+    private RectTransform exitTextRect;
+    private Tweener exitTextTween;
+
 
     private bool initialized = false;
     private Coroutine leaveRoutine;
@@ -79,6 +83,7 @@ public class RideForklift : MonoBehaviour, IResettable
         if (sliderCanvasGroup != null) sliderCanvasGroup.alpha = 0.5f;
 
         if (smoke != null) smoke.SetActive(true);
+        if (instructionCanvas != null) instructionCanvas.SetActive(true);
         StopHealthShake();
     }
 
@@ -108,6 +113,13 @@ public class RideForklift : MonoBehaviour, IResettable
                 smokeParticles.Play();
             }
         }
+
+        if (instructionCanvas != null)
+        {
+            var textObj = instructionCanvas.transform.Find("text-sortir");
+            if (textObj != null)
+                exitTextRect = textObj.GetComponent<RectTransform>();
+        }
     }
 
     void Update()
@@ -124,12 +136,13 @@ public class RideForklift : MonoBehaviour, IResettable
         {
             triggered = true;
             canvas.SetActive(false);
+            instructionCanvas.SetActive(false);
             Explode();
             return;
         }
 
         // --- Gradual health recovery when holding Down Arrow ---
-        if (Input.GetKey(KeyCode.DownArrow) && !forkliftDestroyed && !PlayerMove.isDead)
+        if (Input.GetKey(KeyCode.DownArrow) && !forkliftDestroyed && !PlayerMove.isDead && PlayerMove.onForklift)
         {
             isRepairing = true;
             float recoverSpeed = 5f; // health points per second
@@ -158,9 +171,10 @@ public class RideForklift : MonoBehaviour, IResettable
             {
                 isRepairPulse = true;
                 pulseTimer = 0f;
+                SetWarningLightsColor(Color.green);
             }
 
-            PulseWarningLights(Color.green, Color.yellow, 10f);
+            PulseWarningLights(Color.green, Color.green, 10f);
 
             // Stop smoke and shake if health rises above 50
             if (lowHealth && currentHealth > 50f)
@@ -178,7 +192,10 @@ public class RideForklift : MonoBehaviour, IResettable
 
             // Return to normal red flashing
             if (isRepairPulse)
+            {
+                pulseTimer = 0f;
                 isRepairPulse = false;
+            }
             SetWarningLightsColor(Color.red);
 
             if (isRepairing)
@@ -229,8 +246,10 @@ public class RideForklift : MonoBehaviour, IResettable
     public void ExitForklift()
     {
         if (player == null) return;
+        PlayerMove.onForklift = false;
 
         canvas.SetActive(false);
+        instructionCanvas.SetActive(false);
 
         player.StartCoroutine(player.RaisePlayerBody(-0.35f, 0.6f));
 
@@ -243,7 +262,6 @@ public class RideForklift : MonoBehaviour, IResettable
             if (anim != null) anim.SetBool("isdrivingminecart", false);
         }
 
-        PlayerMove.onForklift = false;
         player.moveSpeed = 12f;
         if (player != null) player.forkliftManager = null;
 
@@ -292,6 +310,25 @@ public class RideForklift : MonoBehaviour, IResettable
 
             if (currentHealth <= 20f)
                 criticalHealth = true;
+
+            if (criticalHealth && exitTextRect != null)
+            {
+                if (exitTextTween == null || !exitTextTween.IsActive())
+                {
+                    exitTextTween = exitTextRect.DORotate(new Vector3(0, 0, 15f), 0.1f, RotateMode.LocalAxisAdd)
+                        .SetLoops(-1, LoopType.Yoyo)
+                        .SetEase(Ease.Linear);
+                }
+            }
+            else
+            {
+                if (exitTextTween != null && exitTextTween.IsActive())
+                {
+                    exitTextTween.Kill();
+                    exitTextRect.localRotation = Quaternion.identity;
+                }
+            }
+
         }
 
         else
@@ -311,6 +348,7 @@ public class RideForklift : MonoBehaviour, IResettable
         {
             forkliftDestroyed = true;
             canvas.SetActive(false);
+            instructionCanvas.SetActive(false);
             StopHealthShake();
             Explode();
             player.DieOnForklift();
@@ -394,8 +432,7 @@ public class RideForklift : MonoBehaviour, IResettable
         }
 
         // small visual delay so the object remains visible for a moment
-        yield return new WaitForSeconds(3f);
-
+        yield return new WaitForSeconds(12f);
         // Before destroying, notify trigger manager so it doesn't keep a stale reference
         if (triggerManager != null)
             triggerManager.NotifyRideDestroyed(gameObject);
