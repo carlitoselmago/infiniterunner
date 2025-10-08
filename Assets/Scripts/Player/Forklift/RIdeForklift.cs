@@ -16,13 +16,8 @@ public class RideForklift : MonoBehaviour, IResettable
     public AudioClip repairSFX;
     private AudioSource repairAudio;
     public Light[] warningLights;
-
-    /*[Header("Fork Controls")]
-    private Transform forkTransform;
-    private Rigidbody forkRb;
-    public float forkSpeed = 1.5f;
-    public float minForkZ = 0f;
-    public float maxForkZ = 4.5f;*/
+    private float pulseTimer = 0f;
+    private bool isRepairPulse = false;
 
     [Header("Explosion")]
     public GameObject explosionPrefab;
@@ -60,17 +55,6 @@ public class RideForklift : MonoBehaviour, IResettable
         MAP = map;
         triggerManager = trigger;
         playerAnimator = playerAnim;
-        /*
-        // find fork (VisMast) deep in hierarchy
-        forkTransform = GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name == "VisMast");
-
-        if (forkTransform != null)
-        {
-            forkRb = forkTransform.GetComponent<Rigidbody>();
-            if (forkRb == null)
-                forkRb = forkTransform.gameObject.AddComponent<Rigidbody>();
-            forkRb.isKinematic = true;
-        }*/
 
         initialized = true;
     }
@@ -169,6 +153,13 @@ public class RideForklift : MonoBehaviour, IResettable
             // Play repair sound
             if (repairAudio != null && !repairAudio.isPlaying)
                 repairAudio.Play();
+
+            if (!isRepairPulse)
+            {
+                isRepairPulse = true;
+                pulseTimer = 0f;
+            }
+
             PulseWarningLights(Color.green, Color.yellow, 10f);
 
             // Stop smoke and shake if health rises above 50
@@ -186,6 +177,8 @@ public class RideForklift : MonoBehaviour, IResettable
                 repairAudio.Stop();
 
             // Return to normal red flashing
+            if (isRepairPulse)
+                isRepairPulse = false;
             SetWarningLightsColor(Color.red);
 
             if (isRepairing)
@@ -199,37 +192,23 @@ public class RideForklift : MonoBehaviour, IResettable
             PulseWarningLights(Color.black, Color.red, 2f);
 
         UpdateSmokeEffect();
-
-        // Fork movement (local Z)
-        /*
-        if (forkTransform != null)
-        {
-            Vector3 pos = forkTransform.localPosition;
-            if (Input.GetKey(KeyCode.UpArrow)) pos.z += forkSpeed * Time.deltaTime; // maybe too much - compromise
-            else if (Input.GetKey(KeyCode.DownArrow)) pos.z -= forkSpeed * Time.deltaTime;
-            pos.z = Mathf.Clamp(pos.z, minForkZ, maxForkZ);
-            forkTransform.localPosition = pos;
-        }*/
     }
 
     private void SetWarningLightsColor(Color color)
     {
         if (warningLights == null) return;
         foreach (var light in warningLights)
-        {
             if (light != null) light.color = color;
-        }
     }
 
     private void PulseWarningLights(Color colorA, Color colorB, float speed = 3f)
     {
         if (warningLights == null) return;
-        float t = (Mathf.Sin(Time.time * speed) + 1f) * 0.5f;
+        pulseTimer += Time.deltaTime * speed;
+        float t = (Mathf.Sin(pulseTimer) + 1f) * 0.5f;
         Color c = Color.Lerp(colorA, colorB, t);
         foreach (var light in warningLights)
-        {
             if (light != null) light.color = c;
-        }
     }
 
     private void UpdateSmokeEffect()
@@ -253,10 +232,8 @@ public class RideForklift : MonoBehaviour, IResettable
 
         canvas.SetActive(false);
 
-        // Lower player visual body
         player.StartCoroutine(player.RaisePlayerBody(-0.35f, 0.6f));
 
-        // toggle animator safely (playerAnimator might be assigned from trigger)
         if (playerAnimator != null)
             playerAnimator.SetBool("isdrivingminecart", false);
         else
@@ -450,6 +427,4 @@ public class RideForklift : MonoBehaviour, IResettable
         criticalHealth = false;
         forkliftDestroyed = false;
     }
-
-
 }
