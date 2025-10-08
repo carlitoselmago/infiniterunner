@@ -13,12 +13,12 @@ public class RideForklift : MonoBehaviour, IResettable
     private Transform forkliftHolder;
     private bool triggered = false;
 
-    [Header("Fork Controls")]
+    /*[Header("Fork Controls")]
     private Transform forkTransform;
     private Rigidbody forkRb;
     public float forkSpeed = 1.5f;
     public float minForkZ = 0f;
-    public float maxForkZ = 4.5f;
+    public float maxForkZ = 4.5f;*/
 
     [Header("Explosion")]
     public GameObject explosionPrefab;
@@ -50,7 +50,7 @@ public class RideForklift : MonoBehaviour, IResettable
         MAP = map;
         triggerManager = trigger;
         playerAnimator = playerAnim;
-
+        /*
         // find fork (VisMast) deep in hierarchy
         forkTransform = GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name == "VisMast");
 
@@ -60,7 +60,7 @@ public class RideForklift : MonoBehaviour, IResettable
             if (forkRb == null)
                 forkRb = forkTransform.gameObject.AddComponent<Rigidbody>();
             forkRb.isKinematic = true;
-        }
+        }*/
 
         initialized = true;
     }
