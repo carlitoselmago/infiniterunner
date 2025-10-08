@@ -6,6 +6,11 @@ public class PlayRandomHitSound : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip[] hitClips;
 
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") || other.CompareTag("car"))
