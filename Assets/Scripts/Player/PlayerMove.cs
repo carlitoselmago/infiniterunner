@@ -349,6 +349,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             float tiltAngle = 20f;       // tilt amount
 
             float moveInput = 0f;
+            if (RideForklift.isRepairing) return;
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
                 moveInput = -1f;
             else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
@@ -460,12 +461,20 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (isUnderwater)
         {
             moveSpeed = 0f;
-            animator.SetTrigger("endlessfall");
             animator.SetBool("isrunning", false);
+
             if (onForklift)
+            {
+                animator.SetBool("isdrivingminecart", false);
                 forkliftManager.ExitForklift();
+                onForklift = false;
+                UpdateActiveCollider();
+            }
+
+            animator.SetTrigger("endlessfall");
             collectableControl.HandlePlayerDeath();
         }
+
     }
 
     // Trigger processing forwarded from HitLogic (child)
@@ -702,11 +711,11 @@ public class PlayerMove : MonoBehaviour, IResettable
     public void DieOnForklift()
     {
         Debug.Log("Player Dead on Forklift");
+        StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
         isDead = true;
         hitLogic.EnableHitbox(HitLogic.HitboxType.None);
         if (playerObject != null)
             playerObject.transform.SetParent(null); // unparent from Player
-        StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
         animator.SetTrigger("die");
         collectableControl.HandlePlayerDeath();
         StartCoroutine(EnableEndSequenceSafely());

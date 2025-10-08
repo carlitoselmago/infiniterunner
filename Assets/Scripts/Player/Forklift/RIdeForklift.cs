@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-using System.Linq;
 using DG.Tweening;
 
 public class RideForklift : MonoBehaviour, IResettable
@@ -13,6 +12,11 @@ public class RideForklift : MonoBehaviour, IResettable
     private Transform forkliftHolder;
     private bool triggered = false;
 
+    [Header("Repair")]
+    public AudioClip repairSFX;
+    private AudioSource repairAudio;
+    public Light[] warningLights;
+
     /*[Header("Fork Controls")]
     private Transform forkTransform;
     private Rigidbody forkRb;
@@ -22,6 +26,11 @@ public class RideForklift : MonoBehaviour, IResettable
 
     [Header("Explosion")]
     public GameObject explosionPrefab;
+
+    [Header("Smoke FX")]
+    private ParticleSystem smokeParticles;
+    private ParticleSystem.EmissionModule smokeEmission;
+    private float maxSmokeRate = 4000f; // adjust for intensity
 
     [Header("Forklift Endurance")]
     public float maxHealth = 100f;
@@ -36,6 +45,7 @@ public class RideForklift : MonoBehaviour, IResettable
     public bool lowHealth = false;
     public static bool criticalHealth = false;
     public static bool forkliftDestroyed = false;
+    public static bool isRepairing = false;
     public GameObject canvas;
     public GameObject smoke;
     public Slider healthBar;
@@ -84,7 +94,7 @@ public class RideForklift : MonoBehaviour, IResettable
         if (background != null) background.color = Color.white;
         if (sliderCanvasGroup != null) sliderCanvasGroup.alpha = 0.5f;
 
-        if (smoke != null) smoke.SetActive(false);
+        if (smoke != null) smoke.SetActive(true);
         StopHealthShake();
     }
 
@@ -93,6 +103,27 @@ public class RideForklift : MonoBehaviour, IResettable
         forkliftHolder = player.transform.Find("forklift");
         if (forkliftHolder == null)
             Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
+
+        // --- Setup repair audio source ---
+        if (repairSFX != null)
+        {
+            repairAudio = gameObject.AddComponent<AudioSource>();
+            repairAudio.clip = repairSFX;
+            repairAudio.loop = true;
+            repairAudio.playOnAwake = false;
+            repairAudio.volume = 0.6f;
+        }
+
+        if (smoke != null)
+        {
+            smokeParticles = smoke.GetComponent<ParticleSystem>();
+            if (smokeParticles != null)
+            {
+                smokeEmission = smokeParticles.emission;
+                smokeEmission.rateOverTime = 0f;
+                smokeParticles.Play();
+            }
+        }
     }
 
     void Update()
@@ -113,6 +144,62 @@ public class RideForklift : MonoBehaviour, IResettable
             return;
         }
 
+        // --- Gradual health recovery when holding Down Arrow ---
+        if (Input.GetKey(KeyCode.DownArrow) && !forkliftDestroyed && !PlayerMove.isDead)
+        {
+            isRepairing = true;
+            float recoverSpeed = 5f; // health points per second
+            currentHealth += recoverSpeed * Time.deltaTime;
+            currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+            playerAnimator.SetBool("isrepairing", true);
+
+            if (healthBar != null)
+                healthBar.value = currentHealth;
+
+            if (fillImage != null)
+            {
+                float tFill = 1f - (currentHealth / maxHealth);
+                fillImage.color = Color.Lerp(Color.white, Color.red, tFill);
+            }
+
+            if (sliderCanvasGroup != null)
+                sliderCanvasGroup.alpha = Mathf.Lerp(0.5f, 1f, 1f - (currentHealth / maxHealth));
+
+            // Play repair sound
+            if (repairAudio != null && !repairAudio.isPlaying)
+                repairAudio.Play();
+            PulseWarningLights(Color.green, Color.yellow, 10f);
+
+            // Stop smoke and shake if health rises above 50
+            if (lowHealth && currentHealth > 50f)
+            {
+                lowHealth = false;
+                StopHealthShake();
+                if (background != null) background.color = Color.white;
+            }
+        }
+        else
+        {
+            // Stop when key released
+            if (repairAudio != null && repairAudio.isPlaying)
+                repairAudio.Stop();
+
+            // Return to normal red flashing
+            SetWarningLightsColor(Color.red);
+
+            if (isRepairing)
+            {
+                isRepairing = false;
+                playerAnimator.SetBool("isrepairing", false);
+            }
+        }
+
+        if (!isRepairing && warningLights != null)
+            PulseWarningLights(Color.black, Color.red, 2f);
+
+        UpdateSmokeEffect();
+
         // Fork movement (local Z)
         /*
         if (forkTransform != null)
@@ -125,12 +212,46 @@ public class RideForklift : MonoBehaviour, IResettable
         }*/
     }
 
+    private void SetWarningLightsColor(Color color)
+    {
+        if (warningLights == null) return;
+        foreach (var light in warningLights)
+        {
+            if (light != null) light.color = color;
+        }
+    }
+
+    private void PulseWarningLights(Color colorA, Color colorB, float speed = 3f)
+    {
+        if (warningLights == null) return;
+        float t = (Mathf.Sin(Time.time * speed) + 1f) * 0.5f;
+        Color c = Color.Lerp(colorA, colorB, t);
+        foreach (var light in warningLights)
+        {
+            if (light != null) light.color = c;
+        }
+    }
+
+    private void UpdateSmokeEffect()
+    {
+        if (smokeParticles == null) return;
+
+        // Map health (100 → 0) to emission (0 → maxSmokeRate)
+        float t = 1f - (currentHealth / maxHealth);
+        float targetRate = Mathf.Lerp(0f, maxSmokeRate, t * t); // quadratic easing for smoother start
+
+        smokeEmission.rateOverTime = targetRate;
+
+        var main = smokeParticles.main;
+        Color baseColor = Color.Lerp(new Color(0.7f, 0.7f, 0.7f, 0.3f), new Color(0.3f, 0.3f, 0.3f, 0.6f), t);
+        main.startColor = baseColor;
+    }
+
     public void ExitForklift()
     {
         if (player == null) return;
 
         canvas.SetActive(false);
-        smoke.SetActive(false);
 
         // Lower player visual body
         player.StartCoroutine(player.RaisePlayerBody(-0.35f, 0.6f));
@@ -174,9 +295,7 @@ public class RideForklift : MonoBehaviour, IResettable
 
         // Canvas alpha
         if (sliderCanvasGroup != null)
-        {
             sliderCanvasGroup.alpha = Mathf.Lerp(0.5f, 1f, 1f - (currentHealth / maxHealth));
-        }
 
         // LOW HEALTH logic (<= 50). Update background color every tick while low.
         if (currentHealth <= 50f)
@@ -184,9 +303,6 @@ public class RideForklift : MonoBehaviour, IResettable
             if (!lowHealth)
             {
                 lowHealth = true;
-                if (smoke != null) smoke.SetActive(true);
-
-                // start a continuous shake
                 StartHealthShake();
             }
 
@@ -201,13 +317,12 @@ public class RideForklift : MonoBehaviour, IResettable
                 criticalHealth = true;
         }
 
-        else // no needed, since you can't recover health for the forklift
+        else
         {
             // If you recover above 50, stop shake and reset background
             if (lowHealth)
             {
                 lowHealth = false;
-                if (smoke != null) smoke.SetActive(false);
                 StopHealthShake();
 
                 if (background != null) background.color = Color.white;
@@ -230,6 +345,8 @@ public class RideForklift : MonoBehaviour, IResettable
     {
         if (explosionPrefab != null)
         {
+            isRepairing = false;
+            smoke.SetActive(false);
             // spawn explosion at forklift position
             GameObject expl = Instantiate(explosionPrefab, transform.position, transform.rotation);
 
