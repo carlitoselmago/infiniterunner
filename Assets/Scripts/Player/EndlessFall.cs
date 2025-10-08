@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EndlessFall : MonoBehaviour, IResettable
 {
-    private float decelerationRate = 1000f;
+    private float decelerationRate = 800f;
     public PlayerMove player;
     public GameObject levelControl;
     public Animator playerAnimator;
@@ -40,17 +40,27 @@ public class EndlessFall : MonoBehaviour, IResettable
 
         Debug.Log("Handling endless fall...");
 
+        /*
         // Disable physics collider to prevent collisions with Ground while sinking
-        BoxCollider box = player.GetComponent<BoxCollider>();
-        if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
+        if (!MineData.isInTheMine) 
         {
-            if (box.enabled)
+            BoxCollider[] boxes = player.GetComponentsInChildren<BoxCollider>();
+            foreach (BoxCollider box in boxes)
             {
-                box.enabled = false;
-                Debug.Log("... Player BoxCollider disabled during fall.");
+                if (box.enabled)
+                {
+                    box.enabled = false;
+                    Debug.Log("... Player BoxCollider disabled during water fall.");
+                }
             }
         }
-        collectableControl.HandlePlayerDeath();
+        collectableControl.HandlePlayerDeath();*/
+
+        if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
+            PlayerMove.isUnderwater = true; // Disable physics collider to prevent collisions with Ground while falling
+        else
+            collectableControl.HandlePlayerDeath(); // otherwise managed by PlayerMove if isUnderwater is true
+
         levelControl.GetComponent<EndRunSequence>().enabled = true;
 
         // Gradually reduce movement speed

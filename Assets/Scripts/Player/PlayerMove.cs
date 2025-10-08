@@ -125,6 +125,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public HurtMask hurtMaskScript;
     public AudioSource minecartObject;
     private bool triggered = false;
+    public GameObject endstormText;
 
     public GameObject MAP;
 
@@ -389,13 +390,6 @@ public class PlayerMove : MonoBehaviour, IResettable
             }
         }
 
-
-
-
-
-
-
-
         // pos interpolator
         switch (pos)
         {
@@ -465,8 +459,12 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (isUnderwater)
         {
+            moveSpeed = 0f;
             animator.SetTrigger("endlessfall");
             animator.SetBool("isrunning", false);
+            if (onForklift)
+                forkliftManager.ExitForklift();
+            collectableControl.HandlePlayerDeath();
         }
     }
 
@@ -618,6 +616,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("minewall") && !triggered)
         {
+            triggered = true;
             camAnimator.SetBool("dead", true);
             if (onForklift)
                 StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
@@ -627,20 +626,17 @@ public class PlayerMove : MonoBehaviour, IResettable
                 playerObject.transform.SetParent(null); // unparent from Player
             if (onMinecart)
             {
-                //animator.SetTrigger("minecartcollision");
+                moveSpeed = 0f;
                 minecartCrashSFX.Play();
                 carCrashSFX.Play();
                 minecart.CartCrash();
                 minecartObject.Stop();
                 onMinecart = false;
-                triggered = true;
             }
             else
             {
-                //animator.SetTrigger("die");
                 animator.SetBool("isrunning", false);
                 carCrashSFX.Play();
-                triggered = true;
             }
             rocks.SetActive(true);
             Debug.Log("Entered in minewall collision with " + other);
@@ -960,6 +956,11 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (forkliftCollider != null) forkliftCollider.enabled = false;
             if (boxCollider != null) boxCollider.enabled = true;
         }
+        if (isUnderwater)
+        {
+            if (forkliftCollider != null) forkliftCollider.enabled = false;
+            if (boxCollider != null) boxCollider.enabled = false;
+        }
     }
 
 
@@ -1038,6 +1039,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // set bools
         onForklift = false;
+        isUnderwater = false;
         boxCollider.enabled = true;
         forkliftCollider.enabled = false;
         godmodevisual.SetActive(false);
@@ -1048,6 +1050,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         onMinecart = false;
         triggered = false;
         rayLength = 1.2f;
+        endstormText.SetActive(false);
 
         // destroy vehicles
         Transform forkliftHolder = transform.Find("forklift");
