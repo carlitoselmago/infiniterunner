@@ -33,6 +33,7 @@ public class Forklift : MonoBehaviour, IResettable
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player") || triggered) return;
+        if (PlayerMove.onForklift) return;
 
         // Prevent double spawn if a ride exists
         if (rideForklift != null) return;

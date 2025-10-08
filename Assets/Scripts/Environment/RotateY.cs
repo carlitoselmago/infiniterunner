@@ -13,15 +13,14 @@ public class RotateY : MonoBehaviour, IResettable
 
     void OnEnable()
     {
-        // Store rotation center using fixed X (e.g., the initial X of player or scene-defined)
-        // Lock X to a specific value. Example: 0
+        // Store rotation center using fixed X
         rotationCenter = new Vector3(0f, player.position.y, player.position.z);
-        // reset rotation (experimental, confirm working)
         rotatedObject.transform.localRotation = Quaternion.identity;
     }
 
     void Update()
     {
+        if (PlayerMove.onForklift) return;
         if (!PlayerMove.isDead)
         {
             // Compute this frame’s rotation
