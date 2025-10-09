@@ -301,17 +301,7 @@ public class RideForklift : MonoBehaviour, IResettable
                 StartHealthShake();
             }
 
-            if (background != null)
-            {
-                // Map currentHealth 50 -> 0 into t 0 -> 1
-                float tBg = Mathf.Clamp01(1f - (currentHealth / 50f));
-                background.color = Color.Lerp(Color.white, Color.red, tBg);
-            }
-
-            if (currentHealth <= 20f)
-                criticalHealth = true;
-
-            if (criticalHealth && exitTextRect != null)
+            if (lowHealth && exitTextRect != null)
             {
                 if (exitTextTween == null || !exitTextTween.IsActive())
                 {
@@ -329,6 +319,15 @@ public class RideForklift : MonoBehaviour, IResettable
                 }
             }
 
+            if (background != null)
+            {
+                // Map currentHealth 50 -> 0 into t 0 -> 1
+                float tBg = Mathf.Clamp01(1f - (currentHealth / 50f));
+                background.color = Color.Lerp(Color.white, Color.red, tBg);
+            }
+
+            if (currentHealth <= 20f)
+                criticalHealth = true;
         }
 
         else
