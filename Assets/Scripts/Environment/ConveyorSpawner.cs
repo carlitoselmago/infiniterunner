@@ -231,11 +231,5 @@ public class ConveyorItem : MonoBehaviour
 
         }
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * raycastDistance);
-    }
 }
 

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,13 +10,13 @@ public class PrintCode : MonoBehaviour
     private string lastCodePrompt;
     private Dictionary<string, string> printedCode = new Dictionary<string, string>
     {
-        { "start","if (startedrunning == false && Input.anyKey == true)\n" +
+        { "start","if (!startedRunning && Input.anyKey)\n" +
             "{\n" +
             "\t\tBGM.Play();\n" +
-            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeBGM, duration = 3, targetVolume = 0.7f)); \n" +
+            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeBGM, 3, 0.7f)); \n" +
             "\t\tStartCoroutine(PlayMainTheme());\n" +
-            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeThemes, duration = 1.5f, targetVolume = 1));\n" +
-            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeSFX, duration = 1.5f, targetVolume = 1));\n" +
+            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeThemes, 1.5f, 1));\n" +
+            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeSFX, 1.5f, 1));\n" +
             "\t\ttutorial2d.transform.Find(touch-cards).gameObject.SetActive(false);\n" +
             "\t\tstartingText.SetActive(false);" +
             "}"
@@ -26,7 +25,7 @@ public class PrintCode : MonoBehaviour
         { "left", "//moved left\n" +
             "if (!isFlying)\n" +
             "{\n" +
-            "\tif (pos == center && transform.position.x == 0f)\n" +
+            "\tif (pos == center)\n" +
             "\t{\n" +
             "\t\tpos = left;\n" +
             "\t}\n" +
@@ -39,7 +38,7 @@ public class PrintCode : MonoBehaviour
         { "right", "//moved right\n" +
             "if (!isFlying)\n" +
             "{\n" +
-            "\tif (pos == center && transform.position.x == 0f)\n" +
+            "\tif (pos == center)\n" +
             "\t{\n" +
             "\t\tpos = right;\n" +
             "\t}\n" +
@@ -50,22 +49,11 @@ public class PrintCode : MonoBehaviour
         },
 
         { "crouch", "//crouch\n"+
-            "if (isRolling == false)\n" +
+            "if (!isRolling)\n" +
             "{\n" +
-            "\t\tcrouchhitbox();\n" +
+            "\t\tSetCrouching(true);\n" +
             "\t\tanimator.SetBool(isrolling, true);\n" +
             "\t\tStartCoroutine(RollSequence());"
-        },
-
-        { "rollsequence", "IEnumerator RollSequence()\n" +
-            "{\n" +
-            "\tyield return new WaitForSeconds(0.45f);\n" +
-            "\tstandingUp = true;\n" +
-            "\tyield return new WaitForSeconds(0.45f);\n" +
-            "\tisRolling = false;\n" +
-            "\tanimator.SetBool(isrolling, false);\n" +
-            "\tnormalhitbox();\n" +
-            "}"
         },
 
         { "hurt", "Player is hurt!"},
@@ -76,26 +64,25 @@ public class PrintCode : MonoBehaviour
             "flyFX.Play();\n" +
             "animator.SetBool(isflying, true);\n" +
             "isFlying = true;"
-            },
+        },
 
         {"dead", "Player died." },
 
         { "jumpsequence", "//jump\n" +
-            "IEnumerator JumpSequence()\n" +
-            "{\n" +
-            "\tjumphitbox();\n" +
-            "\tyield return new WaitForSeconds(0.30f);\n" +
-            "\tcomingDown = true;\n" +
-            "\tyield return new WaitForSeconds(0.30f);\n" +
-            "\tisJumping = false;\n" +
-            "\tcomingDown = false;\n" +
-            "\tanimator.SetBool(isjumping, false);\n" +
-            "\tnormalhitbox();\n" +
-            "}"
+            "SetJumping(true);\n" +
+            "jumpStarted = Time.time;\n" +
+            "animator.SetBool(iskumping, true)"
+        },
+
+        { "dieonforklift", "Player was blown up."},
+
+        { "jumpsequenceend", "//jump end\n" +
+            "SetJumping(false);\n" +
+            "animator.SetBool(isjumping, false);\n"
         },
 
         {"panoptic", "//entered panoptic\n" +
-            "if (alreadyCrossedPanoptic == false)\n" +
+            "if (!alreadyCrossedPanoptic)\n" +
             "{\n" +
             "\tStartCoroutine(ApplyGlissando());\n" +
             "\talreadyCrossedPanoptic = true;\n" +

@@ -14,7 +14,6 @@ public class PlayerMove : MonoBehaviour, IResettable
     public bool isJumping = false;
     public bool isRolling = false;
     public bool isFlying = false;
-    //public bool floating = false;
     public bool holding = false;
     public static bool onMinecart = false;
     public static bool onForklift = false;
@@ -22,7 +21,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public static bool idle = true;
     public static bool isUnderwater = false;
 
-    [Header("Constrains")]  //(from Constrain.cs)
+    [Header("Constrains")]
     public bool blockLeft = false;
     public bool blockRight = false;
 
@@ -61,8 +60,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public Minecart minecart;
 
     //forklift
-    private float forkliftOffsetX = 0f; // current lateral offset
-    // --- define lanes ---
+    private float forkliftOffsetX = 0f;
     float leftLane = -10f;
     float rightLane = 10f;
     public RideForklift forkliftManager;
@@ -432,7 +430,10 @@ public class PlayerMove : MonoBehaviour, IResettable
         {
             float jumpDuration = 0.6f; // set to your clip length
             if (Time.time - jumpStarted >= jumpDuration)
+            {
+                printCodeScript.SetCodePrompt("jumpsequenceend");
                 SetJumping(false);
+            }
         }
 
         // Flying
@@ -467,6 +468,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             }
 
             animator.SetTrigger("endlessfall");
+            printCodeScript.SetCodePrompt("dead");
             collectableControl.HandlePlayerDeath();
         }
 
@@ -706,6 +708,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public void DieOnForklift()
     {
         Debug.Log("Player Dead on Forklift");
+        printCodeScript.SetCodePrompt("dieonforklift");
         StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
         isDead = true;
         hitLogic.EnableHitbox(HitLogic.HitboxType.None);
@@ -770,7 +773,6 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     IEnumerator RollSequence()
     {
-        printCodeScript.SetCodePrompt("rollsequence");
         yield return new WaitForSeconds(0.45f);
         yield return new WaitForSeconds(0.45f);
         SetCrouching(false);
@@ -979,8 +981,6 @@ public class PlayerMove : MonoBehaviour, IResettable
         // Ground detection
         Ray ray = new Ray(rayOrigin, Vector3.down);
         Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
-        // Optional test: remove Ray definition and replace if statement by this:
-        //if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer)) isGrounded = true;
         else isGrounded = false;
 

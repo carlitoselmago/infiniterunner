@@ -15,7 +15,7 @@ public class ParticleSystemController : MonoBehaviour
         // Automatically find the player GameObject
         player = GameObject.Find("Player");
         if (player == null)
-            Debug.LogError("Player GameObject not found. Make sure there is a GameObject named 'Player' in the scene.");
+            Debug.LogError("Player GameObject not found.");
     }
 
     void Update()
