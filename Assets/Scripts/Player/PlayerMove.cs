@@ -110,6 +110,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     private float targetHeight = 22.0f; // previously 17.0f
     private float startY;
+    float fallTimer = 0f;
     private Transform playerStartParent; // To remember original parent
     private Vector3 playerLocalPos;      // Local position relative to parent
     private Quaternion playerLocalRot;   // Local rotation relative to parent
@@ -470,6 +471,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             animator.SetTrigger("endlessfall");
             printCodeScript.SetCodePrompt("dead");
             collectableControl.HandlePlayerDeath();
+            StartCoroutine(EnableEndSequenceSafely());
         }
 
     }
@@ -1020,6 +1022,22 @@ public class PlayerMove : MonoBehaviour, IResettable
                 animator.SetBool("isfalling", false);   //back to running
                 isFalling = false;
             }
+        }
+        // fallback in case player falls beyond trigger
+        if (isFalling)
+        {
+            fallTimer += Time.deltaTime;
+            if (fallTimer >= 10f && !isDead)
+            {
+                moveSpeed = 0f;
+                isDead = true;
+                animator.SetTrigger("endlessfall");
+                collectableControl.HandlePlayerDeath();
+                StartCoroutine(EnableEndSequenceSafely());
+                printCodeScript.SetCodePrompt("longfall");
+            }
+            else
+                fallTimer = 0f;
         }
     }
 

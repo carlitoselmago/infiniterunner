@@ -241,8 +241,6 @@ public class CollectableControl : MonoBehaviour, IResettable
         // Reload saved high score
         SessionData.LoadHighScore(savingPlayerPrefences);
         highScore = SessionData.sessionHighScore;
-
-        //playerMove = player.GetComponent<PlayerMove>();
     }
 
 }
