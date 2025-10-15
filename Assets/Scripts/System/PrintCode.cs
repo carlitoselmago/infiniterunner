@@ -10,83 +10,85 @@ public class PrintCode : MonoBehaviour
     private string lastCodePrompt;
     private Dictionary<string, string> printedCode = new Dictionary<string, string>
     {
-        { "start","if (!startedRunning && Input.anyKey)\n" +
-            "{\n" +
-            "\t\tBGM.Play();\n" +
-            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeBGM, 3, 0.7f)); \n" +
-            "\t\tStartCoroutine(PlayMainTheme());\n" +
-            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeThemes, 1.5f, 1));\n" +
-            "\t\tStartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeSFX, 1.5f, 1));\n" +
-            "\t\ttutorial2d.transform.Find(touch-cards).gameObject.SetActive(false);\n" +
-            "\t\tstartingText.SetActive(false);" +
-            "}"
+        { "start",@"if (!startedRunning && Input.anyKey)
+{
+    BGM.Play();
+    StartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeBGM, 3, 0.7f));
+    StartCoroutine(PlayMainTheme());
+    StartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeThemes, 1.5f, 1));
+    StartCoroutine(FadeMixerGroup.StartFade(audioMixer, volumeSFX, 1.5f, 1));
+    tutorial2d.transform.Find(touch-cards).gameObject.SetActive(false);
+    startingText.SetActive(false);
+}"
         },
 
-        { "left", "//moved left\n" +
-            "if (!isFlying)\n" +
-            "{\n" +
-            "\tif (pos == center)\n" +
-            "\t{\n" +
-            "\t\tpos = left;\n" +
-            "\t}\n" +
-            "\telse if (pos == right)\n" +
-            "\t{\n" +
-            "\t\tpos = center;\n" +
-            "\t}"
+            { "left", @"// moved left
+if (!isFlying)
+{
+    if (pos == center)
+        pos = left;
+
+    else if (pos == right)
+        pos = center;
+}" },
+
+        { "right", @"//moved right
+if (!isFlying)
+{
+    if (pos == center)
+        pos = right;
+
+    else if (pos == left)
+        pos = center;
+}"
         },
 
-        { "right", "//moved right\n" +
-            "if (!isFlying)\n" +
-            "{\n" +
-            "\tif (pos == center)\n" +
-            "\t{\n" +
-            "\t\tpos = right;\n" +
-            "\t}\n" +
-            "\telse if (pos == left)\n" +
-            "\t{\n" +
-            "\t\tpos = center;\n" +
-            "\t}"
-        },
-
-        { "crouch", "//crouch\n"+
-            "if (!isRolling)\n" +
-            "{\n" +
-            "\t\tSetCrouching(true);\n" +
-            "\t\tanimator.SetBool(isrolling, true);\n" +
-            "\t\tStartCoroutine(RollSequence());"
+        { "crouch", @"//crouch
+if (!isRolling)
+{
+    SetCrouching(true);
+    animator.SetBool(isrolling, true);
+    StartCoroutine(RollSequence());
+}"
         },
 
         { "hurt", "Player is hurt!"},
 
-        {"fly", "//Player is flying!!!\n" +
-            "\n" +
-            "godmode = true;\n" +
-            "flyFX.Play();\n" +
-            "animator.SetBool(isflying, true);\n" +
-            "isFlying = true;"
+        {"fly", @"//Player is flying!!!
+
+godmode = true;
+flyFX.Play();
+animator.SetBool(isflying, true);
+isFlying = true;"
         },
 
         {"dead", "Player died." },
 
-        { "jumpsequence", "//jump\n" +
-            "SetJumping(true);\n" +
-            "jumpStarted = Time.time;\n" +
-            "animator.SetBool(iskumping, true)"
+        { "jumpsequence", @"//jump
+SetJumping(true);
+jumpStarted = Time.time;
+animator.SetBool(isjumping, true)"
         },
 
         { "dieonforklift", "Player was blown up."},
 
-        { "jumpsequenceend", "//jump end\n" +
-            "SetJumping(false);\n" +
-            "animator.SetBool(isjumping, false);\n"
+        {"longfall", "Player fell off the world."},
+
+        { "jumpsequenceend", @"//jump end
+float jumpDuration = 0.6f;
+if (Time.time - jumpStarted >= jumpDuration)
+{
+    SetJumping(false);
+    animator.SetBool(isjumping, false);
+}"
         },
 
-        {"panoptic", "//entered panoptic\n" +
-            "if (!alreadyCrossedPanoptic)\n" +
-            "{\n" +
-            "\tStartCoroutine(ApplyGlissando());\n" +
-            "\talreadyCrossedPanoptic = true;\n" +
-            "}"
+        {"panoptic", @"//entered panoptic
+if (!alreadyCrossedPanoptic)
+{
+    StartCoroutine(ApplyGlissando());
+    alreadyCrossedPanoptic = true;
+}"
         }
 
     };
