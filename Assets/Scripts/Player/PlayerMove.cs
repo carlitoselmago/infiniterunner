@@ -20,6 +20,9 @@ public class PlayerMove : MonoBehaviour, IResettable
     private bool mainThemeAlreadyPlaying = false;
     public static bool idle = true;
     public static bool isUnderwater = false;
+    public static bool isOnModernTimes = false;
+    public static bool isInTheSandstorm = false;
+    private bool endSequenceStarted = false;
 
     [Header("Constrains")]
     public bool blockLeft = false;
@@ -455,7 +458,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (!isJumping && !isFlying)
             ApplyVerticalMovement();
 
-        if (isUnderwater)
+        if (isUnderwater && !isDead && !endSequenceStarted)
         {
             moveSpeed = 0f;
             animator.SetBool("isrunning", false);
@@ -468,6 +471,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 UpdateActiveCollider();
             }
 
+            isDead = true;
             animator.SetTrigger("endlessfall");
             printCodeScript.SetCodePrompt("dead");
             collectableControl.HandlePlayerDeath();
@@ -923,6 +927,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     {
         yield return null; // wait one frame
         levelControl.GetComponent<EndRunSequence>().enabled = true;
+        endSequenceStarted = true;
     }
 
     private float interpolateValueY(bool easingOut = true, float origin = 0.0f, float target = 5.0f, float intspeed = 0.2f)
@@ -1027,7 +1032,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (isFalling)
         {
             fallTimer += Time.deltaTime;
-            if (fallTimer >= 10f && !isDead)
+            if (fallTimer >= 10f && !isDead && !endSequenceStarted)
             {
                 moveSpeed = 0f;
                 isDead = true;
@@ -1035,10 +1040,11 @@ public class PlayerMove : MonoBehaviour, IResettable
                 collectableControl.HandlePlayerDeath();
                 StartCoroutine(EnableEndSequenceSafely());
                 printCodeScript.SetCodePrompt("longfall");
-            }
-            else
                 fallTimer = 0f;
+            }
         }
+        else
+            fallTimer = 0;
     }
 
     private void StopThemes()
@@ -1062,6 +1068,8 @@ public class PlayerMove : MonoBehaviour, IResettable
         // set bools
         onForklift = false;
         isUnderwater = false;
+        isOnModernTimes = false;
+        isInTheSandstorm = false;
         boxCollider.enabled = true;
         forkliftCollider.enabled = false;
         godmodevisual.SetActive(false);
@@ -1069,6 +1077,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         startedrunning = false;
         idle = true;
         isDead = false;
+        endSequenceStarted = false;
         onMinecart = false;
         triggered = false;
         rayLength = 1.2f;
