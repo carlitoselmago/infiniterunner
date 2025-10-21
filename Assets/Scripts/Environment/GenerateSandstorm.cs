@@ -88,7 +88,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
 
         while (sandstormGeneratorEnabled)
         {
-            if (MineData.isInTheMine) yield break;
+            if (MineData.isInTheMine || PlayerMove.isOnModernTimes) yield break;
             float randomWait = Random.Range(0f, 40f);
             if (!sandstormGeneratorEnabled)
                 yield return new WaitForSeconds(randomWait); // delay before attempting to generate sandstorm
@@ -113,7 +113,8 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
                 //stop sandstorm
                 StopTheSandstorm();
                 yield return new WaitForSeconds(1);
-                endStormSFX.Play();
+                if (!PlayerMove.isOnModernTimes)
+                    endStormSFX.Play();
                 yield return new WaitForSeconds(fadeDuration);
                 sandstormFX.Stop();
                 generatingSandstorm = false;
