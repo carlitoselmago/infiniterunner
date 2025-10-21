@@ -55,6 +55,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         {
             StopTheSandstorm();
             generatingSandstorm = false;
+            PlayerMove.isInTheSandstorm = false;
         }
 
         if (PlayerMove.isUnderwater && !triggered)
@@ -95,6 +96,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
             if (Random.value > chance)
             {
                 generatingSandstorm = true;
+                PlayerMove.isInTheSandstorm = true;
                 sandstormParticles.Play();
                 particles.SetActive(true);
                 StartCoroutine(FadeFog(minFogDensity, maxFogDensity, fadeDuration));
@@ -115,6 +117,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
                 yield return new WaitForSeconds(fadeDuration);
                 sandstormFX.Stop();
                 generatingSandstorm = false;
+                PlayerMove.isInTheSandstorm = false;
                 yield return new WaitForSeconds(30f);
             }
             else
@@ -188,6 +191,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         }
 
         generatingSandstorm = false;
+        PlayerMove.isInTheSandstorm = false;
         sandstormGeneratorEnabled = false;
 
         StartCoroutine(FadeOutAndStopAudio());
