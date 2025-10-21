@@ -10,12 +10,14 @@ public class CollectableControl : MonoBehaviour, IResettable
     public GameObject levelControl;
     public static int coinCount;
     public GameObject coinCountDisplay;
-    public bool savingPlayerPrefences = true;  //if false, high scores are reset every day
+    public bool savingPlayerPrefences = true;
 
-    //achievements vars
+    // Achievement UI
     public GameObject achievementUI;
     public GameObject achievementEndUItext;
     public GameObject achievementEndUIsubtext;
+
+    // Achievements data
     public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200 };
     private int treballadordelmes_coins_index = 0;
     public int highScore;
@@ -24,46 +26,41 @@ public class CollectableControl : MonoBehaviour, IResettable
     private bool firstForkliftAchieved = false;
     public bool firstAchievementMet = false;
 
-    //time vars
+    // Time tracking
     private float elapsedTime = 0f;
     private List<float> seconds_to_elapse = new List<float> { 60f, 120f, 180f, 240f, 360f, 420f, 520f, 700f };
     private int seconds_to_elapse_index = 0;
-    public int ConvertSecondsToMinutes(float totalSeconds)
-    {
-        int minutes = Mathf.FloorToInt(totalSeconds / 60f);
-        return minutes;
-    }
 
-    //list of compliments
     private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "DEMENT", "MÀQUINA", "DEL SEGLE", "BRUTAL", "ESVERADA", "BOJA", "MODEL", "DIVINA" };
-
-    // store the last achievement text
-    public static string lastAchievementText = "";
-
-    //store the high score message
-    public static string highScoreText = "";
-
-    //list of time compliments
     private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL", "MORIRÀS TREBALLANT", "NO HI HA FUTUR" };
 
-    public static bool achievementShown = false; //used to prevent collisions between score and time achievements
+    // Achievement state
+    public static string lastAchievementText = "";
+    public static string highScoreText = "";
+    public static bool achievementShown = false;
     public bool runtimeHighScoreTriggered = false;
 
-    //audio
+    // Audio
     public AudioMixer audioMixer;
     public AudioSource highScoreSFX;
     public AudioSource highSpeedSFX;
+    public AudioSource coinFX;
     private PlayerMove playerMove;
+
+    // Coin streak bonus
+    public int streakStart = 6;        // Start counting glissando from this many coins
+    public int streakMax = 10;         // Achievement triggers at this number
+    public float streakWindow = 1f;    // Time window in seconds
+    private Queue<float> recentCoinTimes = new Queue<float>();
 
     void Start()
     {
         coinCount = 0;
-        coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
+        coinCountDisplay.GetComponent<Text>().text = coinCount.ToString();
         achievementUI.SetActive(false);
         lastAchievementText = "";
         highScoreText = "";
 
-        // Load saved high score
         SessionData.LoadHighScore(savingPlayerPrefences);
         highScore = SessionData.sessionHighScore;
 
@@ -72,8 +69,6 @@ public class CollectableControl : MonoBehaviour, IResettable
 
     public void HandlePlayerDeath()
     {
-        Debug.Log("Collectable Control: Handling Player Death");
-
         if (coinCount > highScore)
         {
             highScore = coinCount;
@@ -82,112 +77,165 @@ public class CollectableControl : MonoBehaviour, IResettable
             if (savingPlayerPrefences)
                 SessionData.UpdateHighScore(highScore, savingPlayerPrefences);
             highScoreText = "";
-            Debug.Log("New high score saved: " + highScore);
-        }
-        else if (coinCount <= highScore)
-        {
-            highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
-            Debug.Log("Under last score");
         }
         else
         {
-            highScoreText = "";
-            Debug.Log("No new score.");
+            highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
         }
     }
 
     void Update()
     {
-        coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
+        coinCountDisplay.GetComponent<Text>().text = coinCount.ToString();
 
         if (PlayerMove.startedrunning && !PlayerMove.isDead)
         {
             elapsedTime += Time.deltaTime;
 
-            // Coin achievements
-            if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
-            {
-                if (coinCount == treballadordelmes_coins[treballadordelmes_coins_index])
-                {
-                  if (1==1){
-                        string compliment = compliments[treballadordelmes_coins_index];
-                        lastAchievementText = "TREBALLADORA " + compliment + "!";
-                        achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
-                        achievementEndUIsubtext.GetComponent<Text>().text = "Has recol·lectat " + treballadordelmes_coins[treballadordelmes_coins_index].ToString() + " monedes!";
-                        achievementUI.SetActive(true);
-                        achievementShown = true;
-                        highScoreSFX.Play();
-                        dimVolumes();
-                        lifeUp();
-                        treballadordelmes_coins_index += 1;
-                        StartCoroutine(hideachievement());
-                    }
-                }
-        }
-            // Time achievements
-                if (seconds_to_elapse_index < seconds_to_elapse.Count)
-                {
-                    if (elapsedTime > seconds_to_elapse[seconds_to_elapse_index])
-                    {
-                if (!achievementShown)
-                {
-                    int elapsedMinutes = ConvertSecondsToMinutes(elapsedTime);
-
-                    string timeCompliment = timeCompliments[seconds_to_elapse_index];
-                    achievementEndUItext.GetComponent<Text>().text = timeCompliment;
-                    achievementEndUIsubtext.GetComponent<Text>().text = "Has sobreviscut " + elapsedMinutes.ToString() + " minuts!";
-                    achievementUI.SetActive(true);
-                    achievementShown = true;
-                    highSpeedSFX.Play();
-                    dimVolumes();
-                    lifeUp();
-                    seconds_to_elapse_index += 1;
-                        if (seconds_to_elapse_index == 1)
-                        {
-                            firstAchievementMet = true;
-                            levelControl.GetComponent<GenerateSandstorm>().enabled = true;
-                            levelControl.GetComponent<GenerateSandstorm>().StartSandstormGeneration();
-                        }
-                        StartCoroutine(hideachievement());
-                }
-                }
-            }
-
-            // High Score achieved
-            if (!runtimeHighScoreTriggered && coinCount > highScore)
-            {
-                runtimeHighScoreTriggered = true;
-                achievementEndUItext.GetComponent<Text>().text = "NOU RÈCORD!";
-                achievementEndUIsubtext.GetComponent<Text>().text = "No et rendeixis!";
-                achievementUI.SetActive(true);
-                achievementShown = true;
-                highScoreSFX.Play();
-                highSpeedSFX.Play();
-                dimVolumes();
-                lifeUp();
-                StartCoroutine(hideachievement());
-            }
-
-            if (firstForklift && !firstForkliftAchieved)
-            {
-                firstForkliftAchieved = true;
-                achievementEndUItext.GetComponent<Text>().text = "AL TORO!";
-                achievementEndUIsubtext.GetComponent<Text>().text = "Has après a conduir!";
-                achievementUI.SetActive(true);
-                achievementShown = true;
-                highSpeedSFX.Play();
-                dimVolumes();
-                lifeUp();
-                StartCoroutine(hideachievement());
-            }
+            HandleCoinAchievements();
+            HandleTimeAchievements();
+            HandleHighScoreAchievement();
+            HandleFirstForkliftAchievement();
         }
 
-        // Clear High Scores pressing C
         if (Input.GetKeyDown(KeyCode.C))
         {
             SessionData.ClearHighScore();
             highScore = 0;
             Debug.Log("High score reset.");
+        }
+    }
+
+    public void OnCoinCollected()
+    {
+        if (PlayerMove.isOnTheAir)
+        {
+            coinFX.pitch = 1f;
+            coinFX.Play();
+            return;
+        }
+
+        float now = Time.time;
+        recentCoinTimes.Enqueue(now);
+
+        // Remove coins outside streak window
+        while (recentCoinTimes.Count > 0 && now - recentCoinTimes.Peek() > streakWindow)
+            recentCoinTimes.Dequeue();
+
+        int streakCount = recentCoinTimes.Count;
+
+        // Apply musical exponential glissando
+        if (streakCount >= streakStart && streakCount <= streakMax && coinFX != null)
+        {
+            // Exponential curve: pitch rises slowly at first, then faster toward max
+            float t = (float)(streakCount - streakStart) / (streakMax - streakStart); // 0..1
+            float pitch = 1f + Mathf.Pow(t, 1.5f) * 0.5f; // exponent 1.5 for smoother curve
+            coinFX.pitch = Mathf.Clamp(pitch, 1f, 1.5f);
+        }
+        else if (streakCount < streakStart && coinFX != null)
+            coinFX.pitch = 1f; // reset to normal
+
+        coinFX.Play();
+
+        // Streak bonus achievement
+        if (streakCount >= streakMax)
+        {
+            playerMove.AddHeart();
+
+            achievementEndUItext.GetComponent<Text>().text = "PAGA EXTRA!";
+            achievementEndUIsubtext.GetComponent<Text>().text = $"Has agafat {streakCount} monedes en 1 segon!";
+            achievementUI.SetActive(true);
+            achievementShown = true;
+
+            highScoreSFX.Play();
+
+            recentCoinTimes.Clear(); // reset streak
+            coinFX.pitch = 1f;
+
+            StartCoroutine(hideachievement());
+        }
+    }
+
+    void HandleCoinAchievements()
+    {
+        if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
+        {
+            if (coinCount == treballadordelmes_coins[treballadordelmes_coins_index] && !achievementShown)
+            {
+                string compliment = compliments[treballadordelmes_coins_index];
+                lastAchievementText = "TREBALLADORA " + compliment + "!";
+                achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
+                achievementEndUIsubtext.GetComponent<Text>().text = "Has recol·lectat " + treballadordelmes_coins[treballadordelmes_coins_index] + " monedes!";
+                achievementUI.SetActive(true);
+                achievementShown = true;
+                highScoreSFX.Play();
+                dimVolumes();
+                lifeUp();
+                treballadordelmes_coins_index += 1;
+                StartCoroutine(hideachievement());
+            }
+        }
+    }
+
+    void HandleTimeAchievements()
+    {
+        if (seconds_to_elapse_index < seconds_to_elapse.Count)
+        {
+            if (elapsedTime > seconds_to_elapse[seconds_to_elapse_index] && !achievementShown)
+            {
+                int elapsedMinutes = Mathf.FloorToInt(elapsedTime / 60f);
+                string timeCompliment = timeCompliments[seconds_to_elapse_index];
+                achievementEndUItext.GetComponent<Text>().text = timeCompliment;
+                achievementEndUIsubtext.GetComponent<Text>().text = "Has sobreviscut " + elapsedMinutes + " minuts!";
+                achievementUI.SetActive(true);
+                achievementShown = true;
+                highSpeedSFX.Play();
+                dimVolumes();
+                lifeUp();
+                seconds_to_elapse_index += 1;
+
+                if (seconds_to_elapse_index == 1)
+                {
+                    firstAchievementMet = true;
+                    levelControl.GetComponent<GenerateSandstorm>().enabled = true;
+                    levelControl.GetComponent<GenerateSandstorm>().StartSandstormGeneration();
+                }
+
+                StartCoroutine(hideachievement());
+            }
+        }
+    }
+
+    void HandleHighScoreAchievement()
+    {
+        if (!runtimeHighScoreTriggered && coinCount > highScore)
+        {
+            runtimeHighScoreTriggered = true;
+            achievementEndUItext.GetComponent<Text>().text = "NOU RÈCORD!";
+            achievementEndUIsubtext.GetComponent<Text>().text = "No et rendeixis!";
+            achievementUI.SetActive(true);
+            achievementShown = true;
+            highScoreSFX.Play();
+            highSpeedSFX.Play();
+            dimVolumes();
+            lifeUp();
+            StartCoroutine(hideachievement());
+        }
+    }
+
+    void HandleFirstForkliftAchievement()
+    {
+        if (firstForklift && !firstForkliftAchieved)
+        {
+            firstForkliftAchieved = true;
+            achievementEndUItext.GetComponent<Text>().text = "AL TORO!";
+            achievementEndUIsubtext.GetComponent<Text>().text = "Has après a conduir!";
+            achievementUI.SetActive(true);
+            achievementShown = true;
+            highSpeedSFX.Play();
+            dimVolumes();
+            lifeUp();
+            StartCoroutine(hideachievement());
         }
     }
 
@@ -200,7 +248,7 @@ public class CollectableControl : MonoBehaviour, IResettable
 
     void lifeUp()
     {
-         playerMove.AddHeart();
+        playerMove.AddHeart();
     }
 
     IEnumerator hideachievement()
@@ -216,13 +264,11 @@ public class CollectableControl : MonoBehaviour, IResettable
 
     public void ResetState()
     {
-        Debug.Log("CollectableControl reset");
         coinCount = 0;
-        coinCountDisplay.GetComponent<Text>().text = "" + coinCount;
+        coinCountDisplay.GetComponent<Text>().text = coinCount.ToString();
         lastAchievementText = "";
         highScoreText = "";
 
-        // Reset achievements
         treballadordelmes_coins_index = 0;
         seconds_to_elapse_index = 0;
         elapsedTime = 0f;
@@ -233,14 +279,13 @@ public class CollectableControl : MonoBehaviour, IResettable
         firstForklift = false;
         firstForkliftAchieved = false;
 
-        // Reset UI state
+        recentCoinTimes.Clear();
+
         achievementUI.SetActive(false);
         achievementEndUItext.GetComponent<Text>().text = "";
         achievementEndUIsubtext.GetComponent<Text>().text = "";
 
-        // Reload saved high score
         SessionData.LoadHighScore(savingPlayerPrefences);
         highScore = SessionData.sessionHighScore;
     }
-
 }
