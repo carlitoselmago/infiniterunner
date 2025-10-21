@@ -13,6 +13,7 @@ public class MusicEventController : MonoBehaviour, IResettable
     public GameObject alternateNotePrefab;
     public Transform noteParent;
     public AudioMixer audioMixer;
+    public GenerateSandstorm sandstormGenerator;
 
     [Header("Level data")]
     public string jsonFileName = "modern-times-level";
@@ -90,6 +91,8 @@ public class MusicEventController : MonoBehaviour, IResettable
         InitializePools();
         if (levelData != null && levelData.bpm > 0)
             beatDuration = 60f / levelData.bpm;
+        if (sandstormGenerator != null)
+            sandstormGenerator.StopTheSandstorm();  // stop sandstorm if active
     }
 
     IEnumerator StartModernTimes()

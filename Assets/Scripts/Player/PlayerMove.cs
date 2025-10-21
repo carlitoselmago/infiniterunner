@@ -887,15 +887,41 @@ public class PlayerMove : MonoBehaviour, IResettable
     IEnumerator PlayMainTheme()
     {
         yield return new WaitForSeconds(18);
+
+        if (isOnModernTimes)
+            yield break;
+
         if (!idle && !mainTheme.isPlaying && !pyramidsTheme.isPlaying && !flyFX.isPlaying)
         {
             mainTheme.Play();
             mainThemeAlreadyPlaying = true;
+
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 2, 0f));
-            yield return new WaitForSeconds(50);
+
+            float elapsed = 0f;
+            const float totalDuration = 50f;
+
+            while (elapsed < totalDuration)
+            {
+                if (isOnModernTimes)
+                {
+                    // Fade out and stop immediately if player enters Modern Times
+                    StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1.5f, 0f));
+                    mainTheme.Stop();
+                    mainThemeAlreadyPlaying = false;
+                    yield break;
+                }
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            // Fade back in after the loop ends normally
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 3, 1f));
+            StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 3, 1f));
         }
     }
+
 
     IEnumerator delayedGodmodeOff()
     {
