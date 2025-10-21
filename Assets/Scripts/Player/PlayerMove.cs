@@ -8,12 +8,14 @@ public class PlayerMove : MonoBehaviour, IResettable
 {
     private Vector3 startPosition = new Vector3(0f, -0.35f, -48f);
     public float moveSpeed = 12.0f;
+    public static float currentSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float horizontalSpeed = 20f;
     private Quaternion startRotation;
     public bool isJumping = false;
     public bool isRolling = false;
     public bool isFlying = false;
+    public static bool isOnTheAir = false;
     public bool holding = false;
     public static bool onMinecart = false;
     public static bool onForklift = false;
@@ -229,6 +231,8 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     {
         exposedRayLength = rayLength;
+        currentSpeed = moveSpeed;
+        isOnTheAir = holding;
         UpdateActiveCollider();
 
         // Quit the game (Escape)
@@ -529,8 +533,9 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (other.gameObject.CompareTag("coin"))
         {
             coinFX.pitch = 1;
-            coinFX.Play();
+            //coinFX.Play();
             CollectableControl.coinCount += 1;
+            collectableControl.OnCoinCollected();
             other.gameObject.SetActive(false);
         }
 
