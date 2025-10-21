@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1098083471820386683}
   - component: {fileID: 6628487131794429593}
   - component: {fileID: 6614418099942012293}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Barrel RigidBody
   m_TagString: obstacle
   m_Icon: {fileID: 0}

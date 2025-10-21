@@ -137,47 +137,55 @@ public class ConveyorItem : MonoBehaviour
         CullIfTooFar();
     }
 
-    void MoveAlongConveyor() {
-
+    void MoveAlongConveyor()
+    {
         if (groundedAfterFall) return;
 
         float step = speed * Time.deltaTime;
         distanceTravelled += step;
 
-        Vector3 pos = startPos;
+        // 1️⃣ Move along the conveyor direction (assumed -Z)
+        transform.position += new Vector3(0, 0, -step);
 
-        // 1. Up slope
+        // 2️⃣ Handle slope up/down based on how far we are
         if (distanceTravelled <= slopeLength)
         {
             onFlatBelt = false;
             float t = distanceTravelled / slopeLength;
-            pos += new Vector3(0, t * slopeHeight, -distanceTravelled);
+            transform.position = new Vector3(
+                transform.position.x,
+                startPos.y + t * slopeHeight,
+                transform.position.z
+            );
         }
-        // 2. Flat belt
         else if (distanceTravelled <= slopeLength + beltLength)
         {
             onFlatBelt = true;
-            float flatDist = distanceTravelled - slopeLength;
-            pos += new Vector3(0, slopeHeight, -(slopeLength + flatDist));
+            transform.position = new Vector3(
+                transform.position.x,
+                startPos.y + slopeHeight,
+                transform.position.z
+            );
         }
-        // 3. Down slope
         else if (distanceTravelled <= slopeLength + beltLength + slopeLength)
         {
             onFlatBelt = false;
             float downDist = distanceTravelled - (slopeLength + beltLength);
             float t = downDist / slopeLength;
-            pos += new Vector3(0, slopeHeight * (1 - t), -(slopeLength + beltLength + downDist));
+            transform.position = new Vector3(
+                transform.position.x,
+                startPos.y + slopeHeight * (1 - t),
+                transform.position.z
+            );
         }
         else
         {
-            // End of conveyor — start falling!
+            // End of conveyor — start falling
             onFlatBelt = false;
             falling = true;
-            return;
         }
-
-        transform.position = pos;
     }
+
 
     void CheckForGround()
     {
