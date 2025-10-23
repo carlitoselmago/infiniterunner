@@ -44,6 +44,7 @@ public class CollectableControl : MonoBehaviour, IResettable
     public AudioMixer audioMixer;
     public AudioSource highScoreSFX;
     public AudioSource highSpeedSFX;
+    public AudioSource coinStreakSFX;
     public AudioSource coinFX;
     private PlayerMove playerMove;
 
@@ -52,6 +53,8 @@ public class CollectableControl : MonoBehaviour, IResettable
     public int streakMax = 10;         // Achievement triggers at this number
     public float streakWindow = 1f;    // Time window in seconds
     private Queue<float> recentCoinTimes = new Queue<float>();
+    [SerializeField] CoinStreakUI streakUI;
+
 
     void Start()
     {
@@ -118,39 +121,48 @@ public class CollectableControl : MonoBehaviour, IResettable
         float now = Time.time;
         recentCoinTimes.Enqueue(now);
 
-        // Remove coins outside streak window
+        // Remove coins outside the streak window
         while (recentCoinTimes.Count > 0 && now - recentCoinTimes.Peek() > streakWindow)
             recentCoinTimes.Dequeue();
 
         int streakCount = recentCoinTimes.Count;
 
-        // Apply musical exponential glissando
+        // --- 🎵 Handle audio glissando ---
         if (streakCount >= streakStart && streakCount <= streakMax && coinFX != null)
         {
-            // Exponential curve: pitch rises slowly at first, then faster toward max
-            float t = (float)(streakCount - streakStart) / (streakMax - streakStart); // 0..1
-            float pitch = 1f + Mathf.Pow(t, 1.5f) * 0.5f; // exponent 1.5 for smoother curve
+            float t = (float)(streakCount - streakStart) / (streakMax - streakStart);
+            float pitch = 1f + Mathf.Pow(t, 1.5f) * 0.5f;
             coinFX.pitch = Mathf.Clamp(pitch, 1f, 1.5f);
         }
         else if (streakCount < streakStart && coinFX != null)
+        {
             coinFX.pitch = 1f; // reset to normal
+        }
 
         coinFX.Play();
 
-        // Streak bonus achievement
+        // --- 🌟 Update visual streak UI ---
+        if (streakUI != null)
+            streakUI.UpdateDots(streakCount, streakStart, streakMax);
+
+        // --- 💎 Streak bonus achievement ---
         if (streakCount >= streakMax)
         {
             playerMove.AddHeart();
-
+            /*
             achievementEndUItext.GetComponent<Text>().text = "PAGA EXTRA!";
             achievementEndUIsubtext.GetComponent<Text>().text = $"Has agafat {streakCount} monedes en 1 segon!";
             achievementUI.SetActive(true);
-            achievementShown = true;
+            achievementShown = true;*/
 
-            highScoreSFX.Play();
+            coinStreakSFX.Play();
 
             recentCoinTimes.Clear(); // reset streak
             coinFX.pitch = 1f;
+
+            // Trigger UI celebration
+            if (streakUI != null)
+                streakUI.PlayAchievementFlash();
 
             StartCoroutine(hideachievement());
         }
