@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Audio;
+using SuperPivot.Samples;
 
 public class PlayerMove : MonoBehaviour, IResettable
 {
@@ -63,6 +64,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public GameObject mainCam;
     public GameObject rocks;
     public Minecart minecart;
+    public RotateAroundPivot sphereScript;
 
     //forklift
     private float forkliftOffsetX = 0f;
@@ -528,6 +530,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 }
                 hit = false;
             }
+            else
+                sphereScript.BrightUpSphere();
         }
 
         if (other.gameObject.CompareTag("coin"))

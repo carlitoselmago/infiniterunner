@@ -80,6 +80,7 @@ public class MusicEventController : MonoBehaviour, IResettable
     void Start()
     {
         LoadLevelData();
+        InitializePools();
     }
 
     void OnEnable()
@@ -88,7 +89,7 @@ public class MusicEventController : MonoBehaviour, IResettable
         nextNoteIndex = 0;
         StartCoroutine(StartModernTimes());
         usingAlternatePrefab = false;
-        InitializePools();
+        //InitializePools();
         if (levelData != null && levelData.bpm > 0)
             beatDuration = 60f / levelData.bpm;
         if (sandstormGenerator != null)

@@ -25,7 +25,7 @@ public class RideForklift : MonoBehaviour, IResettable
     [Header("Smoke FX")]
     private ParticleSystem smokeParticles;
     private ParticleSystem.EmissionModule smokeEmission;
-    private float maxSmokeRate = 4000f; // adjust for intensity
+    private float maxSmokeRate = 4000f;
 
     [Header("Forklift Endurance")]
     public float maxHealth = 100f;
@@ -93,7 +93,6 @@ public class RideForklift : MonoBehaviour, IResettable
         if (forkliftHolder == null)
             Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
 
-        // --- Setup repair audio source ---
         if (repairSFX != null)
         {
             repairAudio = gameObject.AddComponent<AudioSource>();
@@ -181,6 +180,7 @@ public class RideForklift : MonoBehaviour, IResettable
             {
                 lowHealth = false;
                 StopHealthShake();
+                StopTextShake();
                 if (background != null) background.color = Color.white;
             }
         }
@@ -310,14 +310,6 @@ public class RideForklift : MonoBehaviour, IResettable
                         .SetEase(Ease.Linear);
                 }
             }
-            else
-            {
-                if (exitTextTween != null && exitTextTween.IsActive())
-                {
-                    exitTextTween.Kill();
-                    exitTextRect.localRotation = Quaternion.identity;
-                }
-            }
 
             if (background != null)
             {
@@ -337,6 +329,7 @@ public class RideForklift : MonoBehaviour, IResettable
             {
                 lowHealth = false;
                 StopHealthShake();
+                StopTextShake();
 
                 if (background != null) background.color = Color.white;
             }
@@ -414,6 +407,14 @@ public class RideForklift : MonoBehaviour, IResettable
         isShaking = false;
     }
 
+    private void StopTextShake()
+    {
+            if (exitTextTween != null && exitTextTween.IsActive())
+            {
+                exitTextTween.Kill();
+                exitTextRect.localRotation = Quaternion.identity;
+            }
+    }
 
     private IEnumerator LeaveAndDestroy()
     {
