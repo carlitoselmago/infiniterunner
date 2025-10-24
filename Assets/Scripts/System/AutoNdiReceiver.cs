@@ -14,17 +14,18 @@ public class AutoNdiReceiver : MonoBehaviour
 
     void Update()
     {
-        // Skip if we already assigned
-        if (_assigned) return;
+        if (_assigned) return; // Skip if we already assigned
 
-        // Grab source list
-        var sources = NdiFinder.sourceNames.ToList();
+        var sources = NdiFinder.sourceNames.ToList(); // Grab source list
 
         if (sources.Count > 0)
         {
             _receiver.ndiName = sources[0];
-            _assigned = true; // lock it in
+            FindObjectOfType<PrintCode>().DisplayExternalMessage(_receiver.ndiName);
             Debug.Log("Connected to NDI source: " + _receiver.ndiName);
+            _assigned = true; // lock it in
         }
+        else
+            FindObjectOfType<PrintCode>().DisplayExternalMessage("Looking for source...");
     }
 }
