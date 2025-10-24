@@ -158,11 +158,8 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     void Start()
     {
-        //startPosition = transform.position;
         animator = GetComponentInChildren<Animator>();
         camAnimator = mainCam.GetComponent<Animator>();
-
-        // Ensure playerBody assigned
         if (playerBody == null) playerBody = GetComponent<Rigidbody>();
 
         // Find main non-trigger collider (boxCollider) if not assigned
@@ -298,6 +295,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                             minecartShiftLaneSFX.panStereo = -0.7f;
                             minecartShiftLaneSFX.Play();
                         }
+
                     }
                     else if (pos == "right") // Pressing left when at right goes to center
                     {
@@ -496,7 +494,8 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (!godmode)
             {
                 hit = true;
-                printCodeScript.SetCodePrompt("dead");
+                string collidedObjectName = other.gameObject.name;
+                printCodeScript.UpdateObstacleList(collidedObjectName);
                 hurtMaskScript.Mask();
                 remainingHealth--;
                 Debug.Log("Entered in collision with " + other);
@@ -504,6 +503,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 if (remainingHealth <= 0)
                 {
                     collectableControl.HandlePlayerDeath();
+                    printCodeScript.SetCodePrompt("dead");
                     camAnimator.SetBool("dead", true);
                     isDead = true;
                     if (playerObject != null)
@@ -524,7 +524,6 @@ public class PlayerMove : MonoBehaviour, IResettable
                     printCodeScript.SetCodePrompt("hurt");
                     animator.SetBool("ishurt", true);
                     StartCoroutine(HurtSequence());
-                    //if (other.gameObject.layer != LayerMask.NameToLayer("HasSound")) // uncomment to not play the hurt sfx
                     HurtSFX.Play();
                     RemoveHeartsInReverseOrder();
                 }
@@ -536,7 +535,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("coin"))
         {
-            coinFX.pitch = 1;
+            //coinFX.pitch = 1;
             //coinFX.Play();
             CollectableControl.coinCount += 1;
             collectableControl.OnCoinCollected();
@@ -554,7 +553,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             other.gameObject.SetActive(false);
         }
 
-        if (other.gameObject.CompareTag("powerup") || (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
+        if (other.gameObject.CompareTag("powerup"))
         {
             printCodeScript.SetCodePrompt("fly");
             godmode = true;
@@ -623,7 +622,10 @@ public class PlayerMove : MonoBehaviour, IResettable
                 if (onForklift)
                     StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
                 animator.SetTrigger("die");
-                isDead = true;
+            string collidedObjectName = other.gameObject.name;
+            printCodeScript.UpdateObstacleList(collidedObjectName);
+            printCodeScript.SetCodePrompt("dead");
+            isDead = true;
                 if (playerObject != null)
                     playerObject.transform.SetParent(null); // unparent from Player
                 animator.SetBool("isrunning", false);
@@ -642,6 +644,9 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (onForklift)
                 StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
             animator.SetTrigger("die");
+            string collidedObjectName = other.gameObject.name;
+            printCodeScript.UpdateObstacleList(collidedObjectName);
+            printCodeScript.SetCodePrompt("dead");
             isDead = true;
             if (playerObject != null)
                 playerObject.transform.SetParent(null); // unparent from Player
@@ -730,6 +735,12 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (playerObject != null)
             playerObject.transform.SetParent(null); // unparent from Player
         animator.SetTrigger("die");
+        StartCoroutine(DelayedHandlePlayerDeath(1.5f));
+    }
+
+    private IEnumerator DelayedHandlePlayerDeath(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         collectableControl.HandlePlayerDeath();
         StartCoroutine(EnableEndSequenceSafely());
         onForklift = false;
@@ -856,7 +867,6 @@ public class PlayerMove : MonoBehaviour, IResettable
     IEnumerator ApplyGlissando()
     {
         camAnimator.SetBool("panoptic", true);
-        //mainCam.GetComponent<Animator>().SetBool("panoptic", true);
         printCodeScript.SetCodePrompt("panoptic");
 
         float halfDuration = 4.0f;
@@ -885,7 +895,6 @@ public class PlayerMove : MonoBehaviour, IResettable
         BGM.pitch = endingPitch;
         yield return new WaitForSeconds(6);
         camAnimator.SetBool("panoptic", false);
-        //mainCam.GetComponent<Animator>().SetBool("panoptic", false);
     }
 
     IEnumerator PlayMainTheme()
@@ -920,7 +929,6 @@ public class PlayerMove : MonoBehaviour, IResettable
                 yield return null;
             }
 
-            // Fade back in after the loop ends normally
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 3, 1f));
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 3, 1f));
         }
@@ -1027,7 +1035,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         else isGrounded = false;
 
         // Wall detection
-        Ray leftRay = new Ray(rayOrigin, Vector3.left); // experimental: to be used in wall detection
+        Ray leftRay = new Ray(rayOrigin, Vector3.left);
         Ray rightRay = new Ray(rayOrigin, Vector3.right);
         Debug.DrawRay(rayOrigin, Vector3.left * rayLength*2, Color.green);
         Debug.DrawRay(rayOrigin, Vector3.right * rayLength*2, Color.green);

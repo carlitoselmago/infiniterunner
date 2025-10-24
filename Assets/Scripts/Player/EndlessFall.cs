@@ -40,22 +40,6 @@ public class EndlessFall : MonoBehaviour, IResettable
 
         Debug.Log("Handling endless fall...");
 
-        /*
-        // Disable physics collider to prevent collisions with Ground while sinking
-        if (!MineData.isInTheMine) 
-        {
-            BoxCollider[] boxes = player.GetComponentsInChildren<BoxCollider>();
-            foreach (BoxCollider box in boxes)
-            {
-                if (box.enabled)
-                {
-                    box.enabled = false;
-                    Debug.Log("... Player BoxCollider disabled during water fall.");
-                }
-            }
-        }
-        collectableControl.HandlePlayerDeath();*/
-
         if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
             PlayerMove.isUnderwater = true; // Disable physics collider to prevent collisions with Ground while falling
         else

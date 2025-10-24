@@ -1,4 +1,3 @@
-// Forklift.cs (trigger / spawner)
 using UnityEngine;
 using System.Collections;
 

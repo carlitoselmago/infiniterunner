@@ -234,7 +234,7 @@ public class ConveyorItem : MonoBehaviour
 
         if (!isInFront || distance > maxDistance)
         {
-            Debug.Log($"Culled {name} (InFront={isInFront}, Distance={distance})", this);
+            //Debug.Log($"Culled {name} (InFront={isInFront}, Distance={distance})", this);
             gameObject.SetActive(false);
 
         }
