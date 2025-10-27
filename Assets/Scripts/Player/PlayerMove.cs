@@ -8,7 +8,8 @@ using SuperPivot.Samples;
 public class PlayerMove : MonoBehaviour, IResettable
 {
     private Vector3 startPosition = new Vector3(0f, -0.35f, -48f);
-    public float moveSpeed = 12.0f;
+    public float moveSpeed = 12f;
+    public float skateboardSpeed = 20f;
     public static float currentSpeed = 12.0f;
     private float initialmoveSpeed = 0;
     public float horizontalSpeed = 20f;
@@ -20,6 +21,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public bool holding = false;
     public static bool onMinecart = false;
     public static bool onForklift = false;
+    public static bool onSkateboard = false;
     private bool mainThemeAlreadyPlaying = false;
     public static bool idle = true;
     public static bool isUnderwater = false;
@@ -71,6 +73,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     float leftLane = -10f;
     float rightLane = 10f;
     public RideForklift forkliftManager;
+    public RideSkateboard skateboardManager;
 
     //sfx
     [Header("SFX")]
@@ -232,6 +235,10 @@ public class PlayerMove : MonoBehaviour, IResettable
         exposedRayLength = rayLength;
         currentSpeed = moveSpeed;
         isOnTheAir = holding;
+
+        if (!isFlying && !isUnderwater && !isDead && !onForklift && !onMinecart)
+            moveSpeed = onSkateboard ? skateboardSpeed : initialmoveSpeed;
+
         UpdateActiveCollider();
 
         // Quit the game (Escape)
@@ -421,7 +428,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // Jumping
         if (!isJumping && !isFlying && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)))
-            {
+        {
             if (!startedrunning)
                 StartPlay();
 
@@ -430,8 +437,10 @@ public class PlayerMove : MonoBehaviour, IResettable
             SetJumping(true);
             jumpStarted = Time.time;  // Track start time
             animator.SetTrigger("jump");
+            if (onSkateboard && skateboardManager != null)
+                skateboardManager.SkateJump();
             printCodeScript.SetCodePrompt("jumpsequence");
-            }
+        }
 
         // Jump timing fallback (so we don't rely solely on animator transitions)
         if (isJumping)
@@ -523,6 +532,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 {
                     printCodeScript.SetCodePrompt("hurt");
                     animator.SetBool("ishurt", true);
+                    if (onSkateboard)
+                        skateboardManager.ExitSkateboard();
                     StartCoroutine(HurtSequence());
                     HurtSFX.Play();
                     RemoveHeartsInReverseOrder();
@@ -564,6 +575,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 forkliftManager = null;
                 Debug.Log("Powerup - Exited Forklift");
             }
+            if (onSkateboard)
+                skateboardManager.ExitSkateboard();
             StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 2, 0));
             flyFX.Play();
             BGM.pitch += 0.5f;
@@ -694,6 +707,9 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.CompareTag("obstacle"))
         {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
+                animator.SetBool("ishurt", true);
+
             hurtMaskScript.Mask();
             forkliftManager.ApplyCollisionDamage(Time.deltaTime);
             soundTimer -= Time.deltaTime;   // no està clar
@@ -713,8 +729,15 @@ public class PlayerMove : MonoBehaviour, IResettable
         if (objrb != null && objrb.mass <= 100f && !objrb.isKinematic)
         {
             Vector3 pushDir = transform.forward;
-            objrb.AddForce(pushDir * 20f, ForceMode.Impulse);
+            objrb.AddForce(pushDir * 15f, ForceMode.Impulse);
         }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (!onForklift) return;
+        if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            animator.SetBool("ishurt", false);
     }
 
     private void PlayRandomHitSound()
@@ -934,7 +957,6 @@ public class PlayerMove : MonoBehaviour, IResettable
         }
     }
 
-
     IEnumerator delayedGodmodeOff()
     {
         godmode = true;
@@ -1017,6 +1039,12 @@ public class PlayerMove : MonoBehaviour, IResettable
             if (forkliftCollider != null) forkliftCollider.enabled = false;
             if (boxCollider != null) boxCollider.enabled = false;
         }
+    }
+
+    public void ClearSkateboard()
+    {
+        if (skateboardManager != null)
+            skateboardManager.ClearSkateboard();
     }
 
 
@@ -1110,6 +1138,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // set bools
         onForklift = false;
+        onSkateboard = false;
         isUnderwater = false;
         isOnModernTimes = false;
         isInTheSandstorm = false;

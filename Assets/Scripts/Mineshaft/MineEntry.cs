@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 
 public class MineEntry : MonoBehaviour, IResettable
 {
+    public PlayerMove player;
     public bool isExit = false; // define entry or exit point
     public GameObject levelControl;
     public Volume mineVolume;
@@ -24,6 +25,9 @@ public class MineEntry : MonoBehaviour, IResettable
     {
         if (other.gameObject.CompareTag("Player") && !triggered)
         {
+            if (PlayerMove.onForklift) return;
+            if (PlayerMove.onSkateboard)
+                player.ClearSkateboard();
             triggered = true;
 
             if (!isExit)

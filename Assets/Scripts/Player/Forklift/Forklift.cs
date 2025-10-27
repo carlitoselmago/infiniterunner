@@ -33,6 +33,8 @@ public class Forklift : MonoBehaviour, IResettable
     {
         if (!other.CompareTag("Player") || triggered) return;
         if (PlayerMove.onForklift) return;
+        if (PlayerMove.onSkateboard)
+            player.ClearSkateboard();
 
         // Prevent double spawn if a ride exists
         if (rideForklift != null) return;

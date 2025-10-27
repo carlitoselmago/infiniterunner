@@ -22,6 +22,8 @@ public class CollectableControl : MonoBehaviour, IResettable
     private int treballadordelmes_coins_index = 0;
     public int highScore;
     public static bool highScoreAchieved = false;
+    public static bool firstSkateboard = false;
+    private bool firstSkateboardAchieved = false;
     public static bool firstForklift = false;
     private bool firstForkliftAchieved = false;
     public bool firstAchievementMet = false;
@@ -99,6 +101,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             HandleTimeAchievements();
             HandleHighScoreAchievement();
             HandleFirstForkliftAchievement();
+            HandleFirstSkateboardAchievement();
         }
 
         if (Input.GetKeyDown(KeyCode.C))
@@ -251,6 +254,22 @@ public class CollectableControl : MonoBehaviour, IResettable
         }
     }
 
+    void HandleFirstSkateboardAchievement()
+    {
+        if (firstSkateboard && !firstSkateboardAchieved)
+        {
+            firstSkateboardAchieved = true;
+            achievementEndUItext.GetComponent<Text>().text = "SOBRE RODES";
+            achievementEndUIsubtext.GetComponent<Text>().text = "Ets la més cool!";
+            achievementUI.SetActive(true);
+            achievementShown = true;
+            highSpeedSFX.Play();
+            dimVolumes();
+            lifeUp();
+            StartCoroutine(hideachievement());
+        }
+    }
+
     void dimVolumes()
     {
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 0.5f, 0.15f));
@@ -290,6 +309,8 @@ public class CollectableControl : MonoBehaviour, IResettable
         highScoreAchieved = false;
         firstForklift = false;
         firstForkliftAchieved = false;
+        firstSkateboard = false;
+        firstSkateboardAchieved = false;
 
         recentCoinTimes.Clear();
 
