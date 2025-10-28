@@ -822,8 +822,10 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     IEnumerator RollSequence()
     {
-        yield return new WaitForSeconds(0.45f);
-        yield return new WaitForSeconds(0.45f);
+        if (onSkateboard)
+            yield return new WaitForSeconds(1.35f);
+        else
+            yield return new WaitForSeconds(0.9f);
         SetCrouching(false);
         animator.SetBool("isrolling", false);
     }
