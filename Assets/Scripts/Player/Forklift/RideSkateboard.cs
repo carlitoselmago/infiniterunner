@@ -44,7 +44,7 @@ public class RideSkateboard : MonoBehaviour, IResettable
     {
         skateboardHolder = player.transform.Find("skateboard");
         if (skateboardHolder == null)
-            Debug.LogError("Skateboard holder not found under player! Please create a child named 'skateboard'.");
+            Debug.LogError("Skateboard holder not found under player.");
     }
 
     void Update()
@@ -56,7 +56,7 @@ public class RideSkateboard : MonoBehaviour, IResettable
         if (player != null)
             player.skateboardManager = this;
 
-        // Death / explosion handling
+        // Death handling
         if (PlayerMove.isDead && !triggered)
         {
             triggered = true;
@@ -70,6 +70,7 @@ public class RideSkateboard : MonoBehaviour, IResettable
         if (!isFlipping)
         {
             skateJumpSFX.Play();
+            rideSFX.Stop();
             StartCoroutine(DoFlip());
         }
     }
@@ -79,7 +80,6 @@ public class RideSkateboard : MonoBehaviour, IResettable
         yield return new WaitForSeconds(0.15f);
         isFlipping = true;
 
-        // Use the current local position instead of a fixed offset
         Vector3 startLocalPos = transform.localPosition;
         float elapsed = 0f;
 
@@ -101,6 +101,8 @@ public class RideSkateboard : MonoBehaviour, IResettable
 
         // Snap back to original local position
         transform.localPosition = startLocalPos;
+        leaveSkateSFX.Play();
+        rideSFX.Play();
         isFlipping = false;
     }
 
@@ -169,11 +171,8 @@ public class RideSkateboard : MonoBehaviour, IResettable
 
     void OnDisable()
     {
-        // Notify trigger if possible
         if (triggerManager != null)
             triggerManager.NotifyRideDestroyed(gameObject);
-
-        // Extra cleanup safeguard: remove from holder if still attached
         if (transform.parent != null && transform.parent.name == "skateboard")
             transform.SetParent(null);
     }

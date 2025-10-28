@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class Skateboard : MonoBehaviour, IResettable
 {
@@ -20,7 +19,7 @@ public class Skateboard : MonoBehaviour, IResettable
 
         skateboardHolder = player.transform.Find("skateboard");
         if (skateboardHolder == null)
-            Debug.LogError("Skateboard holder not found under player! Please create a child named 'skateboard'.");
+            Debug.LogError("Skateboard holder not found under player.");
     }
 
     void OnEnable()
