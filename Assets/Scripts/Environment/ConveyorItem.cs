@@ -15,9 +15,8 @@ public class ConveyorItem : MonoBehaviour
 
     // --- Falling state ---
     private bool falling = false;
-    private float fallSpeed = 0f;
     private float gravity = 9.81f;
-    private float fallYThreshold = -50f; // despawn when falling too far
+    private float fallYThreshold = -50f; // despawn if falling too far
     private float spawnTime;
 
     [Header("Ground Check")]
@@ -26,6 +25,8 @@ public class ConveyorItem : MonoBehaviour
     private int groundLayer;
     private bool onFlatBelt = false;
     private bool groundedAfterFall = false;
+
+    private Rigidbody rb;
 
     public void Init(ConveyorSpawner spawner, float speed, float slopeHeight, float slopeLength, float beltLength, Transform cam, float maxDistance)
     {
@@ -40,7 +41,6 @@ public class ConveyorItem : MonoBehaviour
 
         startPos = spawner.transform.position;
         falling = false;
-        fallSpeed = 0f;
         onFlatBelt = false;
         groundedAfterFall = false;
         spawnTime = Time.time;
@@ -52,21 +52,20 @@ public class ConveyorItem : MonoBehaviour
         groundMask = 1 << groundLayer; // convert to bitmask
     }
 
+    private void OnEnable()
+    {
+        rb = gameObject.GetComponent<Rigidbody>();
+    }
+
     void Update()
     {
-        if (Time.time - spawnTime < 0.5f)
-            return;
+        if (Time.time - spawnTime < 0.5f) return;
 
         if (!falling)
         {
             MoveAlongConveyor();
             if (onFlatBelt)
                 CheckForGround();
-        }
-        else
-        {
-            ApplyFalling();
-            CheckForGroundWhileFalling();
         }
 
         CullIfTooFar();
@@ -79,7 +78,7 @@ public class ConveyorItem : MonoBehaviour
         float step = speed * Time.deltaTime;
         distanceTravelled += step;
 
-        // 1️⃣ Move along the conveyor direction (assumed -Z)
+        // 1️⃣ Move along the conveyor direction (-Z)
         transform.position += new Vector3(0, 0, -step);
 
         // 2️⃣ Handle slope up/down based on how far we are
@@ -114,50 +113,24 @@ public class ConveyorItem : MonoBehaviour
             );
         }
         else
-        {
-            // End of conveyor — start falling
-            onFlatBelt = false;
-            falling = true;
-        }
+            StartFalling();
     }
 
 
     void CheckForGround()
     {
         if (!Physics.Raycast(transform.position, Vector3.down, raycastDistance, groundMask))
-        {
-            falling = true;
-            fallSpeed = 0f;
-            onFlatBelt = false;
-        }
+            StartFalling();
     }
 
-
-    void CheckForGroundWhileFalling()
+    void StartFalling()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, raycastDistance, groundMask))
-        {
-            falling = false;
-            groundedAfterFall = true;
-            fallSpeed = 0f;
-            // Snap to ground surface
-            Vector3 pos = transform.position;
-            pos.y = hit.point.y;
-            transform.position = pos;
-        }
-    }
+        if (falling) return;
+        falling = true;
+        onFlatBelt = false;
 
-    void ApplyFalling()
-    {
-
-        if (groundedAfterFall) return;
-
-        fallSpeed += gravity * Time.deltaTime;
-        transform.position += Vector3.down * fallSpeed * Time.deltaTime;
-
-        // --- Despawn after falling far enough ---
-        if (transform.position.y < fallYThreshold)
-            gameObject.SetActive(false);
+        rb.isKinematic = false;
+        rb.velocity = new Vector3(0, 0, -speed * 0.5f);
     }
 
     void CullIfTooFar()
@@ -177,5 +150,3 @@ public class ConveyorItem : MonoBehaviour
         }
     }
 }
-
-
