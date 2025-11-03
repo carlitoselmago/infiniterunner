@@ -4,12 +4,13 @@ public class GenerateTunnel : MonoBehaviour
 {
     public GameObject object1;
     public GameObject object2;
+    public float probabilityObject1 = 0.5f;
 
     void OnEnable()
     {
         float activatedSection = Random.Range(0f, 1f);
 
-            if (activatedSection >= 0.5f)
+            if (activatedSection >= probabilityObject1)
             {
                 object1.SetActive(true);
                 object2.SetActive(false);

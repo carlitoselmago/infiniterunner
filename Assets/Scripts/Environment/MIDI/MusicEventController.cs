@@ -13,10 +13,10 @@ public class MusicEventController : MonoBehaviour, IResettable
     public GameObject alternateNotePrefab;
     public Transform noteParent;
     public AudioMixer audioMixer;
-    public GenerateSandstorm sandstormGenerator;
 
     [Header("Level data")]
     public string jsonFileName = "modern-times-level";
+    public static bool isInMidiLevel = false;
     public bool useResourcesFolder = false;
 
     [Header("Note motion")]
@@ -26,7 +26,7 @@ public class MusicEventController : MonoBehaviour, IResettable
     private LevelData levelData;
     private bool isActive = false;
 
-    private readonly float[] laneX = { -2.84f, 0.12f, 2.96f };
+    private readonly float[] laneX = { -2.84f, 0.11f, 2.96f };
 
     [Header("Pooling")]
     public int poolSize = 200; // max number of notes
@@ -86,14 +86,18 @@ public class MusicEventController : MonoBehaviour, IResettable
     void OnEnable()
     {
         isActive = true;
+        isInMidiLevel = true;
         nextNoteIndex = 0;
         StartCoroutine(StartModernTimes());
         usingAlternatePrefab = false;
         //InitializePools();
         if (levelData != null && levelData.bpm > 0)
             beatDuration = 60f / levelData.bpm;
-        if (sandstormGenerator != null)
-            sandstormGenerator.StopTheSandstorm();  // stop sandstorm if active
+    }
+
+    void OnDisable()
+    {
+        ResetState();
     }
 
     IEnumerator StartModernTimes()
@@ -203,6 +207,7 @@ public class MusicEventController : MonoBehaviour, IResettable
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeBGM", 1f, 0.7f));
 
         isActive = false;
+        isInMidiLevel = false;
         gameObject.SetActive(false);
     }
 
@@ -376,6 +381,7 @@ public class MusicEventController : MonoBehaviour, IResettable
 
         // --- Reset game state ---
         isActive = false;
+        isInMidiLevel = false;
         PlayerMove.isOnModernTimes = false;
 
         // --- Disable controller ---

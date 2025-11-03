@@ -20,6 +20,9 @@ public class RideSkateboard : MonoBehaviour, IResettable
     public float flipHeight = 1f;   // how high it lifts during the flip
     private bool isFlipping = false;
 
+    private BoxCollider box;
+    private Rigidbody rb;
+
     private Vector3 positionOffset = new Vector3(1.537f, 0f, 0.166f);
 
     /// Call after instantiating. The trigger passes itself so this ride can notify it when destroyed.
@@ -136,8 +139,17 @@ public class RideSkateboard : MonoBehaviour, IResettable
 
     private IEnumerator LeaveAndDestroy()
     {
-        // Unparent and leave on MAP
+        // Unparent, leave on MAP and apply inertia
+        box = gameObject.AddComponent<BoxCollider>();
+        rb = gameObject.AddComponent<Rigidbody>();
+
         if (MAP != null) transform.SetParent(MAP.transform, true);
+        float launchForce = PlayerMove.currentSpeed * 4.5f;
+        Vector3 launchDir = player.transform.forward + Vector3.up * 0.3f;
+        rb.AddForce(player.transform.up * 5f, ForceMode.Impulse);
+        rb.AddForce(launchDir.normalized * launchForce, ForceMode.Impulse);
+        rb.AddTorque(Vector3.right * Random.Range(5f, 10f), ForceMode.Impulse);
+
         // If something else was left under skateboardHolder, make sure it's not active
         if (skateboardHolder != null)
         {

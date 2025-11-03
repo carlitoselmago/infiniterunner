@@ -51,7 +51,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     {
         if (!generatingSandstorm) return;
 
-        if (MineData.isInTheMine && sandstormGeneratorEnabled)
+        if (MineData.isInTheMine && sandstormGeneratorEnabled || MusicEventController.isInMidiLevel && sandstormGeneratorEnabled)
         {
             StopTheSandstorm();
             generatingSandstorm = false;

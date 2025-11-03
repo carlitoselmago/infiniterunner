@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class Explodable : MonoBehaviour, IResettable
 {
     [Header("Explosion Settings")]
-    public float explosionForce = 5f;
+    public float explosionForce = 4.5f;
     public float explosionRadius = 3f;
     public float upwardsModifier = 0.5f;
 
