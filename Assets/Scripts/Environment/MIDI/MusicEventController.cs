@@ -319,16 +319,18 @@ public class MusicEventController : MonoBehaviour, IResettable
 
     void CullNotesBehindPlayer()
     {
+        float cullZ = -80f; // distance behind player
+
         for (int i = spawnedNotes.Count - 1; i >= 0; i--)
         {
             GameObject note = spawnedNotes[i];
             if (note == null) continue;
 
-            if (note.activeSelf && note.transform.position.z < -80f)
+            // Compare relative to player position (assumed z = 0)
+            if (note.activeSelf && note.transform.position.z < cullZ)
             {
                 SetActiveRecursively(note, false);
 
-                // Return to proper pool
                 if (usingAlternatePrefab || note.CompareTag("obstacle"))
                     notePoolAlternate.Enqueue(note);
                 else
@@ -338,6 +340,7 @@ public class MusicEventController : MonoBehaviour, IResettable
             }
         }
     }
+
 
 
     public void ResetState()

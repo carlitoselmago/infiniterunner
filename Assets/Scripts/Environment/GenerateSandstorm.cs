@@ -51,9 +51,11 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
     {
         if (!generatingSandstorm) return;
 
-        if (MineData.isInTheMine && sandstormGeneratorEnabled || MusicEventController.isInMidiLevel && sandstormGeneratorEnabled)
+        if ((MineData.isInTheMine || MusicEventController.isInMidiLevel) && sandstormGeneratorEnabled)
         {
+            StopAllCoroutines(); // stop any active fade in/out coroutines
             StopTheSandstorm();
+            StartCoroutine(FadeOutAndStopAudio());
             generatingSandstorm = false;
             PlayerMove.isInTheSandstorm = false;
         }
@@ -171,6 +173,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
+        Debug.Log("StopTheSandstorm");
     }
 
     private IEnumerator FadeOutAndStopAudio()
