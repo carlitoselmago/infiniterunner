@@ -341,32 +341,11 @@ public class MusicEventController : MonoBehaviour, IResettable
         }
     }
 
-
-
     public void ResetState()
     {
         nextNoteIndex = 0;
 
-        // --- Disable and properly return all spawned notes ---
-        for (int i = spawnedNotes.Count - 1; i >= 0; i--)
-        {
-            var note = spawnedNotes[i];
-            if (note != null)
-            {
-                SetActiveRecursively(note, false);
-
-                // Use a tag or a stored reference to know which pool to return to
-                if (note.CompareTag("obstacle") || note.name.Contains("Alternate"))
-                    notePoolAlternate.Enqueue(note);
-                else
-                    notePoolOriginal.Enqueue(note);
-            }
-            spawnedNotes.RemoveAt(i);
-        }
-
-        // --- Rebuild pools to ensure they have poolSize items ---
-        RebuildPool(notePoolOriginal, notePrefabOriginal);
-        RebuildPool(notePoolAlternate, alternateNotePrefab);
+        StartCoroutine(DelayedRebuildPools());
 
         // --- Stop music ---
         if (musicSource != null && musicSource.isPlaying)
@@ -413,6 +392,30 @@ public class MusicEventController : MonoBehaviour, IResettable
         }
     }
 
+    private IEnumerator DelayedRebuildPools()
+    {
+        yield return new WaitForSeconds(7f);
+        // --- Disable and properly return all spawned notes ---
+        for (int i = spawnedNotes.Count - 1; i >= 0; i--)
+        {
+            var note = spawnedNotes[i];
+            if (note != null)
+            {
+                SetActiveRecursively(note, false);
+
+                // Use a tag or a stored reference to know which pool to return to
+                if (note.CompareTag("obstacle") || note.name.Contains("Alternate"))
+                    notePoolAlternate.Enqueue(note);
+                else
+                    notePoolOriginal.Enqueue(note);
+            }
+            spawnedNotes.RemoveAt(i);
+        }
+
+        // --- Rebuild pools to ensure they have poolSize items ---
+        RebuildPool(notePoolOriginal, notePrefabOriginal);
+        RebuildPool(notePoolAlternate, alternateNotePrefab);
+    }
 
     void LoadLevelData()
     {

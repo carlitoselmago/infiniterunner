@@ -35,6 +35,7 @@ public class EndRunSequence : MonoBehaviour
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeThemes", 1.5f, 0));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSFX", 1.5f, 0));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", 1.5f, 0f));
+        StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeModern", 1.5f, 0f));
         levelControl.GetComponent<GenerateSandstorm>().enabled = false;
 
         yield return new WaitForSeconds(1);
@@ -49,7 +50,6 @@ public class EndRunSequence : MonoBehaviour
         highScoreDisplay.GetComponent<Text>().text = CollectableControl.highScoreText;
         endCoinCount.SetActive(true);
         highScoreDisplay.SetActive(true);
-        //fadeOut.SetActive(true);
 
         if (CollectableControl.highScoreAchieved)
             yield return new WaitForSeconds(5f);
@@ -60,13 +60,6 @@ public class EndRunSequence : MonoBehaviour
             yield return new WaitForSeconds(2f);
         else
             yield return new WaitForSeconds(2f);
-
-        //gameOverText.GetComponent<Animator>().enabled = true;
-        //gameOverText.GetComponent<Animator>().Play("FadeOutText");
-        //endCoinCount.GetComponent<Animator>().enabled = true;
-        //endCoinCount.GetComponent<Animator>().Play("FadeOutText");
-        //highScoreDisplay.GetComponent<Animator>().enabled = true;
-        //highScoreDisplay.GetComponent<Animator>().Play("FadeOutText");
 
         yield return new WaitForSeconds(2f);
         startSection.SetActive(true);
@@ -119,7 +112,6 @@ public class EndRunSequence : MonoBehaviour
 
         // Re-enable gameplay systems
         player.enabled = true;
-        //levelControl.GetComponent<GenerateSandstorm>().enabled = true;
 
         // Hide end screen UI
         endScreen.SetActive(false);
