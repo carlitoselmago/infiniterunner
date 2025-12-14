@@ -93,6 +93,7 @@ public class MusicEventController : MonoBehaviour, IResettable
         //InitializePools();
         if (levelData != null && levelData.bpm > 0)
             beatDuration = 60f / levelData.bpm;
+        Debug.Log("Entered Midi Level");
     }
 
     void OnDisable()

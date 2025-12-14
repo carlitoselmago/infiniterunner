@@ -19,6 +19,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public bool isFlying = false;
     public static bool isOnTheAir = false;
     public bool holding = false;
+    public static bool paused = false;
     public static bool onMinecart = false;
     public static bool onForklift = false;
     public static bool onSkateboard = false;
@@ -125,6 +126,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     private Vector3 playerLocalPos;      // Local position relative to parent
     private Quaternion playerLocalRot;   // Local rotation relative to parent
 
+    // Timing
+    public static float runStartTime;
     private float jumpStarted;
 
     public GameObject tutorial2d;
@@ -209,7 +212,6 @@ public class PlayerMove : MonoBehaviour, IResettable
     {
         if (heartList.Count < maxHealth)
         {
-            //Debug.Log("added heart!!!!");
             GameObject clonedHeart = Instantiate(heart, Vector3.zero, Quaternion.identity);
             clonedHeart.transform.SetParent(hearts.transform, false);
             clonedHeart.transform.localPosition = new Vector3(heartList.Count * 50, 0, 0);
@@ -217,6 +219,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             heartList.Add(clonedHeart);
             heartAnimator.SetBool("started", true);
             remainingHealth += 1;
+            Debug.Log("Added Heart. Remaining Health: " + remainingHealth);
         }
         else
             Debug.Log("Cannot add more hearts");
@@ -232,6 +235,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     void Update()
 
     {
+        if (paused) return;
+
         exposedRayLength = rayLength;
         currentSpeed = moveSpeed;
         isOnTheAir = holding;
@@ -269,7 +274,10 @@ public class PlayerMove : MonoBehaviour, IResettable
         }
 
         if (startedrunning && !animator.GetBool("isrunning"))
+        {
+            runStartTime = Time.unscaledTime;   // start counting play time
             animator.SetBool("isrunning", true);
+        }
 
         if (animator.GetBool("isrunning"))
             MAP.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed, Space.World);
@@ -1135,7 +1143,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     public void ResetState()
     {
-        Debug.Log("PlayerMove reset");
+        //Debug.Log("PlayerMove reset");
         levelControl.GetComponent<EndRunSequence>().enabled = false;
 
         // set bools
@@ -1207,6 +1215,12 @@ public class PlayerMove : MonoBehaviour, IResettable
         
         mainThemeAlreadyPlaying = false;
         alreadyCrossedPanoptic = false;
+
+        // set log spacing
+        Debug.Log("\n\n\n");
+        Debug.Log("========================================");
+        Debug.Log($"GAME STARTED: {System.DateTime.Now}");
+        Debug.Log("========================================");
 
         // set health
         foreach (var h in heartList) Destroy(h);

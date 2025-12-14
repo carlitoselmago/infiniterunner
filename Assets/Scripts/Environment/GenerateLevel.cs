@@ -31,7 +31,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
 
     void Awake()
     {
-        Debug.Log("Started GenerateLevel");
+        //Debug.Log("Started GenerateLevel");
         ResetZPos();
         CachePrefabs();
         for (int i = 0; i < 5; i++)

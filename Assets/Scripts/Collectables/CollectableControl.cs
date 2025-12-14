@@ -130,7 +130,7 @@ public class CollectableControl : MonoBehaviour, IResettable
 
         int streakCount = recentCoinTimes.Count;
 
-        // --- 🎵 Handle audio glissando ---
+        // --- Handle audio glissando ---
         if (streakCount >= streakStart && streakCount <= streakMax && coinFX != null)
         {
             float t = (float)(streakCount - streakStart) / (streakMax - streakStart);
@@ -144,22 +144,15 @@ public class CollectableControl : MonoBehaviour, IResettable
 
         coinFX.Play();
 
-        // --- 🌟 Update visual streak UI ---
+        // --- Update visual streak UI ---
         if (streakUI != null)
             streakUI.UpdateDots(streakCount, streakStart, streakMax);
 
-        // --- 💎 Streak bonus achievement ---
+        // --- Streak bonus achievement ---
         if (streakCount >= streakMax)
         {
             playerMove.AddHeart();
-            /*
-            achievementEndUItext.GetComponent<Text>().text = "PAGA EXTRA!";
-            achievementEndUIsubtext.GetComponent<Text>().text = $"Has agafat {streakCount} monedes en 1 segon!";
-            achievementUI.SetActive(true);
-            achievementShown = true;*/
-
             coinStreakSFX.Play();
-
             recentCoinTimes.Clear(); // reset streak
             coinFX.pitch = 1f;
 
@@ -179,6 +172,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             {
                 string compliment = compliments[treballadordelmes_coins_index];
                 lastAchievementText = "TREBALLADORA " + compliment + "!";
+                Debug.Log("New Achievement: " + compliment);
                 achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
                 achievementEndUIsubtext.GetComponent<Text>().text = "Has recol·lectat " + treballadordelmes_coins[treballadordelmes_coins_index] + " monedes!";
                 achievementUI.SetActive(true);
@@ -201,6 +195,7 @@ public class CollectableControl : MonoBehaviour, IResettable
                 int elapsedMinutes = Mathf.FloorToInt(elapsedTime / 60f);
                 string timeCompliment = timeCompliments[seconds_to_elapse_index];
                 achievementEndUItext.GetComponent<Text>().text = timeCompliment;
+                Debug.Log("New Achievement: " + timeCompliment);
                 achievementEndUIsubtext.GetComponent<Text>().text = "Has sobreviscut " + elapsedMinutes + " minuts!";
                 achievementUI.SetActive(true);
                 achievementShown = true;
@@ -228,6 +223,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             runtimeHighScoreTriggered = true;
             achievementEndUItext.GetComponent<Text>().text = "NOU RÈCORD!";
             achievementEndUIsubtext.GetComponent<Text>().text = "No et rendeixis!";
+            Debug.Log("New Achievement: Nou Rècord!");
             achievementUI.SetActive(true);
             achievementShown = true;
             highScoreSFX.Play();
@@ -245,6 +241,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             firstForkliftAchieved = true;
             achievementEndUItext.GetComponent<Text>().text = "AL TORO!";
             achievementEndUIsubtext.GetComponent<Text>().text = "Has après a conduir!";
+            Debug.Log("New Achievement: Al Toro!");
             achievementUI.SetActive(true);
             achievementShown = true;
             highSpeedSFX.Play();
@@ -261,6 +258,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             firstSkateboardAchieved = true;
             achievementEndUItext.GetComponent<Text>().text = "SOBRE RODES";
             achievementEndUIsubtext.GetComponent<Text>().text = "Ets la més cool!";
+            Debug.Log("New Achievement: Sobre rodes!");
             achievementUI.SetActive(true);
             achievementShown = true;
             highSpeedSFX.Play();

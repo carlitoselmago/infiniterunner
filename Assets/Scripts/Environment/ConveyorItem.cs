@@ -15,8 +15,6 @@ public class ConveyorItem : MonoBehaviour
 
     // --- Falling state ---
     private bool falling = false;
-    private float gravity = 9.81f;
-    private float fallYThreshold = -50f; // despawn if falling too far
     private float spawnTime;
 
     [Header("Ground Check")]
@@ -78,10 +76,10 @@ public class ConveyorItem : MonoBehaviour
         float step = speed * Time.deltaTime;
         distanceTravelled += step;
 
-        // 1️⃣ Move along the conveyor direction (-Z)
+        // 1) Move along the conveyor direction (-Z)
         transform.position += new Vector3(0, 0, -step);
 
-        // 2️⃣ Handle slope up/down based on how far we are
+        // 2) Handle slope up/down based on how far we are
         if (distanceTravelled <= slopeLength)
         {
             onFlatBelt = false;
@@ -115,7 +113,6 @@ public class ConveyorItem : MonoBehaviour
         else
             StartFalling();
     }
-
 
     void CheckForGround()
     {

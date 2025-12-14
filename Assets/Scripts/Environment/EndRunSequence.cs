@@ -63,7 +63,21 @@ public class EndRunSequence : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
         startSection.SetActive(true);
+
+        float duration = Time.unscaledTime - PlayerMove.runStartTime;
+
+        Debug.Log("##########");
+        Debug.Log("Collected coins: " + CollectableControl.coinCount);
+        Debug.Log("Achievement text: " + CollectableControl.lastAchievementText);
+        Debug.Log($"Duration: {FormatTime(duration)}");
         ResetGame();
+    }
+
+    private string FormatTime(float seconds)
+    {
+        int mins = Mathf.FloorToInt(seconds / 60f);
+        int secs = Mathf.FloorToInt(seconds % 60f);
+        return $"{mins:00}:{secs:00}";
     }
 
     IEnumerator PopTextAnimation(Text txt, float duration)
@@ -90,6 +104,7 @@ public class EndRunSequence : MonoBehaviour
         Text txt = gameOverText.GetComponent<Text>();
         gameOverText.transform.localScale = Vector3.zero;
         gameOverText.SetActive(true);
+        Debug.Log("Game Over");
 
         if (CollectableControl.highScoreAchieved)
         {
@@ -105,8 +120,8 @@ public class EndRunSequence : MonoBehaviour
 
     private void ResetGame()
     {
-        Debug.Log("Requesting Reset");
         // Reset all IResettable scripts in the scene
+        //Debug.Log("Requesting Reset");
         foreach (var resettable in FindObjectsOfType<MonoBehaviour>().OfType<IResettable>())
             resettable.ResetState();
 

@@ -108,4 +108,3 @@ public class HighestScore : MonoBehaviour, IResettable
         //animator.Update(0f);
     }
 }
-

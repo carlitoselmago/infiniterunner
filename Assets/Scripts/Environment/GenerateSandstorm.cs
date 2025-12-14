@@ -97,6 +97,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
 
             if (Random.value > chance)
             {
+                Debug.Log("Generating Sandstorm...");
                 generatingSandstorm = true;
                 PlayerMove.isInTheSandstorm = true;
                 sandstormParticles.Play();
