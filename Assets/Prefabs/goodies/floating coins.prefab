@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7743781249034579510}
+  - component: {fileID: 5003422507377170206}
   m_Layer: 0
   m_Name: floating coins
   m_TagString: floating coin
@@ -36,6 +37,18 @@ Transform:
   - {fileID: 8374518876166264480}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5003422507377170206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7647477114947012339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0cdf2cc2d6014bc8aa52765db3c676b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2002860660420658580
 PrefabInstance:
   m_ObjectHideFlags: 0

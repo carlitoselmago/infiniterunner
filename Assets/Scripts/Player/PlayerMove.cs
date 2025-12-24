@@ -219,7 +219,8 @@ public class PlayerMove : MonoBehaviour, IResettable
             heartList.Add(clonedHeart);
             heartAnimator.SetBool("started", true);
             remainingHealth += 1;
-            Debug.Log("Added Heart. Remaining Health: " + remainingHealth);
+            if (!idle)
+                Debug.Log("Added Heart. Remaining Health: " + remainingHealth);
         }
         else
             Debug.Log("Cannot add more hearts");
