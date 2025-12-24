@@ -20,10 +20,10 @@ public class FpsSpikeLogger : MonoBehaviour
             if (!spikeLogged && timeBelowThreshold >= requiredDuration)
             {
                 spikeLogged = true;
-
-                Debug.Log(
-                    $"LOW FPS EVENT | < {fpsThreshold} FPS for {requiredDuration} s"
-                );
+                if (!PlayerMove.idle)
+                    Debug.Log(
+                        $"LOW FPS EVENT | < {fpsThreshold} FPS for {requiredDuration} s"
+                    );
             }
         }
         else

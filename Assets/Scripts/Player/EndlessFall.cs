@@ -25,7 +25,7 @@ public class EndlessFall : MonoBehaviour, IResettable
 
         if (!isFalling && other.CompareTag("Player") && !triggered)
         {
-            Debug.Log("ENDLESS FALLING!");
+            Debug.Log("Endlessly falling!");
             triggered = true;
             isFalling = true;
             StartCoroutine(HandleEndlessFall());
