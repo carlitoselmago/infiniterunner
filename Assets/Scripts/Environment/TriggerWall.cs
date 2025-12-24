@@ -9,7 +9,6 @@ public class TriggerWall : MonoBehaviour, IResettable
     {
         if (other.gameObject.CompareTag("Player") && !triggered)
         {
-            //Debug.Log("TRIGGER");
             triggeredObject.SetActive(true);
             triggered = true;
         }

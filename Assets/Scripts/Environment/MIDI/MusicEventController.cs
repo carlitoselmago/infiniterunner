@@ -29,7 +29,7 @@ public class MusicEventController : MonoBehaviour, IResettable
     private readonly float[] laneX = { -2.84f, 0.11f, 2.96f };
 
     [Header("Pooling")]
-    public int poolSize = 200; // max number of notes
+    public int poolSize = 250; // max number of notes
     private int nextNoteIndex = 0;
     private List<GameObject> spawnedNotes = new List<GameObject>();
     private Queue<GameObject> notePoolOriginal = new Queue<GameObject>();
@@ -303,6 +303,11 @@ public class MusicEventController : MonoBehaviour, IResettable
         else
             obj = currentPool.Dequeue();
 
+        var pooled = obj.GetComponent<PooledNote>();
+        if (pooled == null)
+            pooled = obj.AddComponent<PooledNote>();
+        pooled.isAlternate = usingAlternatePrefab;
+
         SetActiveRecursively(obj, true);
         return obj;
     }
@@ -320,7 +325,7 @@ public class MusicEventController : MonoBehaviour, IResettable
 
     void CullNotesBehindPlayer()
     {
-        float cullZ = -80f; // distance behind player
+        float cullZ = -90f; // distance behind player
 
         for (int i = spawnedNotes.Count - 1; i >= 0; i--)
         {
@@ -332,10 +337,17 @@ public class MusicEventController : MonoBehaviour, IResettable
             {
                 SetActiveRecursively(note, false);
 
-                if (usingAlternatePrefab || note.CompareTag("obstacle"))
+                var pooled = note.GetComponent<PooledNote>();
+
+                if (pooled != null && pooled.isAlternate)
                     notePoolAlternate.Enqueue(note);
                 else
                     notePoolOriginal.Enqueue(note);
+/*
+                if (usingAlternatePrefab || note.CompareTag("obstacle"))
+                    notePoolAlternate.Enqueue(note);
+                else
+                    notePoolOriginal.Enqueue(note);*/
 
                 spawnedNotes.RemoveAt(i);
             }
@@ -405,10 +417,17 @@ public class MusicEventController : MonoBehaviour, IResettable
                 SetActiveRecursively(note, false);
 
                 // Use a tag or a stored reference to know which pool to return to
-                if (note.CompareTag("obstacle") || note.name.Contains("Alternate"))
+                var pooled = note.GetComponent<PooledNote>();
+
+                if (pooled != null && pooled.isAlternate)
                     notePoolAlternate.Enqueue(note);
                 else
                     notePoolOriginal.Enqueue(note);
+                /*
+                if (note.CompareTag("obstacle") || note.name.Contains("Alternate"))
+                    notePoolAlternate.Enqueue(note);
+                else
+                    notePoolOriginal.Enqueue(note);*/
             }
             spawnedNotes.RemoveAt(i);
         }
