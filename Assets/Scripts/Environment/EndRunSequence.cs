@@ -68,7 +68,6 @@ public class EndRunSequence : MonoBehaviour
 
         Debug.Log("##########");
         Debug.Log("Collected coins: " + CollectableControl.coinCount);
-        Debug.Log("Achievement text: " + CollectableControl.lastAchievementText);
         Debug.Log($"Duration: {FormatTime(duration)}");
         ResetGame();
     }
@@ -151,7 +150,7 @@ public class EndRunSequence : MonoBehaviour
             if (animator != null)
             {
                 animator.Rebind();
-                animator.Update(0f);
+                //animator.Update(0f);
                 animator.enabled = false;
             }
         }
