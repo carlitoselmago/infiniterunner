@@ -18,7 +18,7 @@ public class CollectableControl : MonoBehaviour, IResettable
     public GameObject achievementEndUIsubtext;
 
     // Achievements data
-    public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200 };
+    public static List<int> treballadordelmes_coins = new List<int> { 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1600 };
     private int treballadordelmes_coins_index = 0;
     public int highScore;
     public static bool highScoreAchieved = false;
@@ -30,11 +30,11 @@ public class CollectableControl : MonoBehaviour, IResettable
 
     // Time tracking
     private float elapsedTime = 0f;
-    private List<float> seconds_to_elapse = new List<float> { 60f, 120f, 180f, 240f, 360f, 420f, 520f, 700f };
+    private List<float> seconds_to_elapse = new List<float> { 60f, 120f, 180f, 240f, 360f, 420f, 480, 600f, 900f };
     private int seconds_to_elapse_index = 0;
 
-    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "DEMENT", "MÀQUINA", "DEL SEGLE", "BRUTAL", "ESVERADA", "BOJA", "MODEL", "DIVINA" };
-    private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL", "MORIRÀS TREBALLANT", "NO HI HA FUTUR" };
+    private List<string> compliments = new List<string> { "DEL DIA", "DEL MES", "DE L'ANY", "TOTAL", "DEMENT", "MÀQUINA", "DEL SEGLE", "BRUTAL", "IDEAL", "MODEL", "BOJA", "DIVINA", "FINAL" };
+    private List<string> timeCompliments = new List<string> { "INCANSABLE!", "INSACIABLE!", "IRREFRENABLE!", "NO POTS PARAR!", "EL TEMPS ÉS OR", "NO HI HA FINAL", "MORIRÀS TREBALLANT", "NO HI HA FUTUR", "ATURA'T!" };
 
     // Achievement state
     public static string lastAchievementText = "";
@@ -166,6 +166,8 @@ public class CollectableControl : MonoBehaviour, IResettable
 
     void HandleCoinAchievements()
     {
+        if (treballadordelmes_coins_index < 0 || treballadordelmes_coins_index >= treballadordelmes_coins.Count) return;
+
         if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
         {
             if (coinCount == treballadordelmes_coins[treballadordelmes_coins_index] && !achievementShown)
@@ -180,7 +182,7 @@ public class CollectableControl : MonoBehaviour, IResettable
                 highScoreSFX.Play();
                 dimVolumes();
                 lifeUp();
-                treballadordelmes_coins_index += 1;
+                treballadordelmes_coins_index++;
                 StartCoroutine(hideachievement());
             }
         }
@@ -188,6 +190,8 @@ public class CollectableControl : MonoBehaviour, IResettable
 
     void HandleTimeAchievements()
     {
+        if (seconds_to_elapse_index < 0 || seconds_to_elapse_index >= seconds_to_elapse.Count) return;
+
         if (seconds_to_elapse_index < seconds_to_elapse.Count)
         {
             if (elapsedTime > seconds_to_elapse[seconds_to_elapse_index] && !achievementShown)
@@ -202,7 +206,7 @@ public class CollectableControl : MonoBehaviour, IResettable
                 highSpeedSFX.Play();
                 dimVolumes();
                 lifeUp();
-                seconds_to_elapse_index += 1;
+                seconds_to_elapse_index++;
 
                 if (seconds_to_elapse_index == 1)
                 {
