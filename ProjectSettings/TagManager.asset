@@ -26,6 +26,7 @@ TagManager:
   - fall
   - cardboard
   - minewall
+  - crate
   layers:
   - Default
   - TransparentFX

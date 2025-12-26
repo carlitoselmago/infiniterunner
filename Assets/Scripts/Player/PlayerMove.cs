@@ -50,6 +50,14 @@ public class PlayerMove : MonoBehaviour, IResettable
     private bool hit = false;
     public static bool isDead = false;
     public bool godmode = false;
+    public static bool bonus = false;
+
+    [Header("Bonus Visual Feedback")]
+    public Light globalLight;
+    public Light bonusSpotlight;
+    public GameObject bonusUI;
+    public Material godModeMaterial;
+    public Material bonusMaterial;
 
     [Header("Fly coins")]
     public GameObject flycoin;
@@ -96,6 +104,7 @@ public class PlayerMove : MonoBehaviour, IResettable
     public AudioSource carCrashSFX;
     public AudioSource cardboard1;
     public AudioSource cardboard2;
+    public AudioSource bonusSFX;
     [Header("Collision Sounds")]
     public AudioSource rumbleSFX;
     public AudioClip[] hitClips;
@@ -160,7 +169,6 @@ public class PlayerMove : MonoBehaviour, IResettable
     };
 
     public PrintCode printCodeScript;
-
 
     void Start()
     {
@@ -555,9 +563,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         if (other.gameObject.CompareTag("coin"))
         {
-            //coinFX.pitch = 1;
-            //coinFX.Play();
-            CollectableControl.coinCount += 1;
+            CollectableControl.coinCount += bonus ? 3 : 1;
             collectableControl.OnCoinCollected();
             other.gameObject.SetActive(false);
         }
@@ -569,7 +575,7 @@ public class PlayerMove : MonoBehaviour, IResettable
             // pitch shift of collected floating coins
             if (coinFX.pitch < 2) coinFX.pitch += 0.2f; else coinFX.pitch = 1;
             StartCoroutine(PitchShiftTimeout());
-            CollectableControl.coinCount += 1;
+            CollectableControl.coinCount += bonus ? 3 : 1;
             other.gameObject.SetActive(false);
         }
 
@@ -607,6 +613,17 @@ public class PlayerMove : MonoBehaviour, IResettable
             }
             isFlying = true;
             playerBody.isKinematic = true;
+        }
+
+        if (other.gameObject.CompareTag("crate"))
+        {
+            if (!bonus)
+            {
+                bonusSFX.Play();
+                bonus = true;
+                other.gameObject.SetActive(false);
+                SetBonusLight(true);
+            }
         }
 
         if (other.gameObject.CompareTag("pyramids") && !mainTheme.isPlaying && !pyramidsTheme.isPlaying) pyramidsTheme.Play();
@@ -859,7 +876,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         while (holding) yield return new WaitForSeconds(1);
 
         camAnimator.SetBool("flying", false);
-        StartCoroutine(delayedGodmodeOff());
+        StartCoroutine(delayedGodmodeOff(5f, 3f));
         StartCoroutine(ChangePitchOverTime());
         animator.SetBool("isflying", false);
 
@@ -968,18 +985,23 @@ public class PlayerMove : MonoBehaviour, IResettable
         }
     }
 
-    IEnumerator delayedGodmodeOff()
+    IEnumerator delayedGodmodeOff(float godmodeDuration, float blinkDuration)
     {
         godmode = true;
         godmodevisual.SetActive(true);
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = true;
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(godmodeDuration);
         godmodevisual.GetComponent<ToggleShield>().enabled = true;
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(blinkDuration);
         godmode = false;
         godmodevisual.SetActive(false);
         godmodevisual.GetComponent<ToggleShield>().enabled = false;
         godmodevisual.GetComponent<ToggleShield>().shield.enabled = false;
+        if (bonus)
+        {
+            bonus = false;
+            SetBonusLight(false);
+        }
     }
 
     public IEnumerator RaisePlayerBody(float targetY, float duration)
@@ -1142,6 +1164,35 @@ public class PlayerMove : MonoBehaviour, IResettable
             panopticSFX.Stop();
     }
 
+    public void SetBonusLight(bool enabled)
+    {
+        bonusSpotlight.enabled = enabled;
+
+        var renderer = godmodevisual.GetComponent<MeshRenderer>();
+        renderer.material = enabled ? bonusMaterial : godModeMaterial;
+        if (enabled)
+            StartCoroutine(delayedGodmodeOff(8f, 3f));
+
+        float startIntensity = enabled ? 1.5f : 1f;
+        float endIntensity = enabled ? 1f : 1.5f;
+
+        StartCoroutine(DimLight(startIntensity, endIntensity));
+        bonusUI.SetActive(enabled);
+    }
+
+    private IEnumerator DimLight(float startingIntensity, float endingIntensity)
+    {
+        float startDimTime = Time.time;
+
+        while (Time.time - startDimTime < 3f)
+        {
+            float t = Time.time - startDimTime;
+            globalLight.intensity = Mathf.Lerp(startingIntensity, endingIntensity, t);
+            yield return null;
+        }
+        globalLight.intensity = endingIntensity;
+    }
+
     public void ResetState()
     {
         //Debug.Log("PlayerMove reset");
@@ -1156,6 +1207,7 @@ public class PlayerMove : MonoBehaviour, IResettable
         boxCollider.enabled = true;
         forkliftCollider.enabled = false;
         godmodevisual.SetActive(false);
+        godmodevisual.GetComponent<MeshRenderer>().material = godModeMaterial;
         godmode = false;
         startedrunning = false;
         idle = true;
@@ -1163,6 +1215,10 @@ public class PlayerMove : MonoBehaviour, IResettable
         endSequenceStarted = false;
         onMinecart = false;
         triggered = false;
+        globalLight.intensity = 1.5f;
+        bonus = false;
+        bonusSpotlight.enabled = false;
+        bonusUI.SetActive(false);
         rayLength = 1.2f;
         endstormText.SetActive(false);
 

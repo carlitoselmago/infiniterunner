@@ -3,7 +3,7 @@ using UnityEngine;
 public class ParachuteDescent : MonoBehaviour
 {
     // Descent Settings
-    private float targetY = -3.67f;
+    public float targetY = -3.67f;
     public float fallSpeed = 1.5f;
 
     // Float & Rotate Settings
@@ -46,7 +46,7 @@ public class ParachuteDescent : MonoBehaviour
             float tempY = amplitude * Mathf.Sin((Time.time - floatStartTime) * frequency);
             transform.localPosition = new Vector3(finalPosition.x, finalPosition.y + tempY, finalPosition.z);
 
-            // Optional: rotate smoothly
+            // Rotate smoothly
             transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
         }
     }

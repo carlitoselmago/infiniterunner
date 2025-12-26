@@ -13,12 +13,6 @@ public class Explodable : MonoBehaviour, IResettable
     private List<Quaternion> originalRotations = new List<Quaternion>();
     private List<Rigidbody> partRigidbodies = new List<Rigidbody>();
 
-    private void Awake()
-    {
-        // Recursively collect all children
-        //CollectParts(transform);
-    }
-
     private void CollectParts(Transform parent)
     {
         foreach (Transform child in parent)
@@ -27,7 +21,6 @@ public class Explodable : MonoBehaviour, IResettable
             originalPositions.Add(child.localPosition);
             originalRotations.Add(child.localRotation);
 
-            // Ensure Rigidbody exists
             Rigidbody rb = child.GetComponent<Rigidbody>();
             if (rb == null)
                 rb = child.gameObject.AddComponent<Rigidbody>();
@@ -46,7 +39,7 @@ public class Explodable : MonoBehaviour, IResettable
 
     private void OnEnable()
     {
-        CollectParts(transform); // experimental
+        CollectParts(transform);
         Explode();
     }
 
@@ -67,8 +60,6 @@ public class Explodable : MonoBehaviour, IResettable
             Transform part = parts[i];
             part.localPosition = originalPositions[i];
             part.localRotation = originalRotations[i];
-
-            // Reset physics state
             Rigidbody rb = partRigidbodies[i];
             rb.isKinematic = false;
             rb.velocity = Vector3.zero;

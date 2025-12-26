@@ -84,9 +84,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             highScoreText = "";
         }
         else
-        {
             highScoreText = "ÚLTIM RECORD: " + highScore + " monedes";
-        }
     }
 
     void Update()
@@ -108,7 +106,7 @@ public class CollectableControl : MonoBehaviour, IResettable
         {
             SessionData.ClearHighScore();
             highScore = 0;
-            Debug.Log("High score reset.");
+            Debug.Log("High score cleared.");
         }
     }
 
@@ -138,10 +136,8 @@ public class CollectableControl : MonoBehaviour, IResettable
             coinFX.pitch = Mathf.Clamp(pitch, 1f, 1.5f);
         }
         else if (streakCount < streakStart && coinFX != null)
-        {
             coinFX.pitch = 1f; // reset to normal
-        }
-
+ 
         coinFX.Play();
 
         // --- Update visual streak UI ---
@@ -174,7 +170,7 @@ public class CollectableControl : MonoBehaviour, IResettable
             {
                 string compliment = compliments[treballadordelmes_coins_index];
                 lastAchievementText = "TREBALLADORA " + compliment + "!";
-                Debug.Log("New Achievement: " + compliment);
+                Debug.Log("New Achievement: TREBALLADORA " + compliment);
                 achievementEndUItext.GetComponent<Text>().text = lastAchievementText;
                 achievementEndUIsubtext.GetComponent<Text>().text = "Has recol·lectat " + treballadordelmes_coins[treballadordelmes_coins_index] + " monedes!";
                 achievementUI.SetActive(true);
@@ -182,7 +178,8 @@ public class CollectableControl : MonoBehaviour, IResettable
                 highScoreSFX.Play();
                 dimVolumes();
                 lifeUp();
-                treballadordelmes_coins_index++;
+                if (treballadordelmes_coins_index < treballadordelmes_coins.Count)
+                    treballadordelmes_coins_index++;
                 StartCoroutine(hideachievement());
             }
         }
@@ -192,8 +189,6 @@ public class CollectableControl : MonoBehaviour, IResettable
     {
         if (seconds_to_elapse_index < 0 || seconds_to_elapse_index >= seconds_to_elapse.Count) return;
 
-        if (seconds_to_elapse_index < seconds_to_elapse.Count)
-        {
             if (elapsedTime > seconds_to_elapse[seconds_to_elapse_index] && !achievementShown)
             {
                 int elapsedMinutes = Mathf.FloorToInt(elapsedTime / 60f);
@@ -206,7 +201,8 @@ public class CollectableControl : MonoBehaviour, IResettable
                 highSpeedSFX.Play();
                 dimVolumes();
                 lifeUp();
-                seconds_to_elapse_index++;
+                if(seconds_to_elapse_index < seconds_to_elapse.Count)
+                    seconds_to_elapse_index++;
 
                 if (seconds_to_elapse_index == 1)
                 {
@@ -216,7 +212,6 @@ public class CollectableControl : MonoBehaviour, IResettable
                 }
 
                 StartCoroutine(hideachievement());
-            }
         }
     }
 
