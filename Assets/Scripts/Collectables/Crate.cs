@@ -4,7 +4,9 @@ public class Crate : MonoBehaviour, IResettable
 {
     public GameObject resettableCrate;
     public GameObject explosionChild;
+    public GameObject explosionCoins;
     private Explodable explodable;
+    private Explodable explodableCoins;
 
     private Vector3 originalPosition;
     private Quaternion originalRotation;
@@ -15,12 +17,17 @@ public class Crate : MonoBehaviour, IResettable
         originalRotation = transform.rotation;
 
         explodable = explosionChild.GetComponent<Explodable>();
+        explodableCoins = explosionCoins.GetComponent<Explodable>();
     }
 
     private void OnEnable()
     {
         if (explosionChild.activeSelf)
+        {
             explosionChild.SetActive(false);
+            explosionCoins.SetActive(false);
+        }
+            
     }
 
     private void OnTriggerEnter(Collider other)
@@ -28,9 +35,11 @@ public class Crate : MonoBehaviour, IResettable
         if (!other.CompareTag("Player"))
             return;
         explosionChild.SetActive(true);
+        explosionCoins.SetActive(true);
         explodable.enabled = true;
+        explodableCoins.enabled = true;
         explodable.Explode();
-
+        explodableCoins.Explode();
     }
 
     public void ResetState()
