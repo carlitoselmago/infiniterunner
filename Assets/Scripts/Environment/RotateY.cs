@@ -20,7 +20,7 @@ public class RotateY : MonoBehaviour, IResettable
 
     void Update()
     {
-        if (PlayerMove.onForklift) return;
+        if (PlayerMove.onForklift || PlayerMove.onSkateboard) return;
         if (!PlayerMove.isDead)
         {
             // Compute this frame’s rotation
