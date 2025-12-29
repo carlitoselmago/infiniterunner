@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ParachuteDescent : MonoBehaviour
+public class ParachuteDescent : MonoBehaviour, IResettable
 {
     // Descent Settings
     public float targetY = -3.67f;
@@ -12,12 +12,23 @@ public class ParachuteDescent : MonoBehaviour
     private float rotationSpeed = 50f;
 
     private bool isDescending = true;
+    private Vector3 startLocal;
     private Vector3 finalPosition;
     private float floatStartTime;
+
+    void Awake()
+    {
+        startLocal = transform.localPosition;
+    }
 
     void Start()
     {
         finalPosition = transform.localPosition;
+    }
+
+    void OnEnable()
+    {
+        ResetState();
     }
 
     void Update()
@@ -49,5 +60,20 @@ public class ParachuteDescent : MonoBehaviour
             // Rotate smoothly
             transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
         }
+    }
+
+    public void StopRotation()
+    {
+        if (!isDescending)
+            rotationSpeed = 0;
+    }
+
+    public void ResetState()
+    {
+        transform.localPosition = startLocal;
+        rotationSpeed = 50f;
+        isDescending = true;
+        floatStartTime = 0f;
+        finalPosition = transform.localPosition;
     }
 }
