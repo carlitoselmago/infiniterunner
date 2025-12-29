@@ -2,11 +2,20 @@ using UnityEngine;
 
 public class ResettableCoin : MonoBehaviour, IResettable
 {
+    private void OnEnable()
+    {
+        ResetCoins();
+    }
+
+    private void ResetCoins()
+    {
+        foreach (Transform child in transform)
+                child.gameObject.SetActive(true);
+    }
+
     public void ResetState()
     {
         gameObject.SetActive(true);
-        foreach (Transform child in transform)
-            if (!child.gameObject.activeSelf)
-                child.gameObject.SetActive(true);
+        ResetCoins();
     }
 }

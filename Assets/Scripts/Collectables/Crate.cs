@@ -7,6 +7,7 @@ public class Crate : MonoBehaviour, IResettable
     public GameObject explosionCoins;
     private Explodable explodable;
     private Explodable explodableCoins;
+    private ParachuteDescent parachuteScript;
 
     private Vector3 originalPosition;
     private Quaternion originalRotation;
@@ -18,6 +19,7 @@ public class Crate : MonoBehaviour, IResettable
 
         explodable = explosionChild.GetComponent<Explodable>();
         explodableCoins = explosionCoins.GetComponent<Explodable>();
+        parachuteScript = gameObject.GetComponent<ParachuteDescent>();
     }
 
     private void OnEnable()
@@ -40,6 +42,7 @@ public class Crate : MonoBehaviour, IResettable
         explodableCoins.enabled = true;
         explodable.Explode();
         explodableCoins.Explode();
+        parachuteScript.StopRotation();
     }
 
     public void ResetState()
