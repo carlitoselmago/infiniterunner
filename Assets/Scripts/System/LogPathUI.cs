@@ -5,10 +5,12 @@ using System.IO;
 public class LogPathUI : MonoBehaviour
 {
     public GameObject panel;
+    public GameObject inputField;
     public TMP_InputField pathInput;
     public TMP_Text errorText;
 
     private bool panelOpen = false;
+    private bool checkDone = false;
 
     void Start()
     {
@@ -18,7 +20,7 @@ public class LogPathUI : MonoBehaviour
 
     void Update()
     {
-        if (!panelOpen && Input.GetKeyDown(KeyCode.P))
+        if (!panelOpen && Input.GetKeyDown(KeyCode.L))
         {
             TogglePanel();
             return;
@@ -27,41 +29,71 @@ public class LogPathUI : MonoBehaviour
         if (!panelOpen)
             return;
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (panelOpen)
         {
-            ValidateAndSave();
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ClosePanel();
+            if (!checkDone)
+            {
+                ShowCheckScreen();
+                if (Input.GetKeyDown(KeyCode.Y)) {
+                    ThreadSafeFileLogger.logging = true;
+                    checkDone = true;
+                    InputPath();
+                    errorText.text = "";
+                }
+                else if (Input.GetKeyDown(KeyCode.N))
+                {
+                    ThreadSafeFileLogger.logging = false;
+                    checkDone = true;
+                    ClosePanel();
+                }
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                {
+                    ValidateAndSave();
+                }
+                else if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    ClosePanel();
+                }
+            }
         }
     }
 
     private void TogglePanel()
     {
         if (!panelOpen) PlayerMove.paused = true;   // pause game when panel is open
-
         panelOpen = !panelOpen;
         panel.SetActive(panelOpen);
+    }
 
-        if (panelOpen)
+    private void InputPath()
+    {
+        if (panelOpen && checkDone)
         {
+            inputField.SetActive(true);
             errorText.text = "";
             pathInput.text = PlayerPrefs.GetString(
                 ThreadSafeFileLogger.PrefKey,
                 ThreadSafeFileLogger.DefaultLogPath
             );
-
             pathInput.ActivateInputField();
             pathInput.Select();
         }
+    }
+    private void ShowCheckScreen()
+    {
+        errorText.text = "Logging Active? Y/N";
     }
 
     private void ClosePanel()
     {
         panelOpen = false;
+        inputField.SetActive(false);
         panel.SetActive(false);
         errorText.text = "";
+        checkDone = false;  // reset logging check
         PlayerMove.paused = false;
     }
 
