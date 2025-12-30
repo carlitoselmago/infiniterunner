@@ -7,6 +7,7 @@ public class ThreadSafeFileLogger : MonoBehaviour
     private static readonly object fileLock = new object();
     private static StreamWriter writer;
     private static bool initialized;
+    public static bool logging = false; // logging enabled
 
     public const string PrefKey = "CustomLogPath";
 
@@ -28,18 +29,24 @@ public class ThreadSafeFileLogger : MonoBehaviour
         initialized = true;
 
         DontDestroyOnLoad(gameObject);
+
+        if (!logging) return;
         OpenLogFile();
         Application.logMessageReceivedThreaded += HandleLog;
     }
 
     void OnApplicationQuit()
     {
+        if (!logging) return;
+
         Application.logMessageReceivedThreaded -= HandleLog;
         CloseLogFile();
     }
 
     public static void ReloadLogPath()
     {
+        if (!logging) return;
+
         CloseLogFile();
         OpenLogFile();
     }
@@ -82,6 +89,8 @@ public class ThreadSafeFileLogger : MonoBehaviour
 
     private static void HandleLog(string logString, string stackTrace, LogType type)
     {
+        if (!logging) return;
+
         lock (fileLock)
         {
             if (writer == null) return;
