@@ -16,21 +16,20 @@ public class ParachuteDescent : MonoBehaviour, IResettable
     private Vector3 finalPosition;
     private float floatStartTime;
 
-    /*void Awake()
+    void Awake()
     {
         startLocal = transform.localPosition;
-    }*/
+    }
 
     void Start()
     {
-        startLocal = transform.localPosition;
         finalPosition = transform.localPosition;
     }
-    /*
+    
     void OnEnable()
     {
         ResetState();
-    }*/
+    }
 
     void Update()
     {
