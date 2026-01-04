@@ -3,11 +3,12 @@ using System.Collections;
 
 public class DestroyObject : MonoBehaviour
 {
-    [Tooltip("The object that will be destroyed if overlapped")]
+    [Tooltip("The object that will be destroyed on enable")]
     public GameObject destroyedObject;
 
     void OnEnable()
     {
+        if (destroyedObject == null) return;
         StartCoroutine(CheckAndDestroy());
     }
 
