@@ -34,6 +34,8 @@ public class PlayerMove : MonoBehaviour, IResettable
     public bool blockLeft = false;
     public bool blockRight = false;
 
+    public LaneHighlight laneHighlight;
+
     // raycast
     [Header("Raycast")]
     public LayerMask groundLayer;
@@ -312,6 +314,13 @@ public class PlayerMove : MonoBehaviour, IResettable
                         return;
                     }
 
+                    if (pos == "left")
+                    {
+                        laneHighlight.Flash();
+                        animator.SetTrigger("blockleft");
+                        return;
+                    }
+
                     if (pos == "center") // Pressing left from center goes to left
                     {
                         pos = "left";
@@ -346,6 +355,13 @@ public class PlayerMove : MonoBehaviour, IResettable
                 {
                     if (blockRight)
                     {
+                        animator.SetTrigger("blockright");
+                        return;
+                    }
+
+                    if (pos == "right")
+                    {
+                        laneHighlight.Flash();
                         animator.SetTrigger("blockright");
                         return;
                     }
