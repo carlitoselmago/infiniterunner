@@ -236,6 +236,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     public void RemoveHeartsInReverseOrder()
     {
+        if (remainingHealth < 0) return;
         int lastindex = heartList.Count - 1;
         Destroy(heartList[lastindex]);
         heartList.RemoveAt(lastindex);
@@ -823,11 +824,13 @@ public class PlayerMove : MonoBehaviour, IResettable
         {
             if (jumping)
             {
+                playerBody.isKinematic = true;
                 gameObject.layer = LayerMask.NameToLayer("PlayerJumping");
                 hitLogic.EnableHitbox(HitLogic.HitboxType.Jump);
             }
             else
             {
+                playerBody.isKinematic = false;
                 gameObject.layer = LayerMask.NameToLayer("Player");
                 hitLogic.EnableHitbox(HitLogic.HitboxType.Normal);
             }

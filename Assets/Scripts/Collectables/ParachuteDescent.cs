@@ -3,7 +3,7 @@ using UnityEngine;
 public class ParachuteDescent : MonoBehaviour, IResettable
 {
     // Descent Settings
-    public float targetY = -3.67f;
+    public float targetLocalY = -3.67f;
     public float fallSpeed = 1.5f;
 
     // Float & Rotate Settings
@@ -12,68 +12,77 @@ public class ParachuteDescent : MonoBehaviour, IResettable
     private float rotationSpeed = 50f;
 
     private bool isDescending = true;
-    private Vector3 startLocal;
-    private Vector3 finalPosition;
+    private Vector3 startLocalPosition;
+    private Vector3 finalLocalPosition;
     private float floatStartTime;
-
-    void Awake()
-    {
-        startLocal = transform.localPosition;
-    }
 
     void Start()
     {
-        finalPosition = transform.localPosition;
-    }
-    
-    void OnEnable()
-    {
-        ResetState();
+        // Cache editor placement RELATIVE to the template
+        startLocalPosition = transform.localPosition;
     }
 
     void Update()
     {
         if (isDescending)
         {
-            Vector3 current = transform.position;
+            Vector3 current = transform.localPosition;
 
-            if (current.y > targetY)
+            if (current.y > targetLocalY)
             {
-                float newY = Mathf.MoveTowards(current.y, targetY, fallSpeed * Time.deltaTime);
-                transform.position = new Vector3(current.x, newY, current.z);
+                float newY = Mathf.MoveTowards(
+                    current.y,
+                    targetLocalY,
+                    fallSpeed * Time.deltaTime
+                );
+
+                transform.localPosition = new Vector3(
+                    current.x,
+                    newY,
+                    current.z
+                );
             }
             else
             {
-                // Lock final Y position, remember start time for sine wave
-                transform.position = new Vector3(current.x, targetY, current.z);
-                finalPosition = transform.localPosition;
+                transform.localPosition = new Vector3(
+                    current.x,
+                    targetLocalY,
+                    current.z
+                );
+
+                finalLocalPosition = transform.localPosition;
                 floatStartTime = Time.time;
                 isDescending = false;
             }
         }
         else
         {
-            // Wiggling phase
-            float tempY = amplitude * Mathf.Sin((Time.time - floatStartTime) * frequency);
-            transform.localPosition = new Vector3(finalPosition.x, finalPosition.y + tempY, finalPosition.z);
+            float tempY = amplitude * Mathf.Sin(
+                (Time.time - floatStartTime) * frequency
+            );
 
-            // Rotate smoothly
-            transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
+            transform.localPosition = new Vector3(
+                finalLocalPosition.x,
+                finalLocalPosition.y + tempY,
+                finalLocalPosition.z
+            );
+
+            transform.Rotate(0f, rotationSpeed * Time.deltaTime, 0f, Space.Self);
         }
     }
 
     public void StopRotation()
     {
         if (!isDescending)
-            rotationSpeed = 0;
+            rotationSpeed = 0f;
     }
 
     public void ResetState()
     {
-        transform.localPosition = startLocal;
+        transform.localPosition = startLocalPosition;
         rotationSpeed = 50f;
         isDescending = true;
         floatStartTime = 0f;
-        finalPosition = transform.localPosition;
+        finalLocalPosition = transform.localPosition;
     }
 }
