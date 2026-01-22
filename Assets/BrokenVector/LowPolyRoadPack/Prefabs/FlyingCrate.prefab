@@ -4458,7 +4458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4a7d48dca9754ec7ab505f21da55b86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetY: 0.65
+  targetLocalY: -3.67
   fallSpeed: 1.25
 --- !u!54 &7869088918260961701
 Rigidbody:
@@ -4541,7 +4541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989ffbbaa58ae4aefa05d69a98ee5c3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activationProbability: 0.5
+  activationProbability: 0.65
 --- !u!114 &6191411397184474503
 MonoBehaviour:
   m_ObjectHideFlags: 0
