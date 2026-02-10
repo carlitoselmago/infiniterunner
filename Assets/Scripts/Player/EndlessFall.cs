@@ -25,7 +25,7 @@ public class EndlessFall : MonoBehaviour, IResettable
 
         if (!isFalling && other.CompareTag("Player") && !triggered)
         {
-            Debug.Log("Endlessly falling!");
+            //Debug.Log("Endlessly falling!");
             triggered = true;
             isFalling = true;
             StartCoroutine(HandleEndlessFall());
@@ -38,7 +38,7 @@ public class EndlessFall : MonoBehaviour, IResettable
         playerAnimator.SetBool("isrunning", false);
         playerAnimator.SetBool("isfalling", false);
 
-        Debug.Log("Handling endless fall...");
+        //Debug.Log("Handling endless fall...");
 
         if (!MineData.isInTheMine) // Allow the player to hit ground when falling from the minecart
             PlayerMove.isUnderwater = true; // Disable physics collider to prevent collisions with Ground while falling

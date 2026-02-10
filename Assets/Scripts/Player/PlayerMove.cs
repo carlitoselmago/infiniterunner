@@ -229,11 +229,11 @@ public class PlayerMove : MonoBehaviour, IResettable
             heartList.Add(clonedHeart);
             heartAnimator.SetBool("started", true);
             remainingHealth += 1;
-            if (!idle)
-                Debug.Log("Added Heart. Remaining Health: " + remainingHealth);
+            //if (!idle)
+                //Debug.Log("Added Heart. Remaining Health: " + remainingHealth);
         }
-        else
-            Debug.Log("Cannot add more hearts");
+        //else
+            //Debug.Log("Cannot add more hearts");
     }
 
     public void RemoveHeartsInReverseOrder()
@@ -429,7 +429,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 animator.SetTrigger("jumpoffminecart");
                 UpdateActiveCollider();
                 forkliftManager = null;
-                Debug.Log("Left Forklift");
+                //Debug.Log("Left Forklift");
             }
         }
 
@@ -541,7 +541,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 printCodeScript.UpdateObstacleList(collidedObjectName);
                 hurtMaskScript.Mask();
                 remainingHealth--;
-                Debug.Log("Entered in collision with " + other);
+                //Debug.Log("Entered in collision with " + other);
 
                 if (remainingHealth <= 0)
                 {
@@ -605,7 +605,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 forkliftManager.ExitForklift();
                 UpdateActiveCollider();
                 forkliftManager = null;
-                Debug.Log("Powerup - Exited Forklift");
+                //Debug.Log("Powerup - Exited Forklift");
             }
             if (onSkateboard)
                 skateboardManager.ExitSkateboard();
@@ -721,7 +721,7 @@ public class PlayerMove : MonoBehaviour, IResettable
                 carCrashSFX.Play();
             }
             rocks.SetActive(true);
-            Debug.Log("Entered in minewall collision with " + other);
+            //Debug.Log("Entered in minewall collision with " + other);
             HideAllTutorialCards();
             collectableControl.HandlePlayerDeath();
             StartCoroutine(EnableEndSequenceSafely());
@@ -738,8 +738,8 @@ public class PlayerMove : MonoBehaviour, IResettable
                 tutorialCardTransform.gameObject.SetActive(true);
                 if (tutorialInstructions.TryGetValue(tutorialcard, out string instruction))
                     DisplayInstruction(instruction);
-                else
-                    Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
+                //else
+                    //Debug.LogError("Instruction not found for tutorial card: " + tutorialcard);
             }
         }
     }
@@ -793,7 +793,7 @@ public class PlayerMove : MonoBehaviour, IResettable
 
     public void DieOnForklift()
     {
-        Debug.Log("Player Dead on Forklift");
+        //Debug.Log("Player Dead on Forklift");
         printCodeScript.SetCodePrompt("dieonforklift");
         StartCoroutine(RaisePlayerBody(-0.35f, 0.4f));
         isDead = true;
@@ -1110,15 +1110,15 @@ public class PlayerMove : MonoBehaviour, IResettable
 
         // Ground detection
         Ray ray = new Ray(rayOrigin, Vector3.down);
-        Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
+        //Debug.DrawRay(rayOrigin, Vector3.down * rayLength, Color.red);
         if (Physics.Raycast(ray, out RaycastHit hit, rayLength, groundLayer)) isGrounded = true;
         else isGrounded = false;
 
         // Wall detection
         Ray leftRay = new Ray(rayOrigin, Vector3.left);
         Ray rightRay = new Ray(rayOrigin, Vector3.right);
-        Debug.DrawRay(rayOrigin, Vector3.left * rayLength*2, Color.green);
-        Debug.DrawRay(rayOrigin, Vector3.right * rayLength*2, Color.green);
+        //Debug.DrawRay(rayOrigin, Vector3.left * rayLength*2, Color.green);
+        //Debug.DrawRay(rayOrigin, Vector3.right * rayLength*2, Color.green);
 
         if (Physics.Raycast(leftRay, out RaycastHit leftHit, rayLength * 2, wallLayer))
         {

@@ -24,7 +24,7 @@ public class WaterTrigger : MonoBehaviour, IResettable
         {
             triggered = true;
             PlayerMove.isUnderwater = true;
-            Debug.Log("Underwater");
+            //Debug.Log("Underwater");
             triggeredVolume.gameObject.SetActive(true);
             splashSound.SetActive(true);
 

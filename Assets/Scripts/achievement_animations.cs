@@ -19,13 +19,13 @@ public class AchievementAnimations : MonoBehaviour
 
         if (rectTransform == null)
         {
-            Debug.LogError("RectTransform component is missing.");
+            //Debug.LogError("RectTransform component is missing.");
             return;
         }
 
         if (canvasGroup == null)
         {
-            Debug.LogError("CanvasGroup component is missing. Adding one.");
+            //Debug.LogError("CanvasGroup component is missing. Adding one.");
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 

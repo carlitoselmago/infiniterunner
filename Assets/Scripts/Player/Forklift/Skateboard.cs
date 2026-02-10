@@ -14,12 +14,12 @@ public class Skateboard : MonoBehaviour, IResettable
 
     private void Start()
     {
-        if (player == null)
-            Debug.LogError("Skateboard: player reference is missing!");
+        //if (player == null)
+            //Debug.LogError("Skateboard: player reference is missing!");
 
         skateboardHolder = player.transform.Find("skateboard");
-        if (skateboardHolder == null)
-            Debug.LogError("Skateboard holder not found under player.");
+        //if (skateboardHolder == null)
+            //Debug.LogError("Skateboard holder not found under player.");
     }
 
     void OnEnable()

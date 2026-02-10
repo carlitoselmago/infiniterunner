@@ -10,10 +10,10 @@ public class ExplodeScaffolding : MonoBehaviour, IResettable
     {
         explodable = scaffolding.GetComponent<Explodable>();
 
-        if (explodable == null)
+        /*if (explodable == null)
             Debug.LogError("Explodable component not found on scaffolding.");
         else
-            Debug.Log("Explodable found");
+            Debug.Log("Explodable found");*/
     }
 
     private void OnTriggerEnter(Collider other)
@@ -23,7 +23,7 @@ public class ExplodeScaffolding : MonoBehaviour, IResettable
             explodable = scaffolding.GetComponent<Explodable>();
             explodable.enabled = true;
             explodable.Explode();
-            Debug.Log("Explosion");
+            //Debug.Log("Explosion");
             triggered = true;
         }
     }

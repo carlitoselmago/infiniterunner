@@ -46,8 +46,8 @@ public class RideSkateboard : MonoBehaviour, IResettable
     private void Start()
     {
         skateboardHolder = player.transform.Find("skateboard");
-        if (skateboardHolder == null)
-            Debug.LogError("Skateboard holder not found under player.");
+        //if (skateboardHolder == null)
+            //Debug.LogError("Skateboard holder not found under player.");
     }
 
     void Update()

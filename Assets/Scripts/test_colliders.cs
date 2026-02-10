@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 
 public class test_colliders : MonoBehaviour
 {
@@ -17,4 +17,4 @@ public class test_colliders : MonoBehaviour
     void OnTriggerEnter(Collider other){
           Debug.Log("Entered collision with " + other.gameObject.name);
     }
-}
+}*/

@@ -13,7 +13,7 @@ public class ActivateAllDisplays : MonoBehaviour
 
         if (Display.displays.Length > 1)
         {
-            Debug.Log("More than one display connected. Required activation of output script.");
+            //Debug.Log("More than one display connected. Required activation of output script.");
             canvas2.SetActive(true);
             // Activate only one display
             Display.displays[1].Activate();

@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class FpsSpikeLogger : MonoBehaviour
 {
@@ -33,4 +33,4 @@ public class FpsSpikeLogger : MonoBehaviour
             spikeLogged = false;
         }
     }
-}
+}*/

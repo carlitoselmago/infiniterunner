@@ -40,12 +40,12 @@ public class RotateY : MonoBehaviour, IResettable
             // Stop once desired rotation is reached
             if (totalRotated >= rotationDegree)
             {
-                Debug.Log($"{name}: Stop Rotation");
+                //Debug.Log($"{name}: Stop Rotation");
                 this.enabled = false;
             }
         } else
         {
-            Debug.Log($"{name}: Rotation stopped after player's death");
+            //Debug.Log($"{name}: Rotation stopped after player's death");
             this.enabled = false;
         }
     }

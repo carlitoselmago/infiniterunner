@@ -8,13 +8,21 @@ public class PrintCode : MonoBehaviour, IResettable
     public GameObject obstaclesDisplay;
     public Text obstaclesText;
 
-    private string codePrompt = "";
-    private string lastCodePrompt;
-    private string obstaclesList = "";
+    //private string codePrompt = "";
+    //private string lastCodePrompt;
     private bool isFadingOutObstacles = false;
     private float fadeDuration = 1.5f;
     private bool alreadyHitObstacle = false;
     private string lastExternalMessage = "";
+
+    private readonly List<Text> keysToReset = new List<Text>(10);
+    private readonly List<Text> inactiveTexts = new List<Text>(10);
+    private readonly System.Text.StringBuilder obstaclesBuilder =
+        new System.Text.StringBuilder(256);
+    private readonly Queue<string> codePromptQueue = new Queue<string>(16);
+    private string lastPrintedCode = null;
+    private string lastEnqueuedCode = null;
+
     private Dictionary<string, string> printedCode = new Dictionary<string, string>
     {
         { "start",@"if (!startedRunning && Input.anyKey)
@@ -110,13 +118,13 @@ if (!alreadyCrossedPanoptic)
     {
         if (canvasText == null)
         {
-            Debug.LogError("canvasText GameObject is not assigned.");
+            //Debug.LogError("canvasText GameObject is not assigned.");
             return;
         }
 
         childTextComponents = canvasText.GetComponentsInChildren<Text>(true);
         if (childTextComponents.Length != 10)
-            Debug.LogError("canvasText should have exactly 10 child objects with Text components.");
+            //Debug.LogError("canvasText should have exactly 10 child objects with Text components.");
 
         foreach (Text text in childTextComponents)
         {
@@ -131,10 +139,9 @@ if (!alreadyCrossedPanoptic)
         }
     }
 
-    void Update()
+    /*void Update()
     {
-        // Collect keys to reset after iteration
-        List<Text> keysToReset = new List<Text>();
+        keysToReset.Clear();
 
         foreach (var item in textTimeouts)
         {
@@ -171,27 +178,99 @@ if (!alreadyCrossedPanoptic)
                 SetTextAlpha(obstaclesText, 1f);
             }
         }
+    }*/
+    void Update()
+    {
+        keysToReset.Clear();
+
+        foreach (var t in childTextComponents)
+        {
+            if (t == null) continue;
+
+            if (!textTimeouts.ContainsKey(t))
+                textTimeouts[t] = 0f;
+        }
+
+        foreach (var kvp in textTimeouts)
+        {
+            if (kvp.Value > 0f && Time.time > kvp.Value)
+            {
+                kvp.Key.gameObject.SetActive(false);
+                keysToReset.Add(kvp.Key);
+            }
+        }
+
+        for (int i = 0; i < keysToReset.Count; i++)
+            textTimeouts[keysToReset[i]] = 0f;
+        /*
+        if (!string.IsNullOrEmpty(codePrompt) &&
+            printedCode.TryGetValue(codePrompt, out string code))
+        {
+            DisplayRandomText(code);
+            codePrompt = "";
+        }*/
+        if (codePromptQueue.Count > 0)
+        {
+            string prompt = codePromptQueue.Dequeue();
+
+            if (prompt == lastPrintedCode)
+                return;
+
+            if (printedCode.TryGetValue(prompt, out string code))
+            {
+                DisplayRandomText(code);
+                lastPrintedCode = prompt;
+            }
+        }
+
+        if (!obstaclesDisplay.activeSelf && alreadyHitObstacle)
+            obstaclesDisplay.SetActive(true);
+
+        UpdateObstacleFade();
     }
+
+    private void UpdateObstacleFade()
+    {
+        if (isFadingOutObstacles && obstaclesText != null)
+        {
+            Color c = obstaclesText.color;
+            c.a = Mathf.MoveTowards(c.a, 0f, Time.deltaTime / fadeDuration);
+            obstaclesText.color = c;
+
+            if (c.a <= 0.01f)
+            {
+                obstaclesText.text = "";
+                isFadingOutObstacles = false;
+                SetTextAlpha(obstaclesText, 1f);
+            }
+        }
+    }
+
 
     public void SetCodePrompt(string newCodePrompt)
     {
-        if (newCodePrompt != lastCodePrompt)
-        {
-            codePrompt = newCodePrompt;
-            lastCodePrompt = newCodePrompt;
-        }
+        if (string.IsNullOrEmpty(newCodePrompt))
+            return;
+
+        //if (newCodePrompt == lastReceivedCode)
+        //    return;
+
+        if (newCodePrompt == lastEnqueuedCode)
+            return;
+        lastEnqueuedCode = newCodePrompt;
+        codePromptQueue.Enqueue(newCodePrompt);
+        //lastReceivedCode = newCodePrompt;
+        //codePrompt = newCodePrompt;
     }
 
     public void UpdateObstacleList(string obstacles)
     {
         if (obstaclesText == null) return;
-        if (!alreadyHitObstacle)
-            alreadyHitObstacle = true;
-        if (!string.IsNullOrEmpty(obstaclesList))
-            obstaclesList += "\n" + obstacles;
-        else
-            obstaclesList = obstacles;
-        obstaclesText.text = obstaclesList;
+        alreadyHitObstacle = true;
+        if (obstaclesBuilder.Length>0)
+            obstaclesBuilder.Append('\n');
+        obstaclesBuilder.Append(obstacles);
+        obstaclesText.text = obstaclesBuilder.ToString();
         SetTextAlpha(obstaclesText, 1f);
         isFadingOutObstacles = false;
     }
@@ -202,33 +281,58 @@ if (!alreadyCrossedPanoptic)
         lastExternalMessage = message;
 
         string targetText = "NDI source: " + message;
-        Debug.Log(targetText);
+        //Debug.Log(targetText);
         DisplayRandomText(targetText);
     }
 
     private void DisplayRandomText(string text)
     {
-        // Find all currently inactive text components
-        List<Text> inactiveTexts = new List<Text>();
-        foreach (Text child in childTextComponents)
+        inactiveTexts.Clear();
+
+        for (int i = 0; i < childTextComponents.Length; i++)
         {
-            if (!child.gameObject.activeSelf)
-                inactiveTexts.Add(child);
+            if (!childTextComponents[i].gameObject.activeSelf)
+                inactiveTexts.Add(childTextComponents[i]);
         }
 
         if (inactiveTexts.Count == 0)
         {
-            Debug.LogWarning("No inactive text components available.");
+            Text fallback = null;
+            float oldestTime = float.MaxValue;
+
+            foreach (var t in childTextComponents)
+            {
+                if (t == null) continue;
+
+                float timeout = textTimeouts.TryGetValue(t, out float v) ? v : 0f;
+
+                if (timeout < oldestTime)
+                {
+                    oldestTime = timeout;
+                    fallback = t;
+                }
+            }
+
+
+            if (fallback == null)
+            {
+                Debug.LogError("No valid fallback Text found");
+                return;
+            }
+
+            fallback.text = text;
+            fallback.gameObject.SetActive(true);
+            textTimeouts[fallback] = Time.time + displayDuration;
             return;
         }
 
-        // Randomly select one of the inactive children
-        int randomIndex = Random.Range(0, inactiveTexts.Count);
-        Text selectedChild = inactiveTexts[randomIndex];
 
-        selectedChild.text = text;
-        selectedChild.gameObject.SetActive(true);
-        textTimeouts[selectedChild] = Time.time + displayDuration;
+        int randomIndex = Random.Range(0, inactiveTexts.Count);
+        Text selected = inactiveTexts[randomIndex];
+
+        selected.text = text;
+        selected.gameObject.SetActive(true);
+        textTimeouts[selected] = Time.time + displayDuration;
     }
 
     private void SetTextAlpha(Text t, float a)
@@ -242,7 +346,10 @@ if (!alreadyCrossedPanoptic)
     {
         isFadingOutObstacles = true; // fade out
         alreadyHitObstacle = false;
-        obstaclesList = "";
+        codePromptQueue.Clear();
+        lastEnqueuedCode = null;
+        lastPrintedCode = null;
+        obstaclesBuilder.Clear();
         obstaclesDisplay.SetActive(alreadyHitObstacle);
         obstaclesText.text = "";
         lastExternalMessage = "";

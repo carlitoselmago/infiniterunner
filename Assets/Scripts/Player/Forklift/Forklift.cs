@@ -15,12 +15,12 @@ public class Forklift : MonoBehaviour, IResettable
 
     private void Start()
     {
-        if (player == null)
-            Debug.LogError("Forklift: player reference is missing!");
+        //if (player == null)
+            //Debug.LogError("Forklift: player reference is missing!");
 
         forkliftHolder = player.transform.Find("forklift");
-        if (forkliftHolder == null)
-            Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
+        //if (forkliftHolder == null)
+            //Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
     }
 
     void OnEnable()

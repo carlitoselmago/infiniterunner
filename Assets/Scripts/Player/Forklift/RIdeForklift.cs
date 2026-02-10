@@ -90,8 +90,8 @@ public class RideForklift : MonoBehaviour, IResettable
     private void Start()
     {
         forkliftHolder = player.transform.Find("forklift");
-        if (forkliftHolder == null)
-            Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
+        //if (forkliftHolder == null)
+            //Debug.LogError("Forklift holder not found under player! Please create a child named 'forklift'.");
 
         if (repairSFX != null)
         {
@@ -368,7 +368,7 @@ public class RideForklift : MonoBehaviour, IResettable
                 if (source.loop)
                     source.Stop();
             }
-            Debug.Log("Forklift exploded!");
+            //Debug.Log("Forklift exploded!");
         }
     }
 

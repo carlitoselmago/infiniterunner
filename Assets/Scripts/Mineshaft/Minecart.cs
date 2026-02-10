@@ -25,8 +25,8 @@ public class Minecart : MonoBehaviour, IResettable
     {
         // Find the "minecart" holder object under the player
         minecartHolder = player.transform.Find("minecart");
-        if (minecartHolder == null)
-            Debug.LogError("Minecart holder not found under player! Please create a child named 'minecart'.");
+        //if (minecartHolder == null)
+            //Debug.LogError("Minecart holder not found under player! Please create a child named 'minecart'.");
     }
 
    void OnEnable()

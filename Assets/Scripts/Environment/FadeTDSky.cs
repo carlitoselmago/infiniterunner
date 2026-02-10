@@ -36,7 +36,7 @@ public class FadeTDSky : MonoBehaviour, IResettable
 
         // Wait for a random interval
         float waitTime = Random.Range(minVisibleTime, maxVisibleTime);
-        Debug.Log(waitTime);
+        //Debug.Log(waitTime);
         yield return new WaitForSeconds(waitTime);
 
         // Fade out

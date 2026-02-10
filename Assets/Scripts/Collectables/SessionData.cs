@@ -14,7 +14,7 @@ public static class SessionData
     public static void UpdateHighScore(int score, bool usePrefs)
     {
         sessionHighScore = score;
-        Debug.Log("New High Score! " + score);
+        //Debug.Log("New High Score! " + score);
         if (usePrefs)
         {
             PlayerPrefs.SetInt(HighScoreKey, sessionHighScore);

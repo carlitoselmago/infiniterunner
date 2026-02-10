@@ -76,7 +76,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
             if (child.GetComponent<MineTemplateMarker>() != null)
             {
                 mineEntryIndex = i;
-                Debug.Log($"Detected mine template at index {i} (name '{child.name}')");
+                //Debug.Log($"Detected mine template at index {i} (name '{child.name}')");
             }
         }
     }
@@ -177,7 +177,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
         }
 
         activeSections = newActive;
-        Debug.Log($"EnterMine() — keeping mine section {mineSection.name}, cleared others");
+        //Debug.Log($"EnterMine() — keeping mine section {mineSection.name}, cleared others");
     }
 
 
@@ -211,7 +211,7 @@ public class GenerateLevel : MonoBehaviour, IResettable
     {
         if (!sectionPools.ContainsKey(prefabIndex))
         {
-            Debug.LogError($"No pool found for prefab index {prefabIndex}! templatesparent has {sectionPrefabs.Length} prefabs.");
+            //Debug.LogError($"No pool found for prefab index {prefabIndex}! templatesparent has {sectionPrefabs.Length} prefabs.");
             prefabIndex = 0; // fallback to first prefab to avoid crash
         }
 

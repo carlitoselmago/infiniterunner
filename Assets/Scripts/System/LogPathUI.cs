@@ -113,7 +113,7 @@ public class LogPathUI : MonoBehaviour
         ThreadSafeFileLogger.ReloadLogPath();
         ClosePanel();
 
-        Debug.Log("Log path updated: " + path);
+        //Debug.Log("Log path updated: " + path);
     }
 
     private bool ValidatePath(string path, out string error)

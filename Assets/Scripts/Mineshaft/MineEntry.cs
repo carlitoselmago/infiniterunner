@@ -16,8 +16,8 @@ public class MineEntry : MonoBehaviour, IResettable
     {
         if (levelControl != null)
             generateLevel = levelControl.GetComponent<GenerateLevel>();
-        else
-            Debug.LogError("MineEntry: levelControl not assigned!");
+        //else
+            //Debug.LogError("MineEntry: levelControl not assigned!");
     }
 
 

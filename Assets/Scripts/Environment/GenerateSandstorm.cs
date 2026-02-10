@@ -81,7 +81,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         sandstormGeneratorEnabled = true;
         if (stormCoroutine != null) StopCoroutine(stormCoroutine);         // Stop any old one before starting a new one
         stormCoroutine = StartCoroutine(GenerateTheSandstorm(2f));
-        Debug.Log("Sandstorm Script Enabled");
+        //Debug.Log("Sandstorm Script Enabled");
     }
 
     IEnumerator GenerateTheSandstorm(float prewait)
@@ -97,7 +97,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
 
             if (Random.value > chance)
             {
-                Debug.Log("Generating Sandstorm...");
+                //Debug.Log("Generating Sandstorm...");
                 generatingSandstorm = true;
                 PlayerMove.isInTheSandstorm = true;
                 sandstormParticles.Play();
@@ -126,7 +126,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
             }
             else
             {
-                Debug.Log("Skipped Sandstrom based on chance");
+                //Debug.Log("Skipped Sandstrom based on chance");
                 yield return new WaitForSeconds(10f);
             }
         }
@@ -174,7 +174,7 @@ public class GenerateSandstorm : MonoBehaviour, IResettable
         StartCoroutine(FadeFog(maxFogDensity, minFogDensity, fadeDuration));
         StartCoroutine(FadeVolumeAndParticles(1f, 0f, fadeDuration));
         StartCoroutine(FadeMixerGroup.StartFade(audioMixer, "volumeSandstorm", fadeDuration, 0f));
-        Debug.Log("StopTheSandstorm");
+        //Debug.Log("StopTheSandstorm");
     }
 
     private IEnumerator FadeOutAndStopAudio()
