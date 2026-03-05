@@ -7,7 +7,7 @@ public class ThreadSafeFileLogger : MonoBehaviour
     private static readonly object fileLock = new object();
     private static StreamWriter writer;
     private static bool initialized;
-    public static bool logging = false; // logging enabled
+    public static bool logging = true; // logging enabled
 
     public const string PrefKey = "CustomLogPath";
 

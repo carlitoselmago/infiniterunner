@@ -209,7 +209,7 @@ public class MusicEventController : MonoBehaviour, IResettable
 
         isActive = false;
         isInMidiLevel = false;
-        gameObject.SetActive(false);
+        ResetState();
     }
 
     void SpawnNote(Note note)

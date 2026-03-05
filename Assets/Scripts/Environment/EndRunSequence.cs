@@ -64,11 +64,11 @@ public class EndRunSequence : MonoBehaviour
         yield return new WaitForSeconds(2f);
         startSection.SetActive(true);
 
-        float duration = Time.unscaledTime - PlayerMove.runStartTime;
+        float playDuration = Time.unscaledTime - PlayerMove.runStartTime;
 
         Debug.Log("##########");
         Debug.Log("Collected coins: " + CollectableControl.coinCount);
-        Debug.Log($"Duration: {FormatTime(duration)}");
+        Debug.Log($"Duration: {FormatTime(playDuration)}");
         ResetGame();
     }
 

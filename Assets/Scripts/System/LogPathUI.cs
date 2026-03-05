@@ -8,6 +8,7 @@ public class LogPathUI : MonoBehaviour
     public GameObject inputField;
     public TMP_InputField pathInput;
     public TMP_Text errorText;
+    public string versionText = "fix6 - ";
 
     private bool panelOpen = false;
     private bool checkDone = false;
@@ -84,7 +85,7 @@ public class LogPathUI : MonoBehaviour
     }
     private void ShowCheckScreen()
     {
-        errorText.text = "Logging Active? Y/N";
+        errorText.text = versionText + "Logging Active? Y/N";
     }
 
     private void ClosePanel()

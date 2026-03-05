@@ -21,8 +21,6 @@ public class ResettableObject : MonoBehaviour, IResettable
         // Reset physics
         if (rb != null)
         {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
             if (wokeOnEnable)
                 rb.WakeUp();
             else

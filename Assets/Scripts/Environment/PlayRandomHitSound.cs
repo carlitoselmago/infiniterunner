@@ -6,6 +6,9 @@ public class PlayRandomHitSound : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip[] hitClips;
 
+    private float lastPlayTime;
+    public float minInterval = 0.1f;
+
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -13,7 +16,7 @@ public class PlayRandomHitSound : MonoBehaviour
         audioSource.minDistance = 5;
         audioSource.maxDistance = 18;
     }
-
+    /*
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") || other.CompareTag("car") || other.CompareTag("obstacle"))
@@ -23,5 +26,24 @@ public class PlayRandomHitSound : MonoBehaviour
             audioSource.pitch = Random.Range(0.8f, 1.1f);
             audioSource.PlayOneShot(hitClips[index]);
         }
+    }*/
+    void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Player") &&
+            !other.CompareTag("car") &&
+            !other.CompareTag("obstacle"))
+            return;
+
+        if (Time.time - lastPlayTime < minInterval)
+            return;
+
+        if (hitClips.Length == 0 || audioSource == null)
+            return;
+
+        lastPlayTime = Time.time;
+
+        int index = Random.Range(0, hitClips.Length);
+        audioSource.pitch = Random.Range(0.8f, 1.1f);
+        audioSource.PlayOneShot(hitClips[index]);
     }
 }
