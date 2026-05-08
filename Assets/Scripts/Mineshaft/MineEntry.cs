@@ -16,8 +16,6 @@ public class MineEntry : MonoBehaviour, IResettable
     {
         if (levelControl != null)
             generateLevel = levelControl.GetComponent<GenerateLevel>();
-        //else
-            //Debug.LogError("MineEntry: levelControl not assigned!");
     }
 
 
@@ -35,7 +33,7 @@ public class MineEntry : MonoBehaviour, IResettable
                 // Entering the mine
                 MineData.isInTheMine = true;
                 MineData.endlessFallDisabled = true;
-                //Debug.Log("Entering the mine");
+                Debug.Log("Entering the mine");
                 generateLevel.EnterMine(gameObject);
                 PlayerMove.rayLength = 2f;
                 //StartCoroutine(FadeVolume(0f, 1f, 3f));
@@ -44,7 +42,7 @@ public class MineEntry : MonoBehaviour, IResettable
             {
                 // Exiting the mine
                 MineData.isInTheMine = false;
-                //Debug.Log("Exiting the mine");
+                Debug.Log("Exiting the mine");
                 generateLevel.ExitMine();
                 //StartCoroutine(FadeVolume(1f, 0f, 1.5f));
                 StartCoroutine(ReenableEndlessFall());

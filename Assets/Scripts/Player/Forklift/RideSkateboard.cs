@@ -178,7 +178,7 @@ public class RideSkateboard : MonoBehaviour, IResettable
             player.skateboardManager = null;
         if (playerAnimator != null)
             playerAnimator.SetBool("isskating", false);
-        gameObject.SetActive(false);
+        StartCoroutine(LeaveAndDestroy());
     }
 
     void OnDisable()
