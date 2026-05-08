@@ -8,7 +8,7 @@ public class SafetyNet : MonoBehaviour, IResettable
         if (ShouldDisable(other.gameObject))
         {
             other.gameObject.SetActive(false);
-            Debug.Log("Falling object caught in the safety net: " + other.name);
+            //Debug.Log("Falling object caught in the safety net: " + other.name);
         }
     }
 
