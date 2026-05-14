@@ -7,7 +7,7 @@ public class PlayRandomHitSound : MonoBehaviour
     public AudioClip[] hitClips;
 
     private float lastPlayTime;
-    public float minInterval = 0.1f;
+    public float minInterval = 0.3f;
 
     private void Start()
     {
@@ -27,6 +27,13 @@ public class PlayRandomHitSound : MonoBehaviour
             audioSource.PlayOneShot(hitClips[index]);
         }
     }*/
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.relativeVelocity.magnitude < 1.5f)
+            return;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player") &&
