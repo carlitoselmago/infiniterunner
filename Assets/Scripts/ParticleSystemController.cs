@@ -24,7 +24,7 @@ public class ParticleSystemController : MonoBehaviour
 
         if (distance <= activationDistance && !isActivated)
         {
-            StartCoroutine(FadeInParticleSystem());
+            //StartCoroutine(FadeInParticleSystem());
             isActivated = true;
         }
     }
