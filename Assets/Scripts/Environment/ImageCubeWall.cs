@@ -16,18 +16,27 @@ public class ImageCubeWall : MonoBehaviour
     public float breakRadius = 2f;
     public float explosionForce = 5f;
     public float upwardModifier = 0.5f;
+    public AudioSource collisionAudio;
 
     private Rigidbody[] cubes;
     private Transform generatedRoot;
+    private bool wallGenerated = false;
 
+    private void Awake()
+    {
+        if (collisionAudio == null)
+            collisionAudio = GetComponent<AudioSource>();
+    }
     private void Start()
     {
-        GenerateWall();
+        if (!wallGenerated)
+            GenerateWall();
     }
 
     [ContextMenu("Generate Wall")]
     public void GenerateWall()
     {
+        if (wallGenerated) return;
         ClearWall();
 
         if (wallMaterial == null || wallMaterial.mainTexture == null)
@@ -113,7 +122,7 @@ public class ImageCubeWall : MonoBehaviour
                 cubes[y * columns + x] = rb;
             }
         }
-
+        wallGenerated = true;
         Debug.Log($"Generated {cubes.Length} image cubes.");
     }
 
@@ -286,32 +295,20 @@ public class ImageCubeWall : MonoBehaviour
                 );
             }
         }
+
+        if (collisionAudio != null && !collisionAudio.isPlaying)
+            collisionAudio.Play();
     }
 
     [ContextMenu("Clear Wall")]
     public void ClearWall()
     {
-        if (generatedRoot == null)
-            return;
-
-        for (int i = generatedRoot.childCount - 1; i >= 0; i--)
-        {
-            Transform child = generatedRoot.GetChild(i);
-
-            MeshFilter filter = child.GetComponent<MeshFilter>();
-
-            if (filter != null && filter.sharedMesh != null)
-            {
-                DestroyObject(filter.sharedMesh);
-            }
-
-            DestroyObject(child.gameObject);
-        }
-
-        DestroyObject(generatedRoot.gameObject);
+        if (generatedRoot != null)
+            DestroyObject(generatedRoot.gameObject);
 
         generatedRoot = null;
         cubes = null;
+        wallGenerated = false;
     }
 
     private void DestroyObject(Object obj)
